@@ -1,7 +1,7 @@
 package model;
 
 // Representation of a 8x8 chess board. A board is a two-dimensional 8x8 int array.
-// This first value refers to the row, the second one to the colum (starting from the black side).
+// This first value refers to the row, the second one to the colum.
 // Note: the pieces are represented as integers in the following fashion:
 // - 0 indicates an empty square (not a piece)
 // - Pawn: 1 / Knight: 2 / Bishop: 3 / Rook: 4 / Queen: 5 / King: 6
