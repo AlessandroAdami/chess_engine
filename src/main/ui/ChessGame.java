@@ -21,7 +21,7 @@ public class ChessGame {
     // EFFECTS: processes player's decisions
     private void runChessGame() {
         boolean keepGoing = true;
-        String command = null;
+        String command;
 
         setup();
 
@@ -45,14 +45,19 @@ public class ChessGame {
     // MODIFIES: this
     // EFFECTS: processes player's commands
     private void processCommand(String command) {
-        if (command.equals("play")) {
-            play();
-        } else if (command.equals("new game"))  {
-            createNewBoard();
-        } else if (command.equals("list")) {
-            manageBoards();
-        } else {
-            System.out.println("Please select valid command...");
+        switch (command) {
+            case "play":
+                play();
+                break;
+            case "new game":
+                createNewBoard();
+                break;
+            case "list":
+                manageBoards();
+                break;
+            default:
+                System.out.println("Please select valid command...");
+                break;
         }
     }
 
@@ -81,6 +86,8 @@ public class ChessGame {
     }
 
     private void manageBoards() {
+        String command;
+        command = input.next();
         System.out.println("\nChose from:");
         System.out.println("\tselect -> select a game to play");
         System.out.println("\tdelete -> delete one of the games");
@@ -88,9 +95,9 @@ public class ChessGame {
         for (int i = 0; i < boards.getBoards().size(); i++) {
             System.out.println(boards.getBoards().get(i).getName());
         }
-        if (input.equals("select")) {
+        if (command.equals("select")) {
             selectBoard();
-        } else if (input.equals("delete")) {
+        } else if (command.equals("delete")) {
             deleteBoard();
         }
     }
@@ -98,7 +105,7 @@ public class ChessGame {
     // MODIFIES: this
     // EFFECTS: lets player select a game in boards
     private void selectBoard() {
-        String command = null;
+        String command;
         command = input.next();
         System.out.println("Enter the name of a game: ");
         for (int i = 0; i <= boards.getBoards().size(); i++) {
@@ -112,7 +119,7 @@ public class ChessGame {
 
     //EFFECTS: deletes a board from boards
     private void deleteBoard() {
-        String command = null;
+        String command;
         boolean keepGoing = true;
 
         while (keepGoing) {

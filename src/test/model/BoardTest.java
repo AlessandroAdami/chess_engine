@@ -14,6 +14,17 @@ public class BoardTest {
     Board b4; //black knight on e4
     Board b5; //black bishop on e5
     Board b6; //black rook on e4
+    Board b7; // this board:
+    /*
+                {4, 0, 0, -6, 0, 0, 0, 0},
+                {0, -3, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, -3, 0, 0},
+                {0, 0, 0, 0, 0, -1, 0, 0},
+                {1, 0, 0, 0, 1, 0, 0, 0},
+                {0, 0, 0, 0, 0, 3, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0},
+                {4, 3, 0, 4, 0, 0, 0, 0},
+     */
 
     @BeforeEach
     public void setup() {
@@ -24,11 +35,23 @@ public class BoardTest {
         b4 = new Board(); b4.clearBoard();
         b5 = new Board(); b5.clearBoard();
         b6 = new Board(); b6.clearBoard();
+        b7 = new Board(); b7.clearBoard();
         b2.placePiece(4,3,6);
         b3.placePiece(4,3,5);
         b4.placePiece(4,3,-2);
         b5.placePiece(4,4,-3);
         b6.placePiece(4,3,-4);
+        b7.placePiece(4,3,1);
+        b7.placePiece(5,4,-1);
+        b7.placePiece(5,2,2);
+        b7.placePiece(5,5,-2);
+        b7.placePiece(3,7,-5);
+        b7.placePiece(3,0,4);
+        b7.placePiece(0,3,1);
+        b7.placePiece(0,0,4);
+        b7.placePiece(0,7,4);
+        b7.placePiece(1,0,3);
+        b7.placePiece(1,6,-3);
     }
 
     @Test
@@ -101,4 +124,37 @@ public class BoardTest {
         assertTrue(b3.isLegalMove(4,3,7,3));
         assertTrue(b3.isLegalMove(4,3,7,6));
     }
+    /*
+                {4, 0, 0, -5, 0, 0, 0, 0},
+                {0, -3, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, -3, 0, 0},
+                {0, 0, 0, 0, 0, -1, 0, 0},
+                {1, 0, 0, 0, 1, 0, 0, 0},
+                {0, 0, 0, 0, 0, 3, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0},
+                {4, 3, 0, 4, 0, 0, 0, 0},
+     */
+
+    @Test
+    public void testIsLegalMove() {
+        assertTrue(b7.isLegalMove(4,3,5,4));
+        assertTrue(b7.isLegalMove(5,4,4,3));
+        assertTrue(b7.isLegalMove(5,2,4,4));
+        assertTrue(b7.isLegalMove(5,5,4,3));
+        assertTrue(b7.isLegalMove(3,0,3,7));
+        assertTrue(b7.isLegalMove(3,7,3,0));
+        assertTrue(b7.isLegalMove(3,0,3,7));
+        assertTrue(b7.isLegalMove(1,0,3,2));
+        assertTrue(b7.isLegalMove(1,6,4,3));
+        assertTrue(b7.isLegalMove(0,7,3,7));
+        assertTrue(b7.isLegalMove(3,7,0,7));
+        assertTrue(b7.isLegalMove(3,7,0,3));
+        assertTrue(b7.isLegalMove(4,3,5,4));
+        assertFalse(b7.isLegalMove(0,0,0,5));
+        assertFalse(b7.isLegalMove(0,7,0,1));
+        assertFalse(b7.isLegalMove(1,0,7,6));
+        assertFalse(b7.isLegalMove(3,7,6,4));
+    }
+
+
 }
