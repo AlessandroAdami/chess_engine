@@ -35,8 +35,8 @@ public class BoardList {
         return boards.get(i);
     }
 
-    public void removeBoard(int i) {
-        boards.remove(i);
+    public Board removeBoard(int i) {
+        return boards.remove(i);
     }
 
     public ArrayList<Board> getBoards() {

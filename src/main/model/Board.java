@@ -99,14 +99,14 @@ public class Board {
         if (piece > 0) { //executes if the pawn is white
             oneStep = (fromRow == toRow - 1);
             twoStep = (fromRow == toRow - 2) && (fromRow == 1)
-                    && (this.position[toCol - 1][toRow - 1] == 0);
+                    && (this.position[toCol + 1][toRow + 1] == 0);
             captures = (fromRow == toRow - 1)
                     && (fromCol == toCol - 1 || fromCol == toCol + 1)
                     && this.position[toCol][toRow] < 0;
         } else { //executes if the pawn is black
             oneStep = (fromRow == toRow + 1);
             twoStep = (fromRow == toRow + 2) && (fromRow == 6)
-                    && (this.position[toCol + 1][toRow + 1] == 0);
+                    && (this.position[toCol - 1][toRow - 1] == 0);
             captures = oneStep
                     && (fromCol == toCol - 1 || fromCol == toCol + 1)
                     && this.position[toCol][toRow] < 0;
@@ -352,6 +352,8 @@ public class Board {
     private String pieceToChar(int piece) {
         String val = "";
         switch (piece) {
+            case 0: val = "0";
+            break;
             case -1: case 1: val = "P";
             break;
             case -2: case 2: val = "N";
@@ -379,6 +381,20 @@ public class Board {
                 this.position[i][j] = 0;
             }
         }
+    }
+
+    //EFFECTS: true if board is empty
+    public boolean isEmpty() {
+        boolean isEmpty = true;
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (position[i][j] != 0) {
+                    isEmpty = false;
+                    break;
+                }
+            }
+        }
+        return isEmpty;
     }
 
     // REQUIRES: piece, col and row are sensible to board

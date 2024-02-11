@@ -79,6 +79,9 @@ public class BoardTest {
         assertTrue(b0.isLegalMove(1,1,1,3));
         assertTrue(b0.isLegalMove(6,6,6,4));
         assertTrue(b0.isLegalMove(4,6,4,5));
+        assertTrue(b0.isLegalMove(0,1,0,3));
+        assertTrue(b0.isLegalMove(7,6,7,4));
+
     }
 
     @Test
