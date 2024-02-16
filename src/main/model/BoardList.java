@@ -1,11 +1,9 @@
 package model;
 
-/*
-Represents a list of boards. The list can be arbitrarily long.
+// Represents a list of boards. The list can be arbitrarily long.
 
- */
+
 //TODO: getters and removers should throw exceptions
-
 
 import java.util.ArrayList;
 
@@ -32,6 +30,7 @@ public class BoardList {
         }
     }
 
+    //REQUIRES: int is not out of index for boards
     //MODIFIES: this
     //EFFECTS: removes board at index i from list
     public Board removeBoard(int i) {
@@ -63,7 +62,6 @@ public class BoardList {
         return new Board();
     }
 
-    //EFFECTS: gets the board at index i
     public Board getBoard(int i) {
         return boards.get(i);
     }

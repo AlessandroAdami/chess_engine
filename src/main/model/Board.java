@@ -57,8 +57,8 @@ public class Board {
     // REQUIRES: fromCol,fromRow,toCol,toRow are in [0,7]
     //           i.e. they are valid squares of a board
     // MODIFIES: this
-    // EFFECTS: moves selected piece to square and captures any piece in
-    //          the to square
+    // EFFECTS: if move is legal, moves selected piece to square and captures any piece in
+    //          the to square. Otherwise, do nothing
     public void movePiece(int fromCol, int fromRow, int toCol, int toRow) {
         int piece = this.position[fromCol][fromRow];
         if (this.isLegalMove(fromCol,fromRow,toCol,toRow)) {
@@ -191,6 +191,7 @@ public class Board {
     }
 
 
+    //TODO: also probably simplifiable
     private boolean isLegalRookMove(int fromCol,int fromRow,int toCol,int toRow) {
         boolean goodRookMove = (fromCol == toCol || fromRow == toRow);
         boolean throughEmptySquares = isRookPathClear(fromCol,fromRow,toCol,toRow);
@@ -258,7 +259,6 @@ public class Board {
         return isLeftOrRight || isUpOrDown;
     }
 
-    // MODIFIES: this
     // EFFECTS: evaluates the current board position
     public int evaluatePos() {
         int eval = 0;
@@ -295,6 +295,7 @@ public class Board {
 
     // EFFECTS: sends each piece to a string for printing purposes.
     //          it also puts the board in the right position array-wise
+    //          notice the resulting board has black on top
     public String[][] boardToStringBoard() {
         String[][] stringBoard = new String[8][8];
         for (int i = 0; i < 8; i++) {
@@ -368,32 +369,39 @@ public class Board {
         return isEmpty;
     }
 
-    // REQUIRES: col,row are in [0,7]
-    //           i.e. they point to a valid square of the board of a board
-    //           piece is a valid piece
-    // MODIFIES: this
-    // EFFECTS: puts place on col,row of this board
-    public void placePiece(int col,int row, int piece) {
-        position[col][row] = piece;
-    }
-
     //EFFECTS: changes the turn (whose move it is)
     public void nextTurn() {
         this.isWhitesTurn = !isWhitesTurn;
     }
 
+    // REQUIRES: col,row are in [0,7]
+    //           i.e. they point to a valid square of the board of a board
+    //           piece is a valid piece
+    // MODIFIES: this
+    // EFFECTS: puts piece on col,row of this board
+    public void placePiece(int col,int row, int piece) {
+        position[col][row] = piece;
+    }
+
     // getters and setters
+
+    // REQUIRES: col,row are in [0,7]
+    //           i.e. they point to a valid square of the board of a board
+    public int getPiece(int col, int row) {
+        return position[col][row];
+    }
 
     public void setName(String name) {
         this.name = name;
     }
 
-    public int[][] getPosition() {
-        return this.position;
-    }
-
     public String getName() {
         return name;
+    }
+
+
+    public int[][] getPosition() {
+        return this.position;
     }
 
     public boolean getIsWhitesTurn() {

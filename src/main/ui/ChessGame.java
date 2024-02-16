@@ -7,7 +7,6 @@ import model.exceptions.MissingBoardException;
 import java.util.Scanner;
 
 // chess game application
-//TODO: add method to rename board
 
 public class ChessGame {
 

@@ -180,5 +180,42 @@ public class BoardTest {
         assertFalse(b7.isLegalMove(3,7,6,4));
     }
 
+    @Test
+    public void testMovePiece() {
+        assertTrue(b0.getIsWhitesTurn());
+        b0.movePiece(1,1,1,3);
+        assertEquals(0,b0.getPiece(1,1));
+        assertEquals(1,b0.getPiece(1,3));
+        assertFalse(b0.getIsWhitesTurn());
+        b0.movePiece(0,1,0,3);
+        assertEquals(1,b0.getPiece(0,1));
+        assertEquals(0,b0.getPiece(0,3));
+        assertFalse(b0.getIsWhitesTurn());
+        b0.movePiece(0,6,0,4);
+        assertEquals(0,b0.getPiece(0,6));
+        assertEquals(-1,b0.getPiece(0,4));
+        assertTrue(b0.getIsWhitesTurn());
+        b0.movePiece(1,3,0,4);
+        assertFalse(b0.getIsWhitesTurn());
+        assertEquals(0,b0.getPiece(1,3));
+        assertEquals(1,b0.getPiece(0,4));
+    }
+
+    @Test
+    public void testBoardToStringBoard() {
+        assertEquals("0",b1.boardToStringBoard()[0][0]);
+        assertEquals("0",b1.boardToStringBoard()[1][1]);
+        assertEquals("0",b1.boardToStringBoard()[2][5]);
+        assertEquals("0",b1.boardToStringBoard()[7][7]);
+        assertEquals("k",b0.boardToStringBoard()[0][4]);
+        assertEquals("q",b0.boardToStringBoard()[0][3]);
+        assertEquals("R",b0.boardToStringBoard()[7][7]);
+        assertEquals("P",b0.boardToStringBoard()[6][7]);
+        assertEquals("N",b0.boardToStringBoard()[7][1]);
+        assertEquals("b",b0.boardToStringBoard()[0][2]);
+    }
+
+
+
 
 }

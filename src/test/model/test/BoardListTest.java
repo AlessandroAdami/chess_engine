@@ -5,6 +5,8 @@ import model.BoardList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class BoardListTest {
@@ -58,7 +60,7 @@ public class BoardListTest {
     }
 
     @Test
-    public void testRemoveBoardStringName() {
+    public void testRemoveBoardString() {
         assertEquals(b0,boardList.removeBoard(b0));
         assertEquals(b1,boardList.removeBoard(b1));
         assertEquals(4,boardList.getBoards().size());
@@ -71,7 +73,67 @@ public class BoardListTest {
     }
 
     @Test
-    public void testGetBoard() {
+    public void testRemoveBoardInt() {
+        assertEquals(b0,boardList.removeBoard(0));
+        assertEquals(b1,boardList.removeBoard(0));
+        assertEquals(4,boardList.getBoards().size());
+        assertEquals(b5,boardList.removeBoard(3));
+        assertEquals(3,boardList.getBoards().size());
+        assertEquals(b2,boardList.removeBoard(0));
+        assertEquals(b3,boardList.removeBoard(0));
+        assertEquals(b4,boardList.removeBoard(0));
+        assertEquals(0,boardList.getBoards().size());
+    }
+
+    @Test
+    public void testGetBoardString() {
         assertEquals(b0,boardList.getBoard("starting"));
+        assertEquals(b1,boardList.getBoard("empty"));
+        assertEquals(6,boardList.getBoards().size());
+        assertEquals(b5,boardList.getBoard("Bishop"));
+        assertEquals(6,boardList.getBoards().size());
+        assertEquals(b2,boardList.getBoard("King"));
+        assertEquals(b3,boardList.getBoard("Queen"));
+        assertEquals(b4,boardList.getBoard("Knight"));
+        assertEquals(6,boardList.getBoards().size());
+    }
+
+    @Test
+    public void testGetBoardInt() {
+        assertEquals(b0,boardList.getBoard(0));
+        assertEquals(b1,boardList.getBoard(1));
+        assertEquals(6,boardList.getBoards().size());
+        assertEquals(b5,boardList.getBoard(5));
+        assertEquals(6,boardList.getBoards().size());
+        assertEquals(b2,boardList.getBoard(2));
+        assertEquals(b3,boardList.getBoard(3));
+        assertEquals(b4,boardList.getBoard(4));
+        assertEquals(6,boardList.getBoards().size());
+    }
+
+    @Test
+    public void testGetBoards() {
+        ArrayList<Board> boardArrayList = new ArrayList<Board>();
+        boardArrayList.add(b0);
+        boardArrayList.add(b1);
+        boardArrayList.add(b2);
+        boardArrayList.add(b3);
+        boardArrayList.add(b4);
+        boardArrayList.add(b5);
+        assertEquals(boardArrayList,boardList.getBoards());
+    }
+
+    @Test
+    public void testIsBoardListEmpty() {
+        assertFalse(boardList.isBoardListEmpty());
+        boardList.removeBoard(0);
+        assertFalse(boardList.isBoardListEmpty());
+        boardList.removeBoard(0);
+        boardList.removeBoard(0);
+        assertFalse(boardList.isBoardListEmpty());
+        boardList.removeBoard(0);
+        boardList.removeBoard(0);
+        boardList.removeBoard(0);
+        assertTrue(boardList.isBoardListEmpty());
     }
 }

@@ -18,6 +18,7 @@ Ultimately, the goal is to provide an interface that allows the player to unders
 their weaknesses and test their strengths, while also testing some new ideas.
 
 ## User Stories
+- As a user, I want to be able to create a new game and specify a name.
 - As a user, I want to be able to play and save multiple games.
-- I want to be able to access my games after I close and reopen the application.
-- As a user, I want to be able to look over my finished games and analyze them.
+- As a user, I want to be able to get an evaluation of the game I am playing.
+- As a user, I want to be able to rename or delete any of my games.
