@@ -5,15 +5,10 @@ package model;
 // Note: the pieces are represented as integers in the following fashion:
 // - 0 indicates an empty square (not a piece)
 // - Pawn: 1 / Knight: 2 / Bishop: 3 / Rook: 4 / Queen: 5 / King: 6
-// black pieces are negative, white pieces are positive
+// black pieces have negative values, white pieces have positive values
 // Moves are represented with the standard chess notation: a-h,1-8, N,B,R,K,Q
 // TODO: lookup enums and understand how they could simplify code
-// TODO: add boolean field that keeps track of whose move it is
 
-//QUESTIONS:
-//           where to put user stories? README
-//           how to have two constructors?
-//           testing printing methods? no but move to UI
 
 public class Board {
 
@@ -22,7 +17,8 @@ public class Board {
     private boolean isWhitesTurn;
 
 
-    // EFFECTS: constructs a new board with the pieces in their starting positions
+    // EFFECTS: constructs a new board
+    //          with the pieces in their starting positions
     //          and name "New Board"
     public Board() {
         position = new int[][]{
@@ -40,7 +36,8 @@ public class Board {
 
     }
 
-    // EFFECTS: constructs a new board with the pieces in their starting positions
+    // EFFECTS: constructs a new board
+    //          with the pieces in their starting positions
     //          and given name
     public Board(String name) {
         position = new int[][]{
@@ -57,6 +54,8 @@ public class Board {
         isWhitesTurn = true;
     }
 
+    // REQUIRES: fromCol,fromRow,toCol,toRow are in [0,7]
+    //           i.e. they are valid squares of a board
     // MODIFIES: this
     // EFFECTS: moves selected piece to square and captures any piece in
     //          the to square
@@ -259,8 +258,6 @@ public class Board {
         return isLeftOrRight || isUpOrDown;
     }
 
-
-
     // MODIFIES: this
     // EFFECTS: evaluates the current board position
     public int evaluatePos() {
@@ -276,53 +273,25 @@ public class Board {
     // REQUIRES: piece is a piece
     // EFFECTS: returns the value of the piece
     private int pieceToVal(int piece) {
+        int val;
+        switch (piece) {
+            case 1: case -1: val = 1;
+            break;
+            case 2: case -2: case 3: case -3: val = 3;
+            break;
+            case 4: case -4: val = 5;
+            break;
+            case 5: case -5: val = 9;
+            break;
+            case 6: case -6: val = 105;
+            break;
+            default: val = 0;
+        }
         if (piece < 0) {
-            return this.blackPieceToVal(piece);
-        } else {
-            return this.whitePieceToValue(piece);
-        }
-    }
-
-    // REQUIRES: piece is a piece
-    // EFFECTS: maps white piece to its evaluation
-    private int whitePieceToValue(int piece) {
-        int val;
-        switch (piece) {
-            case 1: val = 1;
-            break;
-            case 2: case 3: val = 3;
-            break;
-            case 4: val = 5;
-            break;
-            case 5: val = 9;
-            break;
-            case 6: val = 105;
-            break;
-            default: val = 0;
+            val = val * -1;
         }
         return val;
     }
-
-    // REQUIRES: piece is a piece
-    // EFFECTS: maps black piece to its evaluation
-    private int blackPieceToVal(int piece) {
-        int val;
-        switch (piece) {
-            case -1: val = -1;
-                break;
-            case -2: case -3: val = -3;
-                break;
-            case -4: val = -5;
-                break;
-            case -5: val = -9;
-                break;
-            case -6: val = -105;
-                break;
-            default: val = 0;
-        }
-        return val;
-    }
-
 
     // EFFECTS: sends each piece to a string for printing purposes.
     //          it also puts the board in the right position array-wise
@@ -349,6 +318,8 @@ public class Board {
         return straightStringBoard;
     }
 
+    //REQUIRES: piece is a valid piece
+    //EFFECTS: sends each int piece to the corresponding one-string
     private String pieceToChar(int piece) {
         String val = "";
         switch (piece) {
@@ -397,28 +368,24 @@ public class Board {
         return isEmpty;
     }
 
-    // REQUIRES: piece, col and row are sensible to board
+    // REQUIRES: col,row are in [0,7]
+    //           i.e. they point to a valid square of the board of a board
+    //           piece is a valid piece
     // MODIFIES: this
     // EFFECTS: puts place on col,row of this board
     public void placePiece(int col,int row, int piece) {
         position[col][row] = piece;
     }
 
-    // REQUIRES: col and row are sensible to board
-    // MODIFIES: this
-    // EFFECTS: removes any piece from a square
-    public void removePiece(int col,int row) {
-        position[col][row] = 0;
-    }
-
-    //EFFECTS: sets the name of the board to name
-    public void setName(String name) {
-        this.name = name;
-    }
-
     //EFFECTS: changes the turn (whose move it is)
     public void nextTurn() {
         this.isWhitesTurn = !isWhitesTurn;
+    }
+
+    // getters and setters
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public int[][] getPosition() {

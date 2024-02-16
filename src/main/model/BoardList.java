@@ -1,12 +1,11 @@
 package model;
 
 /*
-Represents a list of boards, which is what will allow to user to play multiple games simultaneously.
+Represents a list of boards. The list can be arbitrarily long.
 
  */
 //TODO: getters and removers should throw exceptions
 
-import model.exceptions.MissingBoardException;
 
 import java.util.ArrayList;
 
@@ -73,4 +72,7 @@ public class BoardList {
         return boards;
     }
 
+    public boolean isBoardListEmpty() {
+        return boards.isEmpty();
+    }
 }
