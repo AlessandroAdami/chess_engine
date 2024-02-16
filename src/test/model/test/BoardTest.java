@@ -1,5 +1,6 @@
-package model;
+package model.test;
 
+import model.Board;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -39,8 +40,11 @@ public class BoardTest {
         b2.placePiece(4,3,6);
         b3.placePiece(4,3,5);
         b4.placePiece(4,3,-2);
+        b4.nextTurn();
         b5.placePiece(4,4,-3);
+        b5.nextTurn();
         b6.placePiece(4,3,-4);
+        b6.nextTurn();
         b7.placePiece(4,3,1);
         b7.placePiece(5,4,-1);
         b7.placePiece(5,2,2);
@@ -77,11 +81,16 @@ public class BoardTest {
     public void testIsLegalPawnMove() {
         assertTrue(b0.isLegalMove(1,1,1,2));
         assertTrue(b0.isLegalMove(1,1,1,3));
+        b0.nextTurn();
         assertTrue(b0.isLegalMove(6,6,6,4));
         assertTrue(b0.isLegalMove(4,6,4,5));
+        b0.nextTurn();
         assertTrue(b0.isLegalMove(0,1,0,3));
+        b0.nextTurn();
         assertTrue(b0.isLegalMove(7,6,7,4));
-
+        assertFalse(b0.isLegalMove(1,1,3,3));
+        assertFalse(b0.isLegalMove(0,1,2,3));
+        assertFalse(b0.isLegalMove(7,1,5,2));
     }
 
     @Test
@@ -93,6 +102,7 @@ public class BoardTest {
 
     @Test
     public void testIsLegalKnightMove() {
+        b0.nextTurn();
         assertTrue(b0.isLegalMove(6,7,5,5));
         assertTrue(b4.isLegalMove(4,3,5,5));
         assertTrue(b4.isLegalMove(4,3,2,2));
@@ -141,19 +151,30 @@ public class BoardTest {
     @Test
     public void testIsLegalMove() {
         assertTrue(b7.isLegalMove(4,3,5,4));
+        b7.nextTurn();
         assertTrue(b7.isLegalMove(5,4,4,3));
+        b7.nextTurn();
         assertTrue(b7.isLegalMove(5,2,4,4));
+        b7.nextTurn();
         assertTrue(b7.isLegalMove(5,5,4,3));
+        b7.nextTurn();
         assertTrue(b7.isLegalMove(3,0,3,7));
+        b7.nextTurn();
         assertTrue(b7.isLegalMove(3,7,3,0));
+        b7.nextTurn();
         assertTrue(b7.isLegalMove(3,0,3,7));
         assertTrue(b7.isLegalMove(1,0,3,2));
+        b7.nextTurn();
         assertTrue(b7.isLegalMove(1,6,4,3));
+        b7.nextTurn();
         assertTrue(b7.isLegalMove(0,7,3,7));
+        b7.nextTurn();
         assertTrue(b7.isLegalMove(3,7,0,7));
         assertTrue(b7.isLegalMove(3,7,0,3));
+        b7.nextTurn();
         assertTrue(b7.isLegalMove(4,3,5,4));
         assertFalse(b7.isLegalMove(0,0,0,5));
+        b7.nextTurn();
         assertFalse(b7.isLegalMove(0,7,0,1));
         assertFalse(b7.isLegalMove(1,0,7,6));
         assertFalse(b7.isLegalMove(3,7,6,4));

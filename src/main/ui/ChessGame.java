@@ -2,10 +2,12 @@ package ui;
 
 import model.Board;
 import model.BoardList;
+import model.exceptions.MissingBoardException;
 
 import java.util.Scanner;
 
 // chess game application
+//TODO: add method to rename board
 
 public class ChessGame {
 
@@ -70,6 +72,7 @@ public class ChessGame {
         input.useDelimiter("\n");
     }
 
+    //EFFECTS: displays option to user
     private void showOptions() {
         System.out.println("\nChose from:");
         System.out.println("\tplay -> play current game");
@@ -82,28 +85,38 @@ public class ChessGame {
         boolean isCurrentBoardEmpty = currentBoard.isEmpty();
         if (!isCurrentBoardEmpty) {
             System.out.println(currentBoard.getName() + ":");
-            currentBoard.displayBoard();
+            displayCurrentBoard();
         }
     }
 
+    //TODO: fix this (doesn't really work) & alternate white and black move
     //MODIFIES: this
     //EFFECTS: lets player make moves in current board
     public void play() {
-        String command = "";
-        while (command.equals("")) {
-            System.out.println("\nMake a move:");
-            System.out.println("\nEnter: 'fromCol,fromRow,toCol,toRow");
+        String command;
+        while (true) {
+            System.out.println("\nSelect:");
+            System.out.println("\tMake a move: enter 'fromCol,fromRow,toCol,toRow'");
+            System.out.println("\tback -> go back to menu.");
 
             command = input.next();
 
+            if (command.equals("back")) {
+                break;
+            }
             if (isValidMove(command)) {
                 makeMove(command);
             } else {
                 System.out.println("Not a valid move.");
             }
+            showCurrentBoard();
+
         }
     }
 
+    //REQUIRES: move is in right string format
+    //          i.e. "fromCol,fromRow,toCol,toRow"
+    //          with values in [0,7]
     //EFFECTS: true if move is valid in current Board
     private boolean isValidMove(String move) {
         int fromCol = Integer.parseInt(move.substring(0,1));
@@ -128,6 +141,7 @@ public class ChessGame {
         currentBoard.movePiece(fromCol,fromRow,toCol,toRow);
     }
 
+    //EFFECTS: allows user to play or delete a game in the list
     private void manageBoards() {
         String command = "";
         while (command.equals("")) {
@@ -144,24 +158,30 @@ public class ChessGame {
         }
     }
 
+
+    // TODO: refactor with getBoard
     // MODIFIES: this
     // EFFECTS: lets player select the current game from the list of games
     private void selectBoard() {
-        String boardName = "";
-        while (boardName.equals("")) {
+        String command;
+        boolean keepGoing = true;
+        while (keepGoing) {
             System.out.println("Enter the name of a game: ");
-            for (int i = 0; i < boards.getBoards().size(); i++) {
-                System.out.println("- " + boards.getBoards().get(i).getName());
-            }
+            printBoards();
+            System.out.println("back -> go back");
 
-            boardName = input.next();
-            for (int i = 0; i < boards.getBoards().size(); i++) {
-                if (boardName.equals(boards.getBoards().get(i).getName())) {
-                    currentBoard = boards.getBoards().get(i);
+            command = input.next();
+            for (Board b : boards.getBoards()) {
+                if (command.equals(b.getName())) {
+                    currentBoard = b;
+                    keepGoing = false;
                     break;
-                } else {
-                    System.out.println("Enter a valid board.");
                 }
+            }
+            if (command.equals("back")) {
+                break;
+            } else if (keepGoing) {
+                System.out.println("Enter a valid command.");
             }
         }
     }
@@ -169,27 +189,48 @@ public class ChessGame {
     //MODIFIES: this
     //EFFECTS: deletes a board from boards
     private void deleteBoard() {
-        String boardName = "";
-
-        while (boardName.equals("")) {
+        String command;
+        while (true) {
             System.out.println("Enter the name of a game:");
-            for (int i = 0; i < boards.getBoards().size(); i++) {
-                System.out.println("- " + boards.getBoards().get(i).getName());
-            }
+            printBoards();
+            System.out.println("back -> go back");
 
-            boardName = input.next();
-            for (int i = 0; i < boards.getBoards().size(); i++) {
-                if (boardName.equals(boards.getBoards().get(i).getName())) {
-                    Board removedBoard = new Board();
-                    removedBoard = boards.removeBoard(i);
-                    if (currentBoard.equals(removedBoard)) {
-                        currentBoard.clearBoard();
-                        break;
-                    }
-                } else {
-                    System.out.println("Enter a valid board.");
+            command = input.next();
+
+            Board removedBoard = boards.removeBoard(command);
+            if (removedBoard != null) {
+                if (currentBoard.equals(removedBoard)) {
+                    currentBoard.clearBoard();
                 }
+                System.out.println(currentBoard.getName() + " was deleted.");
+                break;
+            } else if (command.equals("back")) {
+                break;
+            } else {
+                System.out.println("Please enter a valid command");
             }
+        }
+    }
+
+    //EFFECTS: prints out all the names of the boards in order
+    public void printBoards() {
+        for (Board board : boards.getBoards()) {
+            System.out.println("- " + board.getName());
+        }
+    }
+
+    // EFFECTS: displays a board with number strings as established above
+    public void displayCurrentBoard() {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                System.out.print(currentBoard.boardToStringBoard()[i][j] + " ");
+            }
+            System.out.println();
+        }
+        if (currentBoard.getIsWhitesTurn()) {
+            System.out.println("White to move.");
+        } else {
+            System.out.println("Black to move.");
         }
     }
 

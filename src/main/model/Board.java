@@ -7,13 +7,19 @@ package model;
 // - Pawn: 1 / Knight: 2 / Bishop: 3 / Rook: 4 / Queen: 5 / King: 6
 // black pieces are negative, white pieces are positive
 // Moves are represented with the standard chess notation: a-h,1-8, N,B,R,K,Q
+// TODO: lookup enums and understand how they could simplify code
+// TODO: add boolean field that keeps track of whose move it is
 
-import java.util.ArrayList;
+//QUESTIONS:
+//           where to put user stories? README
+//           how to have two constructors?
+//           testing printing methods? no but move to UI
 
 public class Board {
 
-    protected int[][] position; // the board with pieces
-    private final String name; // name of the board
+    private int[][] position; // the board with pieces
+    private String name; // name of the board
+    private boolean isWhitesTurn;
 
 
     // EFFECTS: constructs a new board with the pieces in their starting positions
@@ -30,6 +36,7 @@ public class Board {
                 {4, 1, 0, 0, 0, 0, -1, -4},
         };
         name = "New Board";
+        isWhitesTurn = true;
 
     }
 
@@ -47,7 +54,7 @@ public class Board {
                 {4, 1, 0, 0, 0, 0, -1, -4},
         };
         this.name = name;
-
+        isWhitesTurn = true;
     }
 
     // MODIFIES: this
@@ -58,6 +65,7 @@ public class Board {
         if (this.isLegalMove(fromCol,fromRow,toCol,toRow)) {
             this.position[fromCol][fromRow] = 0;
             this.position[toCol][toRow] = piece;
+            nextTurn();
         }
     }
 
@@ -65,11 +73,13 @@ public class Board {
     // REQUIRES: fromCol,fromRow,toCol,toRow are in [0,7]
     //           i.e. they are valid squares of a board
     // EFFECTS: true if the move is legal on current the board
-    //          moves is defined by the piece, the square the piece is on
+    //          moves is defined by the square the piece is on
     //          and the square the piece wants to go to.
     public boolean isLegalMove(int fromCol, int fromRow, int toCol, int toRow) {
         int piece = this.position[fromCol][fromRow];
-        boolean pieceOnStartingSquare = piece != 0;
+        boolean whiteTurnToMove = (((piece > 0) && isWhitesTurn)
+                || (piece < 0) && (!isWhitesTurn));
+        boolean pieceOnStartingSquare = (piece != 0);
         boolean hasPieceMoved = (fromCol != toCol || fromRow != toRow);
         boolean toEnemyOrEmptySquare = (piece * this.position[toCol][toRow] <= 0);
         boolean isValidMoveForPiece;
@@ -88,28 +98,28 @@ public class Board {
                 break;
             default: isValidMoveForPiece = false;
         }
-        return pieceOnStartingSquare && hasPieceMoved && toEnemyOrEmptySquare && isValidMoveForPiece;
+        return whiteTurnToMove && pieceOnStartingSquare && hasPieceMoved && toEnemyOrEmptySquare && isValidMoveForPiece;
     }
 
     private boolean isLegalPawnMove(int fromCol,int fromRow,int toCol,int toRow) {
         int piece = this.position[fromCol][fromRow];
-        boolean oneStep; //pawn moves foreword onw
+        boolean oneStep; //pawn moves foreword one
         boolean twoStep; //pawn moves foreword two
         boolean captures;//pawn takes a piece
         if (piece > 0) { //executes if the pawn is white
-            oneStep = (fromRow == toRow - 1);
-            twoStep = (fromRow == toRow - 2) && (fromRow == 1)
-                    && (this.position[toCol + 1][toRow + 1] == 0);
-            captures = (fromRow == toRow - 1)
+            oneStep = (fromCol == toCol) && (fromRow + 1 == toRow);
+            twoStep = (fromCol == toCol) && (fromRow + 2 == toRow) && (fromRow == 1)
+                    && (this.position[fromCol][fromRow + 1] == 0);
+            captures = (fromRow + 1 == toRow)
                     && (fromCol == toCol - 1 || fromCol == toCol + 1)
                     && this.position[toCol][toRow] < 0;
         } else { //executes if the pawn is black
-            oneStep = (fromRow == toRow + 1);
-            twoStep = (fromRow == toRow + 2) && (fromRow == 6)
-                    && (this.position[toCol - 1][toRow - 1] == 0);
-            captures = oneStep
+            oneStep = (fromCol == toCol) && (fromRow == toRow + 1);
+            twoStep = (fromCol == toCol) && (fromRow - 2 == toRow) && (fromRow == 6)
+                    && (this.position[fromCol][fromRow - 1] == 0);
+            captures = (fromRow == toRow + 1)
                     && (fromCol == toCol - 1 || fromCol == toCol + 1)
-                    && this.position[toCol][toRow] < 0;
+                    && this.position[toCol][toRow] > 0;
         }
         return oneStep || twoStep || captures;
     }
@@ -120,7 +130,7 @@ public class Board {
         return (rowDelta == 2 && colDelta == 1) || (rowDelta == 1 && colDelta == 2);
     }
 
-    // !!! most definitely simplifiable.
+    // TODO: most definitely simplifiable.
     private boolean isLegalBishopMove(int fromCol,int fromRow,int toCol,int toRow) {
         boolean throughEmptySquares;
         if (fromCol < toCol) {
@@ -314,19 +324,9 @@ public class Board {
     }
 
 
-    // EFFECTS: displays a board with number strings as established above
-    public void displayBoard() {
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                System.out.print(this.boardToStringBoard()[i][j] + " ");
-            }
-            System.out.println();
-        }
-    }
-
     // EFFECTS: sends each piece to a string for printing purposes.
     //          it also puts the board in the right position array-wise
-    private String[][] boardToStringBoard() {
+    public String[][] boardToStringBoard() {
         String[][] stringBoard = new String[8][8];
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
@@ -411,11 +411,25 @@ public class Board {
         position[col][row] = 0;
     }
 
+    //EFFECTS: sets the name of the board to name
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    //EFFECTS: changes the turn (whose move it is)
+    public void nextTurn() {
+        this.isWhitesTurn = !isWhitesTurn;
+    }
+
     public int[][] getPosition() {
         return this.position;
     }
 
     public String getName() {
         return name;
+    }
+
+    public boolean getIsWhitesTurn() {
+        return isWhitesTurn;
     }
 }
