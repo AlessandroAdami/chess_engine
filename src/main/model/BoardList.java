@@ -59,7 +59,7 @@ public class BoardList {
                 return b;
             }
         }
-        return new Board();
+        return null;
     }
 
     public Board getBoard(int i) {

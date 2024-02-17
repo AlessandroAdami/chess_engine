@@ -2,7 +2,6 @@ package ui;
 
 import model.Board;
 import model.BoardList;
-import model.exceptions.MissingBoardException;
 
 import java.util.Scanner;
 
@@ -146,8 +145,9 @@ public class ChessGame {
 
     //EFFECTS: allows user to play or delete a game in the list
     private void manageBoards() {
-        String command = "";
-        while (command.equals("")) {
+        String command;
+        boolean keepGoing = true;
+        while (keepGoing) {
             System.out.println("\nChose from:");
             System.out.println("\tselect -> select a game to play");
             System.out.println("\trename -> rename one of the games");
@@ -156,12 +156,18 @@ public class ChessGame {
 
             command = input.next();
 
-            if (command.equals("select")) {
-                selectBoard();
-            } else if (command.equals("rename")) {
-                renameBoard();
-            } else if (command.equals("delete")) {
-                deleteBoard();
+            switch (command) {
+                case "select": selectBoard();
+                    keepGoing = false;
+                    break;
+                case "rename": renameBoard();
+                    keepGoing = false;
+                    break;
+                case "delete": deleteBoard();
+                    keepGoing = false;
+                    break;
+                default:
+                    System.out.println("Enter a valid command");
             }
         }
     }

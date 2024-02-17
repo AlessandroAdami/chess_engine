@@ -47,9 +47,10 @@ public class BoardListTest {
     }
 
     @Test
-    public void testRemoveBoardBoard() {
+    public void testRemoveBoardString() {
         assertEquals(b0,boardList.removeBoard("starting"));
         assertEquals(b1,boardList.removeBoard("empty"));
+        assertNull(boardList.removeBoard("NoBoard"));
         assertEquals(4,boardList.getBoards().size());
         assertEquals(b5,boardList.removeBoard("Bishop"));
         assertEquals(3,boardList.getBoards().size());
@@ -60,9 +61,11 @@ public class BoardListTest {
     }
 
     @Test
-    public void testRemoveBoardString() {
+    public void testRemoveBoardBoard() {
         assertEquals(b0,boardList.removeBoard(b0));
         assertEquals(b1,boardList.removeBoard(b1));
+        Board boardNotListed = new Board();
+        assertNull(boardList.removeBoard(boardNotListed));
         assertEquals(4,boardList.getBoards().size());
         assertEquals(b5,boardList.removeBoard(b5));
         assertEquals(3,boardList.getBoards().size());
@@ -91,6 +94,7 @@ public class BoardListTest {
         assertEquals(b1,boardList.getBoard("empty"));
         assertEquals(6,boardList.getBoards().size());
         assertEquals(b5,boardList.getBoard("Bishop"));
+        assertNull(boardList.getBoard("NoBoard"));
         assertEquals(6,boardList.getBoards().size());
         assertEquals(b2,boardList.getBoard("King"));
         assertEquals(b3,boardList.getBoard("Queen"));

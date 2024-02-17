@@ -106,16 +106,16 @@ public class Board {
         boolean twoStep; //pawn moves foreword two
         boolean captures;//pawn takes a piece
         if (piece > 0) { //executes if the pawn is white
-            oneStep = (fromCol == toCol) && (fromRow + 1 == toRow);
+            oneStep = (fromCol == toCol) && (fromRow + 1 == toRow) && position[toCol][toRow] == 0;
             twoStep = (fromCol == toCol) && (fromRow + 2 == toRow) && (fromRow == 1)
-                    && (this.position[fromCol][fromRow + 1] == 0);
+                    && (this.position[fromCol][fromRow + 1] == 0)  && position[toCol][toRow] == 0;
             captures = (fromRow + 1 == toRow)
                     && (fromCol == toCol - 1 || fromCol == toCol + 1)
                     && this.position[toCol][toRow] < 0;
         } else { //executes if the pawn is black
-            oneStep = (fromCol == toCol) && (fromRow == toRow + 1);
+            oneStep = (fromCol == toCol) && (fromRow == toRow + 1) && position[toCol][toRow] == 0;
             twoStep = (fromCol == toCol) && (fromRow - 2 == toRow) && (fromRow == 6)
-                    && (this.position[fromCol][fromRow - 1] == 0);
+                    && (this.position[fromCol][fromRow - 1] == 0)  && position[toCol][toRow] == 0;
             captures = (fromRow == toRow + 1)
                     && (fromCol == toCol - 1 || fromCol == toCol + 1)
                     && this.position[toCol][toRow] > 0;
@@ -131,6 +131,7 @@ public class Board {
 
     // TODO: most definitely simplifiable.
     private boolean isLegalBishopMove(int fromCol,int fromRow,int toCol,int toRow) {
+        boolean goodBishopMove = Math.abs(fromCol - toCol) == Math.abs(fromRow - toRow);
         boolean throughEmptySquares;
         if (fromCol < toCol) {
             if (fromRow < toRow) {
@@ -143,7 +144,7 @@ public class Board {
         } else {
             throughEmptySquares = isLegalDownLeftBishopPath(fromCol, fromRow, toCol);
         }
-        return throughEmptySquares;
+        return goodBishopMove && throughEmptySquares;
     }
 
     private boolean isLegalUpRightBishopPath(int fromCol,int fromRow,int toCol) {
@@ -249,14 +250,15 @@ public class Board {
     }
 
     private boolean isLegalQueenMove(int fromCol, int fromRow,int toCol,int toRow) {
-        return (this.isLegalBishopMove(fromCol, fromRow, toCol, toRow)
-                || this.isLegalRookMove(fromCol,fromRow,toCol,toRow));
+        return isLegalBishopMove(fromCol, fromRow, toCol, toRow)
+                || isLegalRookMove(fromCol,fromRow,toCol,toRow);
     }
 
     private boolean isLegalKingMove(int fromCol,int fromRow,int toCol,int toRow) {
-        boolean isLeftOrRight = (fromCol == toCol + 1 || fromCol == toCol - 1);
-        boolean isUpOrDown = (fromRow == toRow + 1 || fromRow == toRow - 1);
-        return isLeftOrRight || isUpOrDown;
+        boolean isLeftOrRight = (Math.abs(toCol - fromCol) == 1) && fromRow == toRow;
+        boolean isUpOrDown = (Math.abs(toRow - fromRow) == 1) && fromCol == toCol;
+        boolean isDiagonal = (Math.abs(toCol - fromCol) == 1) && (Math.abs(toRow - fromRow) == 1);
+        return isLeftOrRight || isUpOrDown || isDiagonal;
     }
 
     // EFFECTS: evaluates the current board position
@@ -300,7 +302,7 @@ public class Board {
         String[][] stringBoard = new String[8][8];
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                stringBoard[i][j] = pieceToChar(position[i][j]);
+                stringBoard[i][j] = pieceToString(position[i][j]);
             }
         }
         String[][] straightStringBoard = new String[8][8];
@@ -321,8 +323,8 @@ public class Board {
 
     //REQUIRES: piece is a valid piece
     //EFFECTS: sends each int piece to the corresponding one-string
-    private String pieceToChar(int piece) {
-        String val = "";
+    private String pieceToString(int piece) {
+        String val;
         switch (piece) {
             case 0: val = "0";
             break;
@@ -336,7 +338,7 @@ public class Board {
             break;
             case -5: case 5: val = "Q";
             break;
-            case -6: case 6: val = "k";
+            default: val = "K";
             break;
         }
         if (piece < 0) {
