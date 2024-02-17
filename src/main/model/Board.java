@@ -6,14 +6,13 @@ package model;
 // - 0 indicates an empty square (not a piece)
 // - Pawn: 1 / Knight: 2 / Bishop: 3 / Rook: 4 / Queen: 5 / King: 6
 // black pieces have negative values, white pieces have positive values
-// Moves are represented with the standard chess notation: a-h,1-8, N,B,R,K,Q
-// TODO: lookup enums and understand how they could simplify code
+// Moves are represented with the standard chess notation: a-h,1-8, N,B,R,K,Q (n,b,r,k,q)
 
 
 public class Board {
 
     private int[][] position; // the board with pieces
-    private String name; // name of the board
+    private String name;
     private boolean isWhitesTurn;
 
 
@@ -100,6 +99,7 @@ public class Board {
         return whiteTurnToMove && pieceOnStartingSquare && hasPieceMoved && toEnemyOrEmptySquare && isValidMoveForPiece;
     }
 
+    //EFFECTS: true if pawn move is legal
     private boolean isLegalPawnMove(int fromCol,int fromRow,int toCol,int toRow) {
         int piece = this.position[fromCol][fromRow];
         boolean oneStep; //pawn moves foreword one
@@ -123,33 +123,25 @@ public class Board {
         return oneStep || twoStep || captures;
     }
 
+    //EFFECTS: true if knight move is legal
     private boolean isLegalKnightMove(int fromCol,int fromRow,int toCol,int toRow) {
         int rowDelta = Math.abs(toRow - fromRow);
         int colDelta = Math.abs(toCol - fromCol);
         return (rowDelta == 2 && colDelta == 1) || (rowDelta == 1 && colDelta == 2);
     }
 
-    // TODO: most definitely simplifiable.
+    //EFFECTS: true if bishop move is legal
     private boolean isLegalBishopMove(int fromCol,int fromRow,int toCol,int toRow) {
         boolean goodBishopMove = Math.abs(fromCol - toCol) == Math.abs(fromRow - toRow);
-        boolean throughEmptySquares;
-        if (fromCol < toCol) {
-            if (fromRow < toRow) {
-                throughEmptySquares = isLegalUpRightBishopPath(fromCol,fromRow,toCol);
-            } else {
-                throughEmptySquares = isLegalDownRightBishopPath(fromCol,fromRow,toCol);
-            }
-        } else if (fromRow < toRow) {
-            throughEmptySquares = isLegalUpLeftBishopPath(fromCol,fromRow,toCol);
-        } else {
-            throughEmptySquares = isLegalDownLeftBishopPath(fromCol, fromRow, toCol);
-        }
+        int colDir = (int) Math.signum(toCol - fromCol);
+        int rowDir = (int) Math.signum(toRow - fromRow);
+        boolean throughEmptySquares = isBishopPathEmpty(fromCol,fromRow,toCol,colDir,rowDir);
         return goodBishopMove && throughEmptySquares;
     }
 
-    private boolean isLegalUpRightBishopPath(int fromCol,int fromRow,int toCol) {
+    private boolean isBishopPathEmpty(int fromCol, int fromRow, int toCol, int colDir, int rowDir) {
         boolean throughEmptySquares = true;
-        for (int col = fromCol + 1, row = fromRow + 1; col < toCol; col++, row++) {
+        for (int col = fromCol + colDir, row = fromRow + rowDir; col != toCol; col = col + colDir, row = row + rowDir) {
             if (this.position[col][row] != 0) {
                 throughEmptySquares = false;
                 break;
@@ -158,102 +150,42 @@ public class Board {
         return throughEmptySquares;
     }
 
-    private boolean isLegalUpLeftBishopPath(int fromCol,int fromRow,int toCol) {
-        boolean throughEmptySquares = true;
-        for (int col = fromCol - 1, row = fromRow + 1; col > toCol; col--, row++) {
-            if (this.position[col][row] != 0) {
-                throughEmptySquares = false;
-                break;
-            }
-        }
-        return throughEmptySquares;
-    }
-
-    private boolean isLegalDownRightBishopPath(int fromCol,int fromRow,int toCol) {
-        boolean throughEmptySquares = true;
-        for (int col = fromCol + 1, row = fromRow - 1; col < toCol; col++, row--) {
-            if (this.position[col][row] != 0) {
-                throughEmptySquares = false;
-                break;
-            }
-        }
-        return throughEmptySquares;
-    }
-
-    private boolean isLegalDownLeftBishopPath(int fromCol,int fromRow,int toCol) {
-        boolean throughEmptySquares = true;
-        for (int col = fromCol - 1, row = fromRow - 1; col > toCol; col--, row--) {
-            if (this.position[col][row] != 0) {
-                throughEmptySquares = false;
-                break;
-            }
-        }
-        return throughEmptySquares;
-    }
-
-
-    //TODO: also probably simplifiable
+    //EFFECTS: true if rook move is legal
     private boolean isLegalRookMove(int fromCol,int fromRow,int toCol,int toRow) {
         boolean goodRookMove = (fromCol == toCol || fromRow == toRow);
-        boolean throughEmptySquares = isRookPathClear(fromCol,fromRow,toCol,toRow);
+        int colDir = (int) Math.signum(toCol - fromCol);
+        int rowDir = (int) Math.signum(toRow - fromRow);
+        boolean throughEmptySquares = isRookPathEmpty(fromCol,fromRow,toCol,toRow, colDir, rowDir);
         return goodRookMove && throughEmptySquares;
     }
 
-    private boolean isRookPathClear(int fromCol,int fromRow,int toCol,int toRow) {
-        boolean isRookPathClear;
-        if (fromCol != toCol) {
-            isRookPathClear = isLegalColMoveRookPath(fromCol,fromRow,toCol);
-        } else {
-            isRookPathClear = isLegalRowMoveRookPath(fromCol,fromRow,toRow);
-        }
-        return isRookPathClear;
-    }
-
-    private boolean isLegalColMoveRookPath(int fromCol,int fromRow,int toCol) {
-        boolean isRookPathClear = true;
-        if (fromCol > toCol) {
-            for (int c = fromCol - 1; c > toCol; c--) {
-                if (this.position[c][fromRow] != 0) {
-                    isRookPathClear = false;
+    private boolean isRookPathEmpty(int fromCol, int fromRow, int toCol, int toRow, int colDir, int rowDir) {
+        boolean throughEmptySquares = true;
+        if (rowDir == 0) {
+            for (int col = fromCol + colDir; col != toCol; col = col + colDir) {
+                if (this.position[col][fromRow] != 0) {
+                    throughEmptySquares = false;
                     break;
                 }
             }
         } else {
-            for (int c = fromCol + 1; c < toCol; c++) {
-                if (this.position[c][fromRow] != 0) {
-                    isRookPathClear = false;
+            for (int row = fromRow + rowDir; row != toRow; row = row + rowDir) {
+                if (this.position[fromCol][row] != 0) {
+                    throughEmptySquares = false;
                     break;
                 }
             }
         }
-        return isRookPathClear;
+        return throughEmptySquares;
     }
 
-    private boolean isLegalRowMoveRookPath(int fromCol,int fromRow,int toRow) {
-        boolean isRookPathClear = true;
-        if (fromRow > toRow) {
-            for (int r = fromRow - 1; r > toRow; r--) {
-                if (this.position[fromCol][r] != 0) {
-                    isRookPathClear = false;
-                    break;
-                }
-            }
-        } else {
-            for (int r = fromRow + 1; r < toRow; r++) {
-                if (this.position[fromCol][r] != 0) {
-                    isRookPathClear = false;
-                    break;
-                }
-            }
-        }
-        return isRookPathClear;
-    }
-
+    //EFFECTS: true if queen move is legal
     private boolean isLegalQueenMove(int fromCol, int fromRow,int toCol,int toRow) {
         return isLegalBishopMove(fromCol, fromRow, toCol, toRow)
                 || isLegalRookMove(fromCol,fromRow,toCol,toRow);
     }
 
+    //EFFECTS: true if king move is legal
     private boolean isLegalKingMove(int fromCol,int fromRow,int toCol,int toRow) {
         boolean isLeftOrRight = (Math.abs(toCol - fromCol) == 1) && fromRow == toRow;
         boolean isUpOrDown = (Math.abs(toRow - fromRow) == 1) && fromCol == toCol;

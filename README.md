@@ -4,7 +4,7 @@
 
 My goal with this application is to let users test their 
 skills in different opening or chosen settings.
-Some key parts of ChessBud will be:
+Some key parts of RookieRook will be:
 
 - A chess interface 
 - A chess bot (possibly with different difficulties settings)

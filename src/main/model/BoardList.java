@@ -1,6 +1,7 @@
 package model;
 
-// Represents a list of boards. The list can be arbitrarily long.
+// Represents a list of boards manager. The list can be arbitrarily long.
+// Boards are listed in the order they are added to the list.
 
 
 //TODO: getters and removers should throw exceptions
@@ -50,9 +51,7 @@ public class BoardList {
         return removedBoard;
     }
 
-    // getters
-
-    // EFFECTS: returns board with name
+    // EFFECTS: returns board with name, if none are found return null.
     public Board getBoard(String name) {
         for (Board b : boards) {
             if (name.equals(b.getName())) {
@@ -66,11 +65,12 @@ public class BoardList {
         return boards.get(i);
     }
 
+    public boolean isBoardListEmpty() {
+        return boards.isEmpty();
+    }
+
     public ArrayList<Board> getBoards() {
         return boards;
     }
 
-    public boolean isBoardListEmpty() {
-        return boards.isEmpty();
-    }
 }

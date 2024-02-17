@@ -5,7 +5,8 @@ import model.BoardList;
 
 import java.util.Scanner;
 
-// chess game application
+// Chess game application. Allows the user to play various games
+// and analyze the current position in each board.
 
 public class ChessGame {
 
@@ -69,7 +70,7 @@ public class ChessGame {
         input.useDelimiter("\n");
     }
 
-    //EFFECTS: displays option to user
+    //EFFECTS: displays menu options
     private void showOptions() {
         System.out.println("\nChose from:");
         System.out.println("\tplay -> play current game");
@@ -88,13 +89,13 @@ public class ChessGame {
 
     //MODIFIES: this
     //EFFECTS: lets player make moves in current board
-    public void play() {
+    private void play() {
         String command;
         while (true) {
             System.out.println("\nSelect:");
             System.out.println("\tMake a move: enter 'fromCol,fromRow,toCol,toRow'");
             System.out.println("\tevaluate -> get evaluation of current position");
-            System.out.println("\tback -> go back to menu.");
+            System.out.println("\tback -> go back to menu");
 
             command = input.next();
 
@@ -226,7 +227,9 @@ public class ChessGame {
         }
     }
 
-    public void pickName(Board b) {
+    //MODIFIES: this, Board
+    //EFFECTS: lets user select name of new board
+    private void pickName(Board b) {
         String command = "";
         while (command.equals("")) {
             System.out.println("Enter the new name:");
@@ -279,14 +282,14 @@ public class ChessGame {
     }
 
     //EFFECTS: prints out all the names of the boards in order
-    public void printBoards() {
+    private void printBoards() {
         for (Board board : boards.getBoards()) {
             System.out.println("- " + board.getName());
         }
     }
 
     // EFFECTS: displays a board with number strings as established above
-    public void displayCurrentBoard() {
+    private void displayCurrentBoard() {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 System.out.print(currentBoard.boardToStringBoard()[i][j] + " ");
