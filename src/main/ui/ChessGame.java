@@ -79,6 +79,7 @@ public class ChessGame {
         System.out.println("\tquit -> quit");
     }
 
+    //EFFECTS: displays current board
     private void showCurrentBoard() {
         boolean isCurrentBoardEmpty = currentBoard.isEmpty();
         if (!isCurrentBoardEmpty) {
@@ -116,7 +117,6 @@ public class ChessGame {
             }
 
             showCurrentBoard();
-
         }
     }
 

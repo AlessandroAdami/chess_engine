@@ -233,7 +233,6 @@ public class BoardTest {
         assertFalse(b6.isLegalMove(4, 3, 7, 3));
     }
 
-
     @Test
     public void testIsLegalMove() {
         assertFalse(b0.isLegalMove(4,3,0,0));
