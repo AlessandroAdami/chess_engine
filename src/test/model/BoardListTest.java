@@ -1,7 +1,5 @@
-package model.test;
+package model;
 
-import model.Board;
-import model.BoardList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

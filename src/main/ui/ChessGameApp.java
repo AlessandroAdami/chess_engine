@@ -2,19 +2,31 @@ package ui;
 
 import model.Board;
 import model.BoardList;
+import model.ChessGame;
+import persistence.JsonReader;
+import persistence.JsonWriter;
 
+import java.io.IOException;
 import java.util.Scanner;
 
 // Chess game application. Allows the user to play various games
 // and analyze the current position in each board.
 
-public class ChessGame {
-
+public class ChessGameApp {
+    private static final String JSON_STORE = "./data/chessgame.json";
+    private JsonWriter jsonWriter;
+    private JsonReader jsonReader;
+    private Scanner input;
+    private ChessGame chessGame;
     private BoardList boards;
     private Board currentBoard;
-    private Scanner input;
 
-    public ChessGame() {
+
+    //EFFECTS: constructs a new ChessGameApp with a chess game
+    //         a reader and writer to file and a user input
+    public ChessGameApp() {
+        jsonReader = new JsonReader(JSON_STORE);
+        jsonWriter = new JsonWriter(JSON_STORE);
         runChessGame();
     }
 
@@ -54,6 +66,12 @@ public class ChessGame {
             case "list":
                 manageBoards();
                 break;
+            case "load games":
+                loadChessGame();
+                break;
+            case "save":
+                saveChessGame();
+                break;
             default:
                 System.out.println("Please select valid command...");
                 break;
@@ -76,6 +94,8 @@ public class ChessGame {
         System.out.println("\tplay -> play current game");
         System.out.println("\tnew game -> create a new game");
         System.out.println("\tlist -> show list of your games");
+        System.out.println("\tload games -> reload your past games");
+        System.out.println("\tsave -> save your current games");
         System.out.println("\tquit -> quit");
     }
 
@@ -126,8 +146,8 @@ public class ChessGame {
         int fromRow = Integer.parseInt(move.substring(2,3));
         int toCol   = Integer.parseInt(move.substring(4,5));
         int toRow   = Integer.parseInt(move.substring(6));
-        if (((0 <= fromCol) && (0 <= fromRow) && (0 <= toCol) && (0 <= toRow))
-                && ((fromCol < 8) && (fromRow < 8) && (toCol < 8) && (toRow < 8))) {
+        if (0 <= fromCol && 0 <= fromRow && 0 <= toCol && 0 <= toRow
+                && fromCol < 8 && fromRow < 8 && toCol < 8 && toRow < 8) {
             return currentBoard.isLegalMove(fromCol,fromRow,toCol,toRow);
         } else {
             return false;
@@ -142,6 +162,40 @@ public class ChessGame {
         int toCol   = Integer.parseInt(move.substring(4,5));
         int toRow   = Integer.parseInt(move.substring(6));
         currentBoard.movePiece(fromCol,fromRow,toCol,toRow);
+        if (currentBoard.isPawnToPromote(toCol,toRow)) {
+            promotePawn(toCol,toRow);
+        }
+    }
+
+    //MODIFIES: this
+    //EFFECTS: lets player pick a piece to promote a pawn to
+    private void promotePawn(int col,int row) {
+        int promotion = 0;
+        while (true) {
+            System.out.println("\nSelect:");
+            System.out.println("\tq -> promote pawn to queen");
+            System.out.println("\tr -> promote pawn to rook");
+            System.out.println("\tn -> promote pawn to knight");
+            System.out.println("\tb -> promote pawn to bishop");
+
+            String command = input.next();
+
+            switch (command) {
+                case "q": promotion = 5;
+                break;
+                case "r": promotion = 4;
+                break;
+                case "b": promotion = 3;
+                break;
+                case "n": promotion = 2;
+                break;
+            }
+
+            if (promotion != 0) {
+                currentBoard.placePiece(col,row, promotion * currentBoard.getPiece(col,row));
+                break;
+            }
+        }
     }
 
     //EFFECTS: allows user to play or delete a game in the list
@@ -174,7 +228,6 @@ public class ChessGame {
     }
 
 
-    // TODO: refactor with getBoard
     // MODIFIES: this
     // EFFECTS: lets player select the current game from the list of games
     private void selectBoard() {
@@ -266,6 +319,34 @@ public class ChessGame {
             } else {
                 System.out.println("Please enter a valid command");
             }
+        }
+    }
+
+    private void saveChessGame() {
+        try {
+            chessGame.setCurrentBoard(currentBoard);
+            chessGame.setBoards(boards);
+            jsonWriter.open();
+            jsonWriter.write(chessGame);
+            jsonWriter.close();
+            System.out.println("Saved games to " + JSON_STORE);
+        } catch (IOException e) {
+            System.out.println("Unable to write to file: " + JSON_STORE);
+        }
+    }
+
+
+    //MODIFIES: this
+    //EFFECTS: loads chess game from file
+    private void loadChessGame() {
+        try {
+            chessGame = jsonReader.read();
+            currentBoard = chessGame.getCurrentBoard();
+            boards = chessGame.getBoards();
+            System.out.println("Loaded games from " + JSON_STORE);
+
+        } catch (IOException e) {
+            System.out.println("Unable to read from file" + JSON_STORE);
         }
     }
 

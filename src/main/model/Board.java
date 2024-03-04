@@ -9,11 +9,15 @@ package model;
 // Moves are represented with the standard chess notation: a-h,1-8, N,B,R,K,Q (n,b,r,k,q)
 
 
+import org.json.JSONObject;
+
 public class Board {
 
     private int[][] position; // the board with pieces
     private String name;
     private boolean isWhitesTurn;
+    private String canWhiteCastle;
+    private String canBlackCastle;
 
 
     // EFFECTS: constructs a new board
@@ -32,7 +36,8 @@ public class Board {
         };
         name = "New Board";
         isWhitesTurn = true;
-
+        canWhiteCastle = "RKR";
+        canBlackCastle = "RKR";
     }
 
     // EFFECTS: constructs a new board
@@ -51,6 +56,8 @@ public class Board {
         };
         this.name = name;
         isWhitesTurn = true;
+        canWhiteCastle = "RKR";
+        canBlackCastle = "RKR";
     }
 
     // REQUIRES: fromCol,fromRow,toCol,toRow are in [0,7]
@@ -64,6 +71,7 @@ public class Board {
             this.position[fromCol][fromRow] = 0;
             this.position[toCol][toRow] = piece;
             nextTurn();
+            updateCastling(fromCol,fromRow,piece);
         }
     }
 
@@ -101,25 +109,23 @@ public class Board {
 
     //EFFECTS: true if pawn move is legal
     private boolean isLegalPawnMove(int fromCol,int fromRow,int toCol,int toRow) {
-        int piece = this.position[fromCol][fromRow];
-        boolean oneStep; //pawn moves foreword one
-        boolean twoStep; //pawn moves foreword two
-        boolean captures;//pawn takes a piece
-        if (piece > 0) { //executes if the pawn is white
-            oneStep = (fromCol == toCol) && (fromRow + 1 == toRow) && position[toCol][toRow] == 0;
-            twoStep = (fromCol == toCol) && (fromRow + 2 == toRow) && (fromRow == 1)
-                    && (this.position[fromCol][fromRow + 1] == 0)  && position[toCol][toRow] == 0;
-            captures = (fromRow + 1 == toRow)
-                    && (fromCol == toCol - 1 || fromCol == toCol + 1)
-                    && this.position[toCol][toRow] < 0;
-        } else { //executes if the pawn is black
-            oneStep = (fromCol == toCol) && (fromRow == toRow + 1) && position[toCol][toRow] == 0;
-            twoStep = (fromCol == toCol) && (fromRow - 2 == toRow) && (fromRow == 6)
-                    && (this.position[fromCol][fromRow - 1] == 0)  && position[toCol][toRow] == 0;
-            captures = (fromRow == toRow + 1)
-                    && (fromCol == toCol - 1 || fromCol == toCol + 1)
-                    && this.position[toCol][toRow] > 0;
+        int pawn = this.position[fromCol][fromRow];
+        boolean oneStep;  //pawn moves foreword one
+        boolean twoStep;  //pawn moves foreword two
+        boolean captures; //pawn takes a piece
+        boolean hasNotMoved;
+        if (pawn > 0) {
+            hasNotMoved = (fromRow == 1);
+        } else {
+            hasNotMoved = (fromRow == 6);
         }
+        oneStep = (fromCol == toCol) && (fromRow + pawn == toRow) && position[toCol][toRow] == 0;
+        twoStep = (fromCol == toCol) && (fromRow + (2 * pawn) == toRow) && hasNotMoved
+                && (this.position[fromCol][fromRow + pawn] == 0)  && position[toCol][toRow] == 0;
+        captures = (fromRow + pawn == toRow)
+                    && (fromCol == toCol - 1 || fromCol == toCol + 1)
+                    && this.position[toCol][toRow] * pawn < 0;
+
         return oneStep || twoStep || captures;
     }
 
@@ -127,7 +133,7 @@ public class Board {
     private boolean isLegalKnightMove(int fromCol,int fromRow,int toCol,int toRow) {
         int rowDelta = Math.abs(toRow - fromRow);
         int colDelta = Math.abs(toCol - fromCol);
-        return (rowDelta == 2 && colDelta == 1) || (rowDelta == 1 && colDelta == 2);
+        return (rowDelta * colDelta == 2);
     }
 
     //EFFECTS: true if bishop move is legal
@@ -303,9 +309,100 @@ public class Board {
         return isEmpty;
     }
 
+    //EFFECTS: true if pawn on the square must be promoted
+    public boolean isPawnToPromote(int col,int row) {
+        int pawn = position[col][row];
+        return (row == 7 && pawn == 1) || (row == 0 && pawn == - 1);
+    }
+
     //EFFECTS: changes the turn (whose move it is)
     public void nextTurn() {
         this.isWhitesTurn = !isWhitesTurn;
+    }
+
+    //MODIFIES: this
+    //EFFECTS: updates who can castle
+    private void updateCastling(int col,int row,int piece) {
+        if (piece > 0) {
+            updateWhiteCastling(col,row,piece);
+        } else {
+            updateBlackCastling(col,row,piece);
+        }
+    }
+
+    private void updateWhiteCastling(int col,int row,int piece) {
+        if (piece == 6) {
+            canWhiteCastle = "";
+        } else if (piece == 4) {
+            if (col == 0 && row == 0) {
+                if (canWhiteCastle.equals("RKR")) {
+                    canWhiteCastle = "KR";
+                } else if (canWhiteCastle.equals("RK")) {
+                    canWhiteCastle = "";
+                }
+            } else if (col == 7 && row == 0) {
+                if (canWhiteCastle.equals("RKR")) {
+                    canWhiteCastle = "RK";
+                } else if (canWhiteCastle.equals("KR")) {
+                    canWhiteCastle = "";
+                }
+            }
+        }
+    }
+
+    private void updateBlackCastling(int col,int row,int piece) {
+        if (piece == 6) {
+            canBlackCastle = "";
+        } else if (piece == 4) {
+            if (col == 0 && row == 7) {
+                if (canBlackCastle.equals("RKR")) {
+                    canBlackCastle = "KR";
+                } else if (canBlackCastle.equals("RK")) {
+                    canBlackCastle = "";
+                }
+            } else if (col == 7 && row == 7) {
+                if (canBlackCastle.equals("RKR")) {
+                    canBlackCastle = "RK";
+                } else if (canBlackCastle.equals("KR")) {
+                    canBlackCastle = "";
+                }
+            }
+        }
+    }
+
+
+    //EFFECTS: return board as json object
+    public JSONObject toJson() {
+        JSONObject json = new JSONObject();
+        json.put("name", name);
+        json.put("position", positionToOneDArray());
+        json.put("isWhitesTurn", isWhitesTurn);
+        json.put("canWhiteCastle", canWhiteCastle);
+        json.put("canBlackCastle", canBlackCastle);
+
+        return json;
+    }
+
+    //EFFECTS: returns position as one dimensional array
+    private int[] positionToOneDArray() {
+        int[] oneDPosition = new int[64];
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                oneDPosition[(i * 8) + j] = position[i][j];
+            }
+        }
+        return oneDPosition;
+    }
+
+    public boolean samePosition(int[][] otherPosition) {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (position[i][j] != otherPosition[i][j]) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     // REQUIRES: col,row are in [0,7]
@@ -329,6 +426,22 @@ public class Board {
         this.name = name;
     }
 
+    public void setPosition(int[][] position) {
+        this.position = position;
+    }
+
+    public void setCanWhiteCastle(String castle) {
+        this.canWhiteCastle = castle;
+    }
+
+    public void setCanBlackCastle(String castle) {
+        this.canBlackCastle = castle;
+    }
+
+    public void setIsWhitesTurn(boolean isWhitesTurn) {
+        this.isWhitesTurn = isWhitesTurn;
+    }
+
     public String getName() {
         return name;
     }
@@ -341,4 +454,13 @@ public class Board {
     public boolean getIsWhitesTurn() {
         return isWhitesTurn;
     }
+
+    public String getCanWhiteCastle() {
+        return canWhiteCastle;
+    }
+
+    public String getCanBlackCastle() {
+        return canBlackCastle;
+    }
+
 }

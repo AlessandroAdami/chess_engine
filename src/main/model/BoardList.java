@@ -6,6 +6,9 @@ package model;
 
 //TODO: getters and removers should throw exceptions
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 public class BoardList {
@@ -49,6 +52,17 @@ public class BoardList {
             }
         }
         return removedBoard;
+    }
+
+    //EFFECTS: returns a JSON array of all the boards
+    public JSONArray toJson() {
+        JSONArray jsonArray = new JSONArray();
+
+        for (Board b : boards) {
+            jsonArray.put(b.toJson());
+        }
+
+        return jsonArray;
     }
 
     // EFFECTS: returns board with name, if none are found return null.
