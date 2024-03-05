@@ -56,8 +56,10 @@ public class BoardTest {
                 {0, 0, 0, 0, 0, 0, 0, 0},
      */
 
+    Board b8;
+
     @BeforeEach
-    public void setup() {
+    void setup() {
         b0 = new Board("starting");
         b1 = new Board(); b1.clearBoard();
         b2 = new Board("king"); b2.clearBoard();
@@ -66,6 +68,8 @@ public class BoardTest {
         b5 = new Board("bishop"); b5.clearBoard();
         b6 = new Board("rook"); b6.clearBoard();
         b7 = new Board("pawns"); b7.clearBoard();
+        b8 = new Board("promotion"); b8.clearBoard();
+
 
         b2.placePiece(4,3,6);
 
@@ -106,22 +110,25 @@ public class BoardTest {
         b7.placePiece(2,6,-1);
         b7.placePiece(5,4,-1);
         b7.placePiece(3,4,-4);
+
+        b8.placePiece(0,7,1);
+        b8.placePiece(7,0,-1);
     }
 
     @Test
-    public void testGetName() {
+    void testGetName() {
         assertEquals("starting",b0.getName());
         assertEquals("New Board",b1.getName());
     }
 
     @Test
-    public void testIsEmpty() {
+    void testIsEmpty() {
         assertFalse(b0.isEmpty());
         assertTrue(b1.isEmpty());
     }
 
     @Test
-    public void testClearBoard() {
+    void testClearBoard() {
         assertEquals(0,b1.getPosition()[0][0]);
         assertEquals(0,b1.getPosition()[1][2]);
         assertEquals(0,b1.getPosition()[6][7]);
@@ -129,7 +136,7 @@ public class BoardTest {
     }
 
     @Test
-    public void testEvaluatePos() {
+    void testEvaluatePos() {
         assertEquals(0,b0.evaluatePos());
         assertEquals(0,b1.evaluatePos());
         assertEquals(105,b2.evaluatePos());
@@ -140,7 +147,7 @@ public class BoardTest {
     }
 
     @Test
-    public void testIsLegalPawnMove() {
+    void testIsLegalPawnMove() {
         assertTrue(b7.isLegalMove(0,1,0,2));
         assertTrue(b7.isLegalMove(0,1,0,3));
         assertTrue(b7.isLegalMove(4,3,3,4));
@@ -158,7 +165,7 @@ public class BoardTest {
     }
 
     @Test
-    public void testIsLegalKingMove() {
+    void testIsLegalKingMove() {
         assertTrue(b2.isLegalMove(4,3,3,2));
         assertTrue(b2.isLegalMove(4,3,4,4));
         assertTrue(b2.isLegalMove(4,3,5,3));
@@ -168,7 +175,7 @@ public class BoardTest {
     }
 
     @Test
-    public void testIsLegalQueenMove() {
+    void testIsLegalQueenMove() {
         assertTrue(b3.isLegalMove(4,3,1,3));
         assertTrue(b3.isLegalMove(4,3,1,6));
         assertTrue(b3.isLegalMove(4,3,2,1));
@@ -190,7 +197,7 @@ public class BoardTest {
     }
 
     @Test
-    public void testIsLegalKnightMove() {
+    void testIsLegalKnightMove() {
         b0.nextTurn();
         assertTrue(b0.isLegalMove(6,7,5,5));
         assertTrue(b4.isLegalMove(4,3,2,2));
@@ -205,7 +212,7 @@ public class BoardTest {
     }
 
     @Test
-    public void testIsLegalBishopMove() {
+    void testIsLegalBishopMove() {
         assertTrue(b5.isLegalMove(4,3,1,6));
         assertTrue(b5.isLegalMove(4,3,2,1));
         assertTrue(b5.isLegalMove(4,3,2,5));
@@ -220,7 +227,7 @@ public class BoardTest {
     }
 
     @Test
-    public void testIsLegalRookMove() {
+    void testIsLegalRookMove() {
         assertTrue(b6.isLegalMove(4, 3, 1, 3));
         assertTrue(b6.isLegalMove(4, 3, 4, 1));
         assertTrue(b6.isLegalMove(4, 3, 4, 5));
@@ -233,7 +240,7 @@ public class BoardTest {
     }
 
     @Test
-    public void testIsLegalMove() {
+    void testIsLegalMove() {
         assertFalse(b0.isLegalMove(4,3,0,0));
         assertFalse(b0.isLegalMove(6,6,6,4));
         assertFalse(b0.isLegalMove(0,0,0,1));
@@ -243,7 +250,7 @@ public class BoardTest {
     }
 
     @Test
-    public void testMovePiece() {
+    void testMovePiece() {
         assertTrue(b0.getIsWhitesTurn());
         b0.movePiece(1,1,1,3);
         assertEquals(0,b0.getPiece(1,1));
@@ -264,7 +271,7 @@ public class BoardTest {
     }
 
     @Test
-    public void testBoardToStringBoard() {
+    void testBoardToStringBoard() {
         assertEquals("0",b1.boardToStringBoard()[0][0]);
         assertEquals("0",b1.boardToStringBoard()[7][7]);
         assertEquals("k",b0.boardToStringBoard()[0][4]);
@@ -274,4 +281,39 @@ public class BoardTest {
         assertEquals("N",b0.boardToStringBoard()[7][1]);
         assertEquals("b",b0.boardToStringBoard()[0][2]);
     }
+
+    @Test
+    void testIsSamePosition() {
+        assertTrue(b0.samePosition(b0.getPosition()));
+        assertTrue(b1.samePosition(b1.getPosition()));
+        assertFalse(b0.samePosition(b1.getPosition()));
+        assertFalse(b1.samePosition(b2.getPosition()));
+    }
+
+    @Test
+    void testIsPawnToPromote() {
+        assertTrue(b8.isPawnToPromote(0,7));
+        assertTrue(b8.isPawnToPromote(7,0));
+        assertFalse(b0.isPawnToPromote(7,0));
+        assertFalse(b0.isPawnToPromote(0,7));
+        assertFalse(b0.isPawnToPromote(7,7));
+    }
+
+    @Test
+    void testUpdateCastling() {
+        assertEquals("RKR",b0.getCanWhiteCastle());
+        assertEquals("RKR",b0.getCanBlackCastle());
+        b0.movePiece(4,1,4,3);
+        b0.movePiece(6,7,5,5);
+        b0.movePiece(4,0,4,1);
+        assertEquals("",b0.getCanWhiteCastle());
+        b0.movePiece(7,7,6,7);
+        assertEquals("RK",b0.getCanBlackCastle());
+        b0.nextTurn();
+        b0.movePiece(1,7,2,5);
+        b0.nextTurn();
+        b0.movePiece(0,7,1,7);
+        assertEquals("",b0.getCanBlackCastle());
+    }
+
 }

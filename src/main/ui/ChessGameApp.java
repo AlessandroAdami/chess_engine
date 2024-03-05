@@ -101,8 +101,8 @@ public class ChessGameApp {
 
     //EFFECTS: displays current board
     private void showCurrentBoard() {
-        boolean isCurrentBoardEmpty = currentBoard.isEmpty();
-        if (!isCurrentBoardEmpty) {
+        boolean isCurrentBoardNull = currentBoard == null;
+        if (!isCurrentBoardNull) {
             System.out.println(currentBoard.getName() + ":");
             displayCurrentBoard();
         }
@@ -309,7 +309,6 @@ public class ChessGameApp {
             Board removedBoard = boards.removeBoard(command);
             if (removedBoard != null) {
                 if (currentBoard.equals(removedBoard)) {
-                    currentBoard.clearBoard();
                     setNewBoard();
                 }
                 System.out.println(currentBoard.getName() + " was deleted.");
@@ -322,6 +321,18 @@ public class ChessGameApp {
         }
     }
 
+    //EFFECTS: sets the first board in boards as current board
+    private void setNewBoard() {
+        if (boards.isBoardListEmpty()) {
+            Board b = new Board();
+            boards.addBoard(b);
+            this.currentBoard = b;
+        } else {
+            this.currentBoard = boards.getBoard(0);
+        }
+    }
+
+    //EFFECTS: saves current chess game to file
     private void saveChessGame() {
         try {
             chessGame.setCurrentBoard(currentBoard);
@@ -335,7 +346,6 @@ public class ChessGameApp {
         }
     }
 
-
     //MODIFIES: this
     //EFFECTS: loads chess game from file
     private void loadChessGame() {
@@ -347,18 +357,6 @@ public class ChessGameApp {
 
         } catch (IOException e) {
             System.out.println("Unable to read from file" + JSON_STORE);
-        }
-    }
-
-    //EFFECTS: sets the first board in boards as current boards
-    //         if boards is empty, creates a new board
-    private void setNewBoard() {
-        if (boards.isBoardListEmpty()) {
-            Board b = new Board();
-            boards.addBoard(b);
-            this.currentBoard = b;
-        } else {
-            this.currentBoard = boards.getBoard(0);
         }
     }
 

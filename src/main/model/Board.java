@@ -8,6 +8,9 @@ package model;
 // black pieces have negative values, white pieces have positive values
 // Moves are represented with the standard chess notation: a-h,1-8, N,B,R,K,Q (n,b,r,k,q)
 
+//TODO: - add castling (just make it a king move)
+//      - add enpassant
+//      - add checks
 
 import org.json.JSONObject;
 
@@ -83,7 +86,7 @@ public class Board {
     //          and the square the piece wants to go to.
     public boolean isLegalMove(int fromCol, int fromRow, int toCol, int toRow) {
         int piece = this.position[fromCol][fromRow];
-        boolean whiteTurnToMove = (((piece > 0) && isWhitesTurn)
+        boolean rightTurnToMove = (((piece > 0) && isWhitesTurn)
                 || (piece < 0) && (!isWhitesTurn));
         boolean pieceOnStartingSquare = (piece != 0);
         boolean hasPieceMoved = (fromCol != toCol || fromRow != toRow);
@@ -104,7 +107,7 @@ public class Board {
                 break;
             default: isValidMoveForPiece = false;
         }
-        return whiteTurnToMove && pieceOnStartingSquare && hasPieceMoved && toEnemyOrEmptySquare && isValidMoveForPiece;
+        return rightTurnToMove && pieceOnStartingSquare && hasPieceMoved && toEnemyOrEmptySquare && isValidMoveForPiece;
     }
 
     //EFFECTS: true if pawn move is legal
@@ -351,9 +354,9 @@ public class Board {
     }
 
     private void updateBlackCastling(int col,int row,int piece) {
-        if (piece == 6) {
+        if (piece == -6) {
             canBlackCastle = "";
-        } else if (piece == 4) {
+        } else if (piece == -4) {
             if (col == 0 && row == 7) {
                 if (canBlackCastle.equals("RKR")) {
                     canBlackCastle = "KR";
@@ -394,6 +397,7 @@ public class Board {
         return oneDPosition;
     }
 
+    //EFFECTS: returns true if otherPosition is the same as this position
     public boolean samePosition(int[][] otherPosition) {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
@@ -445,7 +449,6 @@ public class Board {
     public String getName() {
         return name;
     }
-
 
     public int[][] getPosition() {
         return this.position;
