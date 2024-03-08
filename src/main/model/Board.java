@@ -201,7 +201,7 @@ public class Board {
         boolean isDiagonal = (Math.abs(toCol - fromCol) == 1) && (Math.abs(toRow - fromRow) == 1);
         return isLeftOrRight || isUpOrDown || isDiagonal;
     }
-
+/*
     //EFFECTS: true if king is in check
     private boolean isChecked() {
         int color;
@@ -280,7 +280,7 @@ public class Board {
     private boolean isAttackedByBishop(int col, int row, int color) {
         return false;
     }
-
+*/
 
     // EFFECTS: evaluates the current board position
     public int evaluatePos() {

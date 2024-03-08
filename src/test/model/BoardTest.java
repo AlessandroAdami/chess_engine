@@ -155,6 +155,10 @@ public class BoardTest {
         assertFalse(b7.isLegalMove(2,1,2,2));
         assertFalse(b7.isLegalMove(2,1,2,3));
         assertFalse(b7.isLegalMove(2,1,3,2));
+        assertFalse(b7.isLegalMove(4,3,4,6));
+        assertFalse(b7.isLegalMove(2,1,0,3));
+        assertFalse(b7.isLegalMove(0,1,0,5));
+        assertFalse(b7.isLegalMove(4,3,4,6));
         b7.nextTurn();
         assertTrue(b7.isLegalMove(0,6,0,5));
         assertTrue(b7.isLegalMove(0,6,0,4));
@@ -162,6 +166,7 @@ public class BoardTest {
         assertTrue(b7.isLegalMove(5,4,4,3));
         assertTrue(b7.isLegalMove(5,4,6,3));
         assertFalse(b7.isLegalMove(2,6,2,4));
+        assertFalse(b7.isLegalMove(5,4,5,2));
     }
 
     @Test
@@ -300,20 +305,64 @@ public class BoardTest {
     }
 
     @Test
-    void testUpdateCastling() {
+    void testUpdateWhiteCastling() {
         assertEquals("RKR",b0.getCanWhiteCastle());
-        assertEquals("RKR",b0.getCanBlackCastle());
         b0.movePiece(4,1,4,3);
-        b0.movePiece(6,7,5,5);
+        b0.nextTurn();
         b0.movePiece(4,0,4,1);
         assertEquals("",b0.getCanWhiteCastle());
-        b0.movePiece(7,7,6,7);
-        assertEquals("RK",b0.getCanBlackCastle());
+        Board boardLeft = new Board();
+        boardLeft.movePiece(0,1,0,2);
+        boardLeft.nextTurn();
+        boardLeft.movePiece(0,0,0,1);
+        assertEquals("KR",boardLeft.getCanWhiteCastle());
+        boardLeft.nextTurn();
+        boardLeft.movePiece(7,1,7,2);
+        boardLeft.nextTurn();
+        boardLeft.movePiece(7,0,7,1);
+        assertEquals("",boardLeft.getCanWhiteCastle());
+        Board boardRight = new Board();
+        boardRight.movePiece(7,1,7,2);
+        boardRight.nextTurn();
+        boardRight.movePiece(7,0,7,1);
+        assertEquals("RK",boardRight.getCanWhiteCastle());
+        boardRight.nextTurn();
+        boardRight.movePiece(0,1,0,2);
+        boardRight.nextTurn();
+        boardRight.movePiece(0,0,0,1);
+        assertEquals("",boardRight.getCanWhiteCastle());
+    }
+
+    @Test
+    void testUpdateBlackCastling() {
+        assertEquals("RKR",b0.getCanBlackCastle());
         b0.nextTurn();
-        b0.movePiece(1,7,2,5);
+        b0.movePiece(4,6,4,4);
         b0.nextTurn();
-        b0.movePiece(0,7,1,7);
+        b0.movePiece(4,7,4,6);
         assertEquals("",b0.getCanBlackCastle());
+        Board boardLeft = new Board();
+        boardLeft.nextTurn();
+        boardLeft.movePiece(0,6,0,5);
+        boardLeft.nextTurn();
+        boardLeft.movePiece(0,7,0,6);
+        assertEquals("KR",boardLeft.getCanBlackCastle());
+        boardLeft.nextTurn();
+        boardLeft.movePiece(7,6,7,5);
+        boardLeft.nextTurn();
+        boardLeft.movePiece(7,7,7,6);
+        assertEquals("",boardLeft.getCanBlackCastle());
+        Board boardRight = new Board();
+        boardRight.nextTurn();
+        boardRight.movePiece(7,6,7,5);
+        boardRight.nextTurn();
+        boardRight.movePiece(7,7,7,6);
+        assertEquals("RK",boardRight.getCanBlackCastle());
+        boardRight.nextTurn();
+        boardRight.movePiece(0,6,0,5);
+        boardRight.nextTurn();
+        boardRight.movePiece(0,7,0,6);
+        assertEquals("",boardRight.getCanBlackCastle());
     }
 
 }
