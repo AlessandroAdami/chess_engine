@@ -1,8 +1,6 @@
 package persistence;
 
 // A reader that reads ChessGame from JSON data stored in file
-// Note: the JSON object saves the board as a 1D int[64] array
-//       instead of a 2D int[8][8] array
 
 import model.Board;
 import model.BoardList;
@@ -37,7 +35,7 @@ public class JsonReader {
         StringBuilder contentBuilder = new StringBuilder();
 
         try (Stream<String> stream = Files.lines(Paths.get(source), StandardCharsets.UTF_8)) {
-            stream.forEach(s -> contentBuilder.append(s));
+            stream.forEach(contentBuilder::append);
         }
 
         return contentBuilder.toString();
@@ -79,6 +77,8 @@ public class JsonReader {
         }
     }
 
+    //MODIFIES: bl
+    //EFFECTS: adds parsed board to bl
     private void addBoard(BoardList bl, JSONObject board) {
         bl.addBoard(parseBoard(board));
     }
@@ -102,6 +102,7 @@ public class JsonReader {
         return board;
     }
 
+    //EFFECTS: returns the JSONArray as a (board) position array
     private int[][] toPositionArray(JSONArray jsonPositionArray) {
         int[][] position = new int[8][8];
         int[] numArray = toNumArray(jsonPositionArray);
@@ -114,6 +115,7 @@ public class JsonReader {
         return position;
     }
 
+    //EFFECTS: returns the JSONArray as an integer array
     private int[] toNumArray(JSONArray jsonPositionArray) {
         int[] numArray = new int[64];
         for (int i = 0; i < 64; i++) {

@@ -9,20 +9,22 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ChessGameTest {
 
     ChessGame chessGame;
+    ChessGame chessGame0;
     Board b0;
     Board b1;
     BoardList list;
 
     @BeforeEach
     void setup() {
-        chessGame = new ChessGame();
         b0 = new Board("Board 0");
         b1 = new Board("Board 1");
         list = new BoardList();
         list.addBoard(b0);
         list.addBoard(b1);
+        chessGame = new ChessGame();
         chessGame.setBoards(list);
         chessGame.setCurrentBoard(b0);
+        chessGame0 = new ChessGame(list,b0);
     }
 
     @Test
@@ -33,5 +35,12 @@ public class ChessGameTest {
         assertEquals("Board 0", chessGame.getBoards().getBoard(0).getName());
         assertTrue(chessGame.getBoards().getBoard(1).getIsWhitesTurn());
         assertEquals("Board 1", chessGame.getBoards().getBoard(1).getName());
+
+        assertTrue(chessGame0.getCurrentBoard().getIsWhitesTurn());
+        assertEquals("Board 0", chessGame0.getCurrentBoard().getName());
+        assertTrue(chessGame0.getBoards().getBoard(0).getIsWhitesTurn());
+        assertEquals("Board 0", chessGame0.getBoards().getBoard(0).getName());
+        assertTrue(chessGame0.getBoards().getBoard(1).getIsWhitesTurn());
+        assertEquals("Board 1", chessGame0.getBoards().getBoard(1).getName());
     }
 }

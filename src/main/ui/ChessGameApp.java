@@ -27,6 +27,7 @@ public class ChessGameApp {
     public ChessGameApp() {
         jsonReader = new JsonReader(JSON_STORE);
         jsonWriter = new JsonWriter(JSON_STORE);
+        chessGame = new ChessGame();
         runChessGame();
     }
 
@@ -172,7 +173,7 @@ public class ChessGameApp {
     private void promotePawn(int col,int row) {
         int promotion = 0;
         while (true) {
-            System.out.println("\nSelect:");
+            System.out.println("Your pawn is promoting!\n");
             System.out.println("\tq -> promote pawn to queen");
             System.out.println("\tr -> promote pawn to rook");
             System.out.println("\tn -> promote pawn to knight");

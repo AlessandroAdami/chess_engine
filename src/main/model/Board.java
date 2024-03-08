@@ -9,7 +9,7 @@ package model;
 // Moves are represented with the standard chess notation: a-h,1-8, N,B,R,K,Q (n,b,r,k,q)
 
 //TODO: - add castling (just make it a king move)
-//      - add enpassant
+//      - add en-passant
 //      - add checks
 
 import org.json.JSONObject;
@@ -78,7 +78,6 @@ public class Board {
         }
     }
 
-
     // REQUIRES: fromCol,fromRow,toCol,toRow are in [0,7]
     //           i.e. they are valid squares of a board
     // EFFECTS: true if the move is legal on current the board
@@ -88,7 +87,6 @@ public class Board {
         int piece = this.position[fromCol][fromRow];
         boolean rightTurnToMove = (((piece > 0) && isWhitesTurn)
                 || (piece < 0) && (!isWhitesTurn));
-        boolean pieceOnStartingSquare = (piece != 0);
         boolean hasPieceMoved = (fromCol != toCol || fromRow != toRow);
         boolean toEnemyOrEmptySquare = (piece * this.position[toCol][toRow] <= 0);
         boolean isValidMoveForPiece;
@@ -107,15 +105,15 @@ public class Board {
                 break;
             default: isValidMoveForPiece = false;
         }
-        return rightTurnToMove && pieceOnStartingSquare && hasPieceMoved && toEnemyOrEmptySquare && isValidMoveForPiece;
+        return rightTurnToMove && hasPieceMoved && toEnemyOrEmptySquare && isValidMoveForPiece;
     }
 
     //EFFECTS: true if pawn move is legal
     private boolean isLegalPawnMove(int fromCol,int fromRow,int toCol,int toRow) {
         int pawn = this.position[fromCol][fromRow];
-        boolean oneStep;  //pawn moves foreword one
-        boolean twoStep;  //pawn moves foreword two
-        boolean captures; //pawn takes a piece
+        boolean oneStep;
+        boolean twoStep;
+        boolean captures;
         boolean hasNotMoved;
         if (pawn > 0) {
             hasNotMoved = (fromRow == 1);
@@ -148,6 +146,7 @@ public class Board {
         return goodBishopMove && throughEmptySquares;
     }
 
+    //EFFECTS: true if bishop path is empty
     private boolean isBishopPathEmpty(int fromCol, int fromRow, int toCol, int colDir, int rowDir) {
         boolean throughEmptySquares = true;
         for (int col = fromCol + colDir, row = fromRow + rowDir; col != toCol; col = col + colDir, row = row + rowDir) {
@@ -168,6 +167,7 @@ public class Board {
         return goodRookMove && throughEmptySquares;
     }
 
+    //EFFECTS: true if rook path is empty
     private boolean isRookPathEmpty(int fromCol, int fromRow, int toCol, int toRow, int colDir, int rowDir) {
         boolean throughEmptySquares = true;
         if (rowDir == 0) {
@@ -201,6 +201,86 @@ public class Board {
         boolean isDiagonal = (Math.abs(toCol - fromCol) == 1) && (Math.abs(toRow - fromRow) == 1);
         return isLeftOrRight || isUpOrDown || isDiagonal;
     }
+
+    //EFFECTS: true if king is in check
+    private boolean isChecked() {
+        int color;
+        if (isWhitesTurn) {
+            color = 1;
+        } else {
+            color = -1;
+        }
+        int col = findKingCol(color);
+        int row = findKingRow(color);
+
+        return isInCheck(col,row,color);
+    }
+
+    //EFFECTS: return col of king's position
+    private int findKingCol(int color) {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (position[i][j] == 6 * color) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
+    //EFFECTS: returns row of king's position
+    private int findKingRow(int color) {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (position[i][j] == 6 * color) {
+                    return j;
+                }
+            }
+        }
+        return -1;
+    }
+
+    //EFFECTS: returns true if square is attacked by enemy piece
+    private boolean isInCheck(int col,int row,int color) {
+        boolean rook = isAttackedByRook(col,row,color);
+        boolean bishop = isAttackedByBishop(col,row,color);
+        boolean knight = isAttackedByKnight(col,row,color);
+        boolean pawn = isAttackedByPawn(col,row,color);
+
+        return rook || bishop || knight || pawn;
+    }
+
+    //EFFECTS: true if square is attacked by enemy pawn
+    private boolean isAttackedByPawn(int col, int row, int color) {
+        boolean plusCol = false;
+        boolean minusCol = false;
+        if (row + color < 0 || row + color > 7) {
+            return false;
+        }
+        if (col - 1 >= 0) {
+            minusCol = position[col - 1][row + color] == color * -1;
+        }
+        if (col + 1 <= 7) {
+            plusCol = position[col + 1][row + color] == color * -1;
+        }
+        return  minusCol || plusCol;
+    }
+
+    //EFFECTS: true if square is attacked by enemy knight
+    private boolean isAttackedByKnight(int col, int row, int color) {
+        return false; //TODO: just use islegalknightmove for every knight in board
+    }
+
+    //EFFECTS: true if square is attacked by enemy rook
+    private boolean isAttackedByRook(int col, int row, int color) {
+        return false;
+    }
+
+    //EFFECTS: true if square is attacked by enemy bishop
+    private boolean isAttackedByBishop(int col, int row, int color) {
+        return false;
+    }
+
 
     // EFFECTS: evaluates the current board position
     public int evaluatePos() {
@@ -333,6 +413,8 @@ public class Board {
         }
     }
 
+    //MODIFIES: this
+    //EFFECTS: updates white's castling
     private void updateWhiteCastling(int col,int row,int piece) {
         if (piece == 6) {
             canWhiteCastle = "";
@@ -353,6 +435,8 @@ public class Board {
         }
     }
 
+    //MODIFIES: this
+    //EFFECTS: updates black's castling
     private void updateBlackCastling(int col,int row,int piece) {
         if (piece == -6) {
             canBlackCastle = "";
@@ -409,9 +493,6 @@ public class Board {
         return true;
     }
 
-    // REQUIRES: col,row are in [0,7]
-    //           i.e. they point to a valid square of the board of a board
-    //           piece is a valid piece
     // MODIFIES: this
     // EFFECTS: puts piece on col,row of this board
     public void placePiece(int col,int row, int piece) {
@@ -421,7 +502,6 @@ public class Board {
     // getters and setters
 
     // REQUIRES: col,row are in [0,7]
-    //           i.e. they point to a valid square of the board of a board
     public int getPiece(int col, int row) {
         return position[col][row];
     }
