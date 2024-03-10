@@ -9,19 +9,19 @@ package model;
 // Moves are represented with the standard chess notation: a-h,1-8, N,B,R,K,Q (n,b,r,k,q)
 
 //TODO: - add castling (just make it a king move)
-//      - add en-passant
 //      - add checks
 
 import org.json.JSONObject;
 
 public class Board {
 
-    private int[][] position; // the board with pieces
+    private int[][] position;
     private String name;
     private boolean isWhitesTurn;
     private String canWhiteCastle;
     private String canBlackCastle;
-
+    private int enPassantCol;
+    private static final int NO_EN_PASSANT = -1;
 
     // EFFECTS: constructs a new board
     //          with the pieces in their starting positions
@@ -41,6 +41,7 @@ public class Board {
         isWhitesTurn = true;
         canWhiteCastle = "RKR";
         canBlackCastle = "RKR";
+        enPassantCol = NO_EN_PASSANT;
     }
 
     // EFFECTS: constructs a new board
@@ -61,6 +62,7 @@ public class Board {
         isWhitesTurn = true;
         canWhiteCastle = "RKR";
         canBlackCastle = "RKR";
+        enPassantCol = NO_EN_PASSANT;
     }
 
     // REQUIRES: fromCol,fromRow,toCol,toRow are in [0,7]
@@ -68,13 +70,13 @@ public class Board {
     // MODIFIES: this
     // EFFECTS: if move is legal, moves selected piece to square and captures any piece in
     //          the to square. Otherwise, do nothing
-    public void movePiece(int fromCol, int fromRow, int toCol, int toRow) {
+    public void makeMove(int fromCol, int fromRow, int toCol, int toRow) {
         int piece = this.position[fromCol][fromRow];
-        if (this.isLegalMove(fromCol,fromRow,toCol,toRow)) {
-            this.position[fromCol][fromRow] = 0;
-            this.position[toCol][toRow] = piece;
+        if (this.isLegalMove(fromCol, fromRow, toCol, toRow)) {
+            movePiece(piece, fromCol,fromRow,toCol,toRow);
             nextTurn();
-            updateCastling(fromCol,fromRow,piece);
+            updateCastling(fromCol, fromRow, piece);
+            enPassantCol = updateEnPassantCol(piece, fromCol, fromRow, toRow);
         }
     }
 
@@ -108,6 +110,13 @@ public class Board {
         return rightTurnToMove && hasPieceMoved && toEnemyOrEmptySquare && isValidMoveForPiece;
     }
 
+    //EFFECTS: moves piece from square to square
+    private void movePiece(int piece, int fromCol, int fromRow, int toCol, int toRow) {
+        enPassantCaptures(fromCol,fromRow,toCol,toRow);
+        this.position[fromCol][fromRow] = 0;
+        this.position[toCol][toRow] = piece;
+    }
+
     //EFFECTS: true if pawn move is legal
     private boolean isLegalPawnMove(int fromCol,int fromRow,int toCol,int toRow) {
         int pawn = this.position[fromCol][fromRow];
@@ -115,10 +124,14 @@ public class Board {
         boolean twoStep;
         boolean captures;
         boolean hasNotMoved;
+        boolean enPassant;
+        int enPassantRow;
         if (pawn > 0) {
             hasNotMoved = (fromRow == 1);
+            enPassantRow = 5;
         } else {
             hasNotMoved = (fromRow == 6);
+            enPassantRow = 2;
         }
         oneStep = (fromCol == toCol) && (fromRow + pawn == toRow) && position[toCol][toRow] == 0;
         twoStep = (fromCol == toCol) && (fromRow + (2 * pawn) == toRow) && hasNotMoved
@@ -126,8 +139,34 @@ public class Board {
         captures = (fromRow + pawn == toRow)
                     && (fromCol == toCol - 1 || fromCol == toCol + 1)
                     && this.position[toCol][toRow] * pawn < 0;
+        enPassant = (enPassantCol == toCol) && (toRow == enPassantRow);
 
-        return oneStep || twoStep || captures;
+        return oneStep || twoStep || captures || enPassant;
+    }
+
+    //MODIFIES: this
+    //EFFECTS: captures en-passant
+    private void enPassantCaptures(int fromCol, int fromRow, int toCol, int toRow) {
+        if (isLegalPawnMove(fromCol,fromRow,toCol,toRow)) {
+            int pawn = position[fromCol][fromRow];
+            int enPassantRow = (pawn > 0) ? 4 : 3;
+            boolean enPassant = (enPassantCol == toCol) && (enPassantRow == fromRow);
+            if (enPassant) {
+                this.position[enPassantCol][enPassantRow] = 0;
+            }
+        }
+    }
+
+    //EFFECTS: if pawn has advanced two squares, reassign en-passantCol;
+    private int updateEnPassantCol(int piece, int col, int fromRow, int toRow) {
+        enPassantCol = NO_EN_PASSANT;
+        int pawn = Math.abs(piece);
+        if (pawn == 1) {
+            if (fromRow + (2 * piece) == toRow) {
+                enPassantCol = col;
+            }
+        }
+        return enPassantCol;
     }
 
     //EFFECTS: true if knight move is legal
@@ -201,86 +240,6 @@ public class Board {
         boolean isDiagonal = (Math.abs(toCol - fromCol) == 1) && (Math.abs(toRow - fromRow) == 1);
         return isLeftOrRight || isUpOrDown || isDiagonal;
     }
-/*
-    //EFFECTS: true if king is in check
-    private boolean isChecked() {
-        int color;
-        if (isWhitesTurn) {
-            color = 1;
-        } else {
-            color = -1;
-        }
-        int col = findKingCol(color);
-        int row = findKingRow(color);
-
-        return isInCheck(col,row,color);
-    }
-
-    //EFFECTS: return col of king's position
-    private int findKingCol(int color) {
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                if (position[i][j] == 6 * color) {
-                    return i;
-                }
-            }
-        }
-        return -1;
-    }
-
-    //EFFECTS: returns row of king's position
-    private int findKingRow(int color) {
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                if (position[i][j] == 6 * color) {
-                    return j;
-                }
-            }
-        }
-        return -1;
-    }
-
-    //EFFECTS: returns true if square is attacked by enemy piece
-    private boolean isInCheck(int col,int row,int color) {
-        boolean rook = isAttackedByRook(col,row,color);
-        boolean bishop = isAttackedByBishop(col,row,color);
-        boolean knight = isAttackedByKnight(col,row,color);
-        boolean pawn = isAttackedByPawn(col,row,color);
-
-        return rook || bishop || knight || pawn;
-    }
-
-    //EFFECTS: true if square is attacked by enemy pawn
-    private boolean isAttackedByPawn(int col, int row, int color) {
-        boolean plusCol = false;
-        boolean minusCol = false;
-        if (row + color < 0 || row + color > 7) {
-            return false;
-        }
-        if (col - 1 >= 0) {
-            minusCol = position[col - 1][row + color] == color * -1;
-        }
-        if (col + 1 <= 7) {
-            plusCol = position[col + 1][row + color] == color * -1;
-        }
-        return  minusCol || plusCol;
-    }
-
-    //EFFECTS: true if square is attacked by enemy knight
-    private boolean isAttackedByKnight(int col, int row, int color) {
-        return false; //TODO: just use islegalknightmove for every knight in board
-    }
-
-    //EFFECTS: true if square is attacked by enemy rook
-    private boolean isAttackedByRook(int col, int row, int color) {
-        return false;
-    }
-
-    //EFFECTS: true if square is attacked by enemy bishop
-    private boolean isAttackedByBishop(int col, int row, int color) {
-        return false;
-    }
-*/
 
     // EFFECTS: evaluates the current board position
     public int evaluatePos() {
@@ -457,15 +416,15 @@ public class Board {
         }
     }
 
-
     //EFFECTS: return board as json object
     public JSONObject toJson() {
         JSONObject json = new JSONObject();
-        json.put("name", name);
         json.put("position", positionToOneDArray());
+        json.put("name", name);
         json.put("isWhitesTurn", isWhitesTurn);
         json.put("canWhiteCastle", canWhiteCastle);
         json.put("canBlackCastle", canBlackCastle);
+        json.put("enPassantCol", enPassantCol);
 
         return json;
     }
@@ -500,8 +459,6 @@ public class Board {
     }
 
     // getters and setters
-
-    // REQUIRES: col,row are in [0,7]
     public int getPiece(int col, int row) {
         return position[col][row];
     }
@@ -544,6 +501,10 @@ public class Board {
 
     public String getCanBlackCastle() {
         return canBlackCastle;
+    }
+
+    public int getEnPassantCol() {
+        return enPassantCol;
     }
 
 }

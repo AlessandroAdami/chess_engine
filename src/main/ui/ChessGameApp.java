@@ -162,7 +162,7 @@ public class ChessGameApp {
         int fromRow = Integer.parseInt(move.substring(2,3));
         int toCol   = Integer.parseInt(move.substring(4,5));
         int toRow   = Integer.parseInt(move.substring(6));
-        currentBoard.movePiece(fromCol,fromRow,toCol,toRow);
+        currentBoard.makeMove(fromCol,fromRow,toCol,toRow);
         if (currentBoard.isPawnToPromote(toCol,toRow)) {
             promotePawn(toCol,toRow);
         }

@@ -3,6 +3,7 @@
         {
             "canBlackCastle": "RKR",
             "name": "New Board",
+            "enPassantCol": -1,
             "position": [
                 4,
                 1,
@@ -75,6 +76,7 @@
         {
             "canBlackCastle": "RK",
             "name": "Board 2",
+            "enPassantCol": -1,
             "position": [
                 4,
                 1,
@@ -148,6 +150,7 @@
     "currentBoard": {
         "canBlackCastle": "RKR",
         "name": "New Board",
+        "enPassantCol": -1,
         "position": [
             4,
             1,

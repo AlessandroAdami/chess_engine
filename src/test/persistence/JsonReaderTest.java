@@ -42,6 +42,7 @@ public class JsonReaderTest {
             assertTrue(currentBoard.getIsWhitesTurn());
             assertEquals("RKR", currentBoard.getCanWhiteCastle());
             assertEquals("RKR", currentBoard.getCanBlackCastle());
+            assertEquals(-1, currentBoard.getEnPassantCol());
             assertEquals(1, boards.getBoards().size());
         } catch (IOException e) {
             fail("Couldn't read from file");
