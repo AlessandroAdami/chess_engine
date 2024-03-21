@@ -83,6 +83,9 @@ public class JsonReader {
         bl.addBoard(parseBoard(board));
     }
 
+    //TODO: change parseBoard to create a new check-scanner
+    //      (and eventually bot) for the board
+
     // MODIFIES: bl
     // EFFECTS: returns parsed board to board list
     private Board parseBoard(JSONObject jsonObject) {

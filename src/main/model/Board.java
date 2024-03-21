@@ -8,8 +8,7 @@ package model;
 // black pieces have negative values, white pieces have positive values
 // Moves are represented with the standard chess notation: a-h,1-8, N,B,R,K,Q (n,b,r,k,q)
 
-//TODO: - add castling (just make it a king move)
-//      - add checks
+//TODO: - understand the relationship between checker and board
 
 import org.json.JSONObject;
 
@@ -21,11 +20,10 @@ public class Board {
     private String canWhiteCastle;
     private String canBlackCastle;
     private int enPassantCol;
-    private static final int NO_EN_PASSANT = -1;
+    private CheckScanner checkScanner;
 
     // EFFECTS: constructs a new board
-    //          with the pieces in their starting positions
-    //          and name "New Board"
+    //          with name "New Board"
     public Board() {
         position = new int[][]{
                 {4, 1, 0, 0, 0, 0, -1, -4},
@@ -41,12 +39,12 @@ public class Board {
         isWhitesTurn = true;
         canWhiteCastle = "RKR";
         canBlackCastle = "RKR";
-        enPassantCol = NO_EN_PASSANT;
+        enPassantCol = -1;
+        checkScanner = new CheckScanner(this);
     }
 
     // EFFECTS: constructs a new board
-    //          with the pieces in their starting positions
-    //          and given name
+    //          with given name
     public Board(String name) {
         position = new int[][]{
                 {4, 1, 0, 0, 0, 0, -1, -4},
@@ -62,11 +60,11 @@ public class Board {
         isWhitesTurn = true;
         canWhiteCastle = "RKR";
         canBlackCastle = "RKR";
-        enPassantCol = NO_EN_PASSANT;
+        enPassantCol = -1;
+        checkScanner = new CheckScanner(this);
     }
 
     // REQUIRES: fromCol,fromRow,toCol,toRow are in [0,7]
-    //           i.e. they are valid squares of a board
     // MODIFIES: this
     // EFFECTS: if move is legal, moves selected piece to square and captures any piece in
     //          the to square. Otherwise, do nothing
@@ -81,7 +79,6 @@ public class Board {
     }
 
     // REQUIRES: fromCol,fromRow,toCol,toRow are in [0,7]
-    //           i.e. they are valid squares of a board
     // EFFECTS: true if the move is legal on current the board
     //          moves is defined by the square the piece is on
     //          and the square the piece wants to go to.
@@ -157,9 +154,10 @@ public class Board {
         }
     }
 
+    //MODIFIES: this
     //EFFECTS: if pawn has advanced two squares, reassign en-passantCol;
     private int updateEnPassantCol(int piece, int col, int fromRow, int toRow) {
-        enPassantCol = NO_EN_PASSANT;
+        enPassantCol = -1;
         int pawn = Math.abs(piece);
         if (pawn == 1) {
             if (fromRow + (2 * piece) == toRow) {

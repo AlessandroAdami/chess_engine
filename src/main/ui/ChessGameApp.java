@@ -6,13 +6,19 @@ import model.ChessGame;
 import persistence.JsonReader;
 import persistence.JsonWriter;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.util.Scanner;
 
 // Chess game application. Allows the user to play various games
 // and analyze the current position in each board.
 
-public class ChessGameApp {
+public class ChessGameApp extends JFrame {
+
+    public static final int WIDTH  = 1000;
+    public static final int HEIGHT = 1000;
+
+
     private static final String JSON_STORE = "./data/chessgame.json";
     private JsonWriter jsonWriter;
     private JsonReader jsonReader;
@@ -22,8 +28,7 @@ public class ChessGameApp {
     private Board currentBoard;
 
 
-    //EFFECTS: constructs a new ChessGameApp with a chess game
-    //         a reader and writer to file and a user input
+    //EFFECTS: constructs and runs ChessGameApp
     public ChessGameApp() {
         jsonReader = new JsonReader(JSON_STORE);
         jsonWriter = new JsonWriter(JSON_STORE);
@@ -102,8 +107,7 @@ public class ChessGameApp {
 
     //EFFECTS: displays current board
     private void showCurrentBoard() {
-        boolean isCurrentBoardNull = currentBoard == null;
-        if (!isCurrentBoardNull) {
+        if (currentBoard != null) {
             System.out.println(currentBoard.getName() + ":");
             displayCurrentBoard();
         }
