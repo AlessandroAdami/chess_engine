@@ -20,7 +20,6 @@ public class Board {
     private String canWhiteCastle;
     private String canBlackCastle;
     private int enPassantCol;
-    private CheckScanner checkScanner;
 
     // EFFECTS: constructs a new board
     //          with name "New Board"
@@ -40,7 +39,6 @@ public class Board {
         canWhiteCastle = "RKR";
         canBlackCastle = "RKR";
         enPassantCol = -1;
-        checkScanner = new CheckScanner(this);
     }
 
     // EFFECTS: constructs a new board
@@ -61,7 +59,6 @@ public class Board {
         canWhiteCastle = "RKR";
         canBlackCastle = "RKR";
         enPassantCol = -1;
-        checkScanner = new CheckScanner(this);
     }
 
     // REQUIRES: fromCol,fromRow,toCol,toRow are in [0,7]

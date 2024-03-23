@@ -3,20 +3,28 @@ package ui;
 import model.Board;
 import model.BoardList;
 import model.ChessGame;
+import model.Pieces;
 import persistence.JsonReader;
 import persistence.JsonWriter;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Scanner;
 
 // Chess game application. Allows the user to play various games
 // and analyze the current position in each board.
+//TODO: - use Joptionpane to handle creating new games!!!
+//      - it can also do menus!!!
+//      - progress bar for evaluations
+//      - override exit on close to save the game before closing the application
+public class ChessGameApp extends JFrame implements ActionListener {
 
-public class ChessGameApp extends JFrame {
-
-    public static final int WIDTH  = 1000;
-    public static final int HEIGHT = 1000;
+    private static final int WIDTH  = 1000;
+    private static final int HEIGHT = 1000;
 
 
     private static final String JSON_STORE = "./data/chessgame.json";
@@ -26,6 +34,7 @@ public class ChessGameApp extends JFrame {
     private ChessGame chessGame;
     private BoardList boards;
     private Board currentBoard;
+    private Pieces pieces;
 
 
     //EFFECTS: constructs and runs ChessGameApp
@@ -33,6 +42,7 @@ public class ChessGameApp extends JFrame {
         jsonReader = new JsonReader(JSON_STORE);
         jsonWriter = new JsonWriter(JSON_STORE);
         chessGame = new ChessGame();
+        pieces = new Pieces((HEIGHT - 100) / 8);
         runChessGame();
     }
 
@@ -43,6 +53,7 @@ public class ChessGameApp extends JFrame {
         String command;
 
         setup();
+        initFrame();
 
         while (keepGoing) {
             showOptions();
@@ -57,6 +68,18 @@ public class ChessGameApp extends JFrame {
             }
         }
         System.out.println("\nNice moves!");
+    }
+
+    //EFFECTS: displays the window
+    private void initFrame() {
+        this.setTitle("TITLE OF APPLICATION");
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setResizable(true);
+        this.setSize(WIDTH,HEIGHT);
+        ImageIcon imageIcon = new ImageIcon("FILENAME");
+        this.setIconImage(imageIcon.getImage());
+        this.setVisible(true);
+        paintBoard();
     }
 
     // MODIFIES: this
@@ -398,5 +421,45 @@ public class ChessGameApp extends JFrame {
             this.boards.addBoard(b);
             this.currentBoard = b;
         }
+    }
+
+    //EFFECTS: draws the board
+    private void paintBoard() {
+        ImageIcon oldIcon = new ImageIcon("./data/chessBoard.png");
+        Image oldImage = oldIcon.getImage();
+        Image scaledImage = oldImage.getScaledInstance(HEIGHT - 100,HEIGHT - 100, Image.SCALE_SMOOTH);
+        ImageIcon chessBoardImage = new ImageIcon(scaledImage);
+        JLabel boardLabel = new JLabel();
+        boardLabel.setText(currentBoard.getName());
+        boardLabel.setIcon(chessBoardImage);
+        boardLabel.setHorizontalTextPosition(JLabel.CENTER);
+        boardLabel.setVerticalTextPosition(JLabel.TOP);
+        boardLabel.setVerticalAlignment(JLabel.CENTER);
+        boardLabel.setHorizontalAlignment(JLabel.CENTER);
+        paintPieces(boardLabel);
+        this.add(boardLabel);
+        this.setIconImage(pieces.getPieceImage(-6).getImage());
+    }
+
+    //EFFECTS: draws the pieces on the board
+    private void paintPieces(JLabel board) {
+        int squareImageScale = (HEIGHT - 100) / 8;
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                ImageIcon piece = pieces.getPieceImage(currentBoard.getPiece(i,j));
+                JLabel pieceLabel = new JLabel(piece);
+                pieceLabel.setBounds(
+                        i * squareImageScale,
+                        j * squareImageScale,
+                        (i + 1) * squareImageScale,
+                        (j + 1) * squareImageScale);
+                board.add(pieceLabel);
+            }
+        }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        //stub
     }
 }
