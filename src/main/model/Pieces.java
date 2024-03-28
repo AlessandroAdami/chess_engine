@@ -1,5 +1,7 @@
 package model;
 
+import model.exceptions.NoPieceException;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -8,11 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-//Creates a list of images of the pieces in this order:
-// 0-5 white
-// 6-11 black
-// pawn-rook-knight-bishop-queen-king
-
+//Manages images of pieces.
 
 public class Pieces {
 
@@ -31,6 +29,7 @@ public class Pieces {
     private ImageIcon whiteKing;
     private ImageIcon blackKing;
 
+    //EFFECTS: retrieves the images of the pieces and rescales them
     public Pieces(int scale) {
         this.scale = scale;
         this.pieces = new ArrayList<>();
@@ -39,6 +38,7 @@ public class Pieces {
         scaleImages();
     }
 
+    //EFFECTS: gets the images of the pieces
     private void createPieces() {
         whitePawn   = new ImageIcon("./data/whitePawn.png");
         whiteKnight = new ImageIcon("./data/whiteKnight.png");
@@ -55,6 +55,7 @@ public class Pieces {
     }
 
 
+    //EFFECTS: adds pieces to the list
     private void addPieces() {
         pieces.add(whitePawn);
         pieces.add(whiteKnight);
@@ -70,16 +71,20 @@ public class Pieces {
         pieces.add(blackKing);
     }
 
+    //EFFECTS: scales all the images
     private void scaleImages() {
-        for (int i = 0; i < 11; i++) {
-            ImageIcon icon = pieces.get(i);
+        for (ImageIcon icon : pieces) {
             Image oldImage = icon.getImage();
-            Image scaledImage = oldImage.getScaledInstance(scale,scale, Image.SCALE_SMOOTH);
+            Image scaledImage = oldImage.getScaledInstance(scale, scale, Image.SCALE_SMOOTH);
             icon.setImage(scaledImage);
         }
     }
 
-    public ImageIcon getPieceImage(int piece) {
+    //EFFECTS: returns an ImageIcon of piece
+    public ImageIcon getPieceImage(int piece) throws NoPieceException {
+        if (piece == 0) {
+            throw new NoPieceException();
+        }
         switch (piece) {
             case 1: return whitePawn;
             case 2: return whiteKnight;
@@ -92,7 +97,8 @@ public class Pieces {
             case -3: return blackBishop;
             case -4: return blackRook;
             case -5: return blackQueen;
-            default: return blackKing;
+            case -6: return blackKing;
+            default: throw new NoPieceException();
         }
     }
 

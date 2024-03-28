@@ -9,6 +9,7 @@ package model;
 // Moves are represented with the standard chess notation: a-h,1-8, N,B,R,K,Q (n,b,r,k,q)
 
 //TODO: - understand the relationship between checker and board
+//      - implement castling
 
 import org.json.JSONObject;
 

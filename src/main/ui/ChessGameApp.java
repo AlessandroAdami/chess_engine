@@ -4,14 +4,15 @@ import model.Board;
 import model.BoardList;
 import model.ChessGame;
 import model.Pieces;
+import model.exceptions.NoPieceException;
 import persistence.JsonReader;
 import persistence.JsonWriter;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -21,6 +22,7 @@ import java.util.Scanner;
 //      - it can also do menus!!!
 //      - progress bar for evaluations
 //      - override exit on close to save the game before closing the application
+//      - add method to make moves like e4 and not 1,0,1,1
 public class ChessGameApp extends JFrame implements ActionListener {
 
     private static final int WIDTH  = 1000;
@@ -72,7 +74,8 @@ public class ChessGameApp extends JFrame implements ActionListener {
 
     //EFFECTS: displays the window
     private void initFrame() {
-        this.setTitle("TITLE OF APPLICATION");
+        this.setTitle("Chess App");
+        this.setLayout(null);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(true);
         this.setSize(WIDTH,HEIGHT);
@@ -423,37 +426,51 @@ public class ChessGameApp extends JFrame implements ActionListener {
         }
     }
 
+    //MODIFIES: this
     //EFFECTS: draws the board
     private void paintBoard() {
         ImageIcon oldIcon = new ImageIcon("./data/chessBoard.png");
         Image oldImage = oldIcon.getImage();
-        Image scaledImage = oldImage.getScaledInstance(HEIGHT - 100,HEIGHT - 100, Image.SCALE_SMOOTH);
+        int size = HEIGHT - 120;
+        Image scaledImage = oldImage.getScaledInstance(size,size, Image.SCALE_SMOOTH);
         ImageIcon chessBoardImage = new ImageIcon(scaledImage);
+        Border boardBorder = BorderFactory.createLineBorder(Color.cyan,3);//change this to colorless
         JLabel boardLabel = new JLabel();
         boardLabel.setText(currentBoard.getName());
         boardLabel.setIcon(chessBoardImage);
         boardLabel.setHorizontalTextPosition(JLabel.CENTER);
         boardLabel.setVerticalTextPosition(JLabel.TOP);
+        boardLabel.setBounds(250, 0, size, size + 50);
         boardLabel.setVerticalAlignment(JLabel.CENTER);
         boardLabel.setHorizontalAlignment(JLabel.CENTER);
+        boardLabel.setBorder(boardBorder);
         paintPieces(boardLabel);
         this.add(boardLabel);
-        this.setIconImage(pieces.getPieceImage(-6).getImage());
+        this.setIconImage(scaledImage);
     }
 
+    //MODIFIES: this, board
     //EFFECTS: draws the pieces on the board
     private void paintPieces(JLabel board) {
-        int squareImageScale = (HEIGHT - 100) / 8;
+        int size = HEIGHT - 120;
+        int squareImageScale = size / 8;
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                ImageIcon piece = pieces.getPieceImage(currentBoard.getPiece(i,j));
-                JLabel pieceLabel = new JLabel(piece);
-                pieceLabel.setBounds(
-                        i * squareImageScale,
-                        j * squareImageScale,
-                        (i + 1) * squareImageScale,
-                        (j + 1) * squareImageScale);
-                board.add(pieceLabel);
+                try {
+                    ImageIcon piece = pieces.getPieceImage(currentBoard.getPiece(i,j));
+                    JLabel pieceLabel = new JLabel();
+                    pieceLabel.setIcon(piece);
+                    pieceLabel.setBounds(
+                              i * squareImageScale,
+                            - 80 + (8 - j) * squareImageScale,
+                            squareImageScale,
+                            squareImageScale);
+                    pieceLabel.setVerticalAlignment(JLabel.CENTER);
+                    pieceLabel.setHorizontalAlignment(JLabel.CENTER);
+                    board.add(pieceLabel);
+                } catch (NoPieceException e) {
+                    //draw nothing if there is no piece in the square
+                }
             }
         }
     }
