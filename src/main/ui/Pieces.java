@@ -1,12 +1,9 @@
-package model;
+package ui;
 
 import model.exceptions.NoPieceException;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +35,7 @@ public class Pieces {
         scaleImages();
     }
 
+    //MODIFIES: this
     //EFFECTS: gets the images of the pieces
     private void createPieces() {
         whitePawn   = new ImageIcon("./data/whitePawn.png");
@@ -55,6 +53,7 @@ public class Pieces {
     }
 
 
+    //MODIFIES: this
     //EFFECTS: adds pieces to the list
     private void addPieces() {
         pieces.add(whitePawn);
@@ -71,6 +70,7 @@ public class Pieces {
         pieces.add(blackKing);
     }
 
+    //MODIFES: this
     //EFFECTS: scales all the images
     private void scaleImages() {
         for (ImageIcon icon : pieces) {
@@ -86,12 +86,12 @@ public class Pieces {
             throw new NoPieceException();
         }
         switch (piece) {
-            case 1: return whitePawn;
-            case 2: return whiteKnight;
-            case 3: return whiteBishop;
-            case 4: return whiteRook;
-            case 5: return whiteQueen;
-            case 6: return whiteKing;
+            case  1: return whitePawn;
+            case  2: return whiteKnight;
+            case  3: return whiteBishop;
+            case  4: return whiteRook;
+            case  5: return whiteQueen;
+            case  6: return whiteKing;
             case -1: return blackPawn;
             case -2: return blackKnight;
             case -3: return blackBishop;
@@ -100,6 +100,20 @@ public class Pieces {
             case -6: return blackKing;
             default: throw new NoPieceException();
         }
+    }
+
+    //getters
+
+    public List<ImageIcon> getPieces() {
+        return pieces;
+    }
+
+    public ImageIcon getPieceAtIndex(int i) {
+        return pieces.get(i);
+    }
+
+    public int getScale() {
+        return scale;
     }
 
 }

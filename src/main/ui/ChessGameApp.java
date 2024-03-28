@@ -3,7 +3,6 @@ package ui;
 import model.Board;
 import model.BoardList;
 import model.ChessGame;
-import model.Pieces;
 import model.exceptions.NoPieceException;
 import persistence.JsonReader;
 import persistence.JsonWriter;
@@ -23,10 +22,16 @@ import java.util.Scanner;
 //      - progress bar for evaluations
 //      - override exit on close to save the game before closing the application
 //      - add method to make moves like e4 and not 1,0,1,1
+//      - change EXIT_ON_CLOSE to prompt saving games
+
+// System.exit(0) closes the program
+// menuItem.setMnemonic(KeyEvent.KE) allows to bind a menu item to a key typing
+// the same can be done with menus Alt + KE
 public class ChessGameApp extends JFrame implements ActionListener {
 
     private static final int WIDTH  = 1000;
     private static final int HEIGHT = 1000;
+    private static final int BOARD_SIZE = HEIGHT - 100;
 
 
     private static final String JSON_STORE = "./data/chessgame.json";
@@ -37,14 +42,20 @@ public class ChessGameApp extends JFrame implements ActionListener {
     private BoardList boards;
     private Board currentBoard;
     private Pieces pieces;
-
+    private JMenuBar menuBar;
+    private JPanel gameListPanel;
+    private ButtonGroup gamesButtonGroup;
+    private JTextField moveText;
+    private JButton confirmMoveButton;
+    private JLabel boardLabel;
+    private JLabel[][] piecesLabels;
 
     //EFFECTS: constructs and runs ChessGameApp
     public ChessGameApp() {
         jsonReader = new JsonReader(JSON_STORE);
         jsonWriter = new JsonWriter(JSON_STORE);
         chessGame = new ChessGame();
-        pieces = new Pieces((HEIGHT - 100) / 8);
+        pieces = new Pieces(BOARD_SIZE / 8);
         runChessGame();
     }
 
@@ -81,8 +92,76 @@ public class ChessGameApp extends JFrame implements ActionListener {
         this.setSize(WIDTH,HEIGHT);
         ImageIcon imageIcon = new ImageIcon("FILENAME");
         this.setIconImage(imageIcon.getImage());
+        menuBar = new JMenuBar();
+        setupMenuBar();
+        setupGameListPanel();
+        setupMakeMove();
+
         this.setVisible(true);
         paintBoard();
+    }
+
+    //MODIFIES: this
+    //EFFECTS: sets up menu bar
+    private void setupMenuBar() {
+        JMenu fileMenu = new JMenu("File");
+        JMenuItem loadItem = new JMenuItem("Load games from file");
+        JMenuItem saveItem = new JMenuItem("Save games to file");
+        loadItem.addActionListener(this);
+        saveItem.addActionListener(this);
+        fileMenu.add(loadItem);
+        fileMenu.add(saveItem);
+
+        JMenu gamesMenu = new JMenu("Games");
+        JMenuItem newGameItem = new JMenuItem("New Game");
+        JMenuItem manageGamesItem = new JMenuItem("Manage Games");
+        newGameItem.addActionListener(this);
+        manageGamesItem.addActionListener(this);
+        gamesMenu.add(newGameItem);
+        gamesMenu.add(manageGamesItem);
+
+        menuBar.add(fileMenu);
+        menuBar.add(gamesMenu);
+        this.setJMenuBar(menuBar);
+    }
+
+    private void setupGameListPanel() {
+        gameListPanel = new JPanel();
+        gamesButtonGroup = new ButtonGroup();
+        gameListPanel.setBounds(0,0, (WIDTH - BOARD_SIZE) * 2, HEIGHT);
+        Border gameListPanelBorder = BorderFactory.createLineBorder(Color.cyan,3);
+        gameListPanel.setBorder(gameListPanelBorder);
+
+        for (int i = 0; i < boards.getBoards().size(); i++) {
+            Board b = boards.getBoard(i);
+            JRadioButton boardButton = new JRadioButton(b.getName());
+            boardButton.setBounds(0, i * 100,300,100);
+            boardButton.setFocusable(false);
+            boardButton.addActionListener(e -> currentBoard = b);
+            gamesButtonGroup.add(boardButton);
+            gameListPanel.add(boardButton);
+        }
+
+        this.add(gameListPanel);
+    }
+
+    private void setupMakeMove() {
+        confirmMoveButton = new JButton("Confirm");
+        confirmMoveButton.setFocusable(false);
+        confirmMoveButton.setBounds(1310,100,90,25);
+        moveText = new JTextField();
+        moveText.setBounds(1200, 100, 100,25);
+        String textString;
+        if (currentBoard.getIsWhitesTurn()) {
+            textString = "White move...";
+        } else {
+            textString = "Black move...";
+        }
+        moveText.setText(textString);
+        confirmMoveButton.addActionListener(this);
+
+        this.add(confirmMoveButton);
+        this.add(moveText);
     }
 
     // MODIFIES: this
@@ -196,6 +275,7 @@ public class ChessGameApp extends JFrame implements ActionListener {
         if (currentBoard.isPawnToPromote(toCol,toRow)) {
             promotePawn(toCol,toRow);
         }
+        repaintPiece(fromCol,fromRow,toCol,toRow);
     }
 
     //MODIFIES: this
@@ -257,7 +337,6 @@ public class ChessGameApp extends JFrame implements ActionListener {
             }
         }
     }
-
 
     // MODIFIES: this
     // EFFECTS: lets player select the current game from the list of games
@@ -371,7 +450,7 @@ public class ChessGameApp extends JFrame implements ActionListener {
             jsonWriter.open();
             jsonWriter.write(chessGame);
             jsonWriter.close();
-            System.out.println("Saved games to " + JSON_STORE);
+            System.out.println("Games saved to " + JSON_STORE);
         } catch (IOException e) {
             System.out.println("Unable to write to file: " + JSON_STORE);
         }
@@ -384,7 +463,7 @@ public class ChessGameApp extends JFrame implements ActionListener {
             chessGame = jsonReader.read();
             currentBoard = chessGame.getCurrentBoard();
             boards = chessGame.getBoards();
-            System.out.println("Loaded games from " + JSON_STORE);
+            System.out.println("Games loaded from " + JSON_STORE);
 
         } catch (IOException e) {
             System.out.println("Unable to read from file" + JSON_STORE);
@@ -429,13 +508,13 @@ public class ChessGameApp extends JFrame implements ActionListener {
     //MODIFIES: this
     //EFFECTS: draws the board
     private void paintBoard() {
+        boardLabel = new JLabel();
         ImageIcon oldIcon = new ImageIcon("./data/chessBoard.png");
         Image oldImage = oldIcon.getImage();
         int size = HEIGHT - 120;
         Image scaledImage = oldImage.getScaledInstance(size,size, Image.SCALE_SMOOTH);
         ImageIcon chessBoardImage = new ImageIcon(scaledImage);
         Border boardBorder = BorderFactory.createLineBorder(Color.cyan,3);//change this to colorless
-        JLabel boardLabel = new JLabel();
         boardLabel.setText(currentBoard.getName());
         boardLabel.setIcon(chessBoardImage);
         boardLabel.setHorizontalTextPosition(JLabel.CENTER);
@@ -444,16 +523,16 @@ public class ChessGameApp extends JFrame implements ActionListener {
         boardLabel.setVerticalAlignment(JLabel.CENTER);
         boardLabel.setHorizontalAlignment(JLabel.CENTER);
         boardLabel.setBorder(boardBorder);
-        paintPieces(boardLabel);
+        setupPiecesLabels();
         this.add(boardLabel);
         this.setIconImage(scaledImage);
     }
 
     //MODIFIES: this, board
     //EFFECTS: draws the pieces on the board
-    private void paintPieces(JLabel board) {
-        int size = HEIGHT - 120;
-        int squareImageScale = size / 8;
+    private void setupPiecesLabels() {
+        piecesLabels = new JLabel[8][8];
+        int squareImageScale = (HEIGHT - 120) / 8;
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 try {
@@ -467,7 +546,8 @@ public class ChessGameApp extends JFrame implements ActionListener {
                             squareImageScale);
                     pieceLabel.setVerticalAlignment(JLabel.CENTER);
                     pieceLabel.setHorizontalAlignment(JLabel.CENTER);
-                    board.add(pieceLabel);
+                    boardLabel.add(pieceLabel);
+                    piecesLabels[i][j] = pieceLabel;
                 } catch (NoPieceException e) {
                     //draw nothing if there is no piece in the square
                 }
@@ -475,8 +555,53 @@ public class ChessGameApp extends JFrame implements ActionListener {
         }
     }
 
+    //MODIFIES: this, board
+    //EFFECTS: redraws the pieces on the board
+    private void repaintPieces() {
+        int squareImageScale = (HEIGHT - 120) / 8;
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                JLabel pieceLabel = piecesLabels[i][j];
+                if (pieceLabel != null) {
+                    pieceLabel.setBounds(
+                            i * squareImageScale,
+                            - 80 + (8 - j) * squareImageScale,
+                            squareImageScale,
+                            squareImageScale);
+                    pieceLabel.setVerticalAlignment(JLabel.CENTER);
+                    pieceLabel.setHorizontalAlignment(JLabel.CENTER);
+                }
+
+            }
+        }
+    }
+
+    //MODIFIES: this
+    //EFFECTS: repaints the piece moved on the board
+    private void repaintPiece(int fromCol,int fromRow,int toCol,int toRow) {
+        JLabel movedPieceLabel = piecesLabels[fromCol][fromRow];
+        piecesLabels[toCol][toRow] = movedPieceLabel;
+        piecesLabels[fromCol][fromRow] = null;
+        repaintPieces();
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
-        //stub
+        if (e.getSource() == menuBar.getMenu(0).getItem(0)) {
+            loadChessGame();
+            //repaintBoard(something);
+        } else if (e.getSource() == menuBar.getMenu(0).getItem(1)) {
+            saveChessGame();
+        } else if (e.getSource() == menuBar.getMenu(1).getItem(0)) {
+            System.out.println("create new game");
+        } else if (e.getSource() == menuBar.getMenu(1).getItem(1)) {
+            System.out.println("manage games");
+        } else if (e.getSource() == confirmMoveButton) {
+            String move = moveText.getText();
+            if (isValidMove(move)) {
+                makeMove(move);
+            }
+
+        }
     }
 }
