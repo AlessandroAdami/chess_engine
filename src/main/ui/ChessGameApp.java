@@ -18,11 +18,6 @@ import java.util.Scanner;
 // Chess game application. Allows the user to play various games
 // and analyze the current position in each board.
 
-//TODO: - progress bar for evaluations
-//      - override exit on close to save the game before closing the application
-//      - add functionality to make mouse moves and not typed
-
-// Note: System.exit(0) closes the program
 public class ChessGameApp extends JFrame implements ActionListener {
 
     private static final int WIDTH  = 1000;
@@ -95,6 +90,8 @@ public class ChessGameApp extends JFrame implements ActionListener {
         this.initComponents();
     }
 
+    //MODIFIES: this
+    //EFFECTS: initializes components
     private void initComponents() {
         ImageIcon imageIcon = new ImageIcon("FILENAME");
         this.setIconImage(imageIcon.getImage());
@@ -126,6 +123,8 @@ public class ChessGameApp extends JFrame implements ActionListener {
         this.setJMenuBar(menuBar);
     }
 
+    //MODIFIES: this
+    //EFFECTS: sets up list of games
     private void setupGameListPanel() {
         gameListPanel = new JPanel();
         boardListText = new JTextArea();
@@ -133,6 +132,8 @@ public class ChessGameApp extends JFrame implements ActionListener {
         Border gameListPanelBorder = BorderFactory.createLineBorder(Color.cyan,3);
         gameListPanel.setBorder(gameListPanelBorder);
         boardListText.setBounds(0,0,1000,300);
+        int backgroundColor = gameListPanel.getBackground().getRGB();
+        boardListText.setBackground(new Color(backgroundColor));
         updateBoardList();
         boardListText.setEditable(false);
         gameListPanel.add(boardListText);
@@ -173,6 +174,8 @@ public class ChessGameApp extends JFrame implements ActionListener {
         this.add(moveText);
     }
 
+    //MODIFIES: this
+    //EFFECTS: sets up create new board button/text
     private void setupCreateNewBoard() {
         createNewBoardButton = new JButton("Create");
         createNewBoardButton.setFocusable(false);
@@ -185,6 +188,8 @@ public class ChessGameApp extends JFrame implements ActionListener {
         this.add(newBoardName);
     }
 
+    //MODIFIES: this
+    //EFFECTS: sets up delete board button/text
     private void setupDeleteBoard() {
         deleteBoardButton = new JButton("Delete");
         deleteBoardButton.setFocusable(false);
@@ -197,6 +202,8 @@ public class ChessGameApp extends JFrame implements ActionListener {
         this.add(deleteBoardName);
     }
 
+    //MODIFIES: this
+    //EFFECTS: sets up select board button/text
     private void setupSelectBoard() {
         selectBoardButton = new JButton("Select");
         selectBoardButton.setFocusable(false);
@@ -485,6 +492,8 @@ public class ChessGameApp extends JFrame implements ActionListener {
         }
     }
 
+    //MODIFIES: this
+    //EFFECTS: deletes board
     private void deleteBoard(String name) {
         Board removedBoard = boards.removeBoard(name);
         if (removedBoard != null) {
@@ -503,7 +512,6 @@ public class ChessGameApp extends JFrame implements ActionListener {
         } else {
             this.currentBoard = boards.getBoard(0);
         }
-        //repaint
     }
 
     //EFFECTS: saves current chess game to file
@@ -567,7 +575,6 @@ public class ChessGameApp extends JFrame implements ActionListener {
             this.boards.addBoard(b);
             this.currentBoard = b;
         }
-        //repaint
     }
 
     // MODIFIES: this
@@ -576,7 +583,6 @@ public class ChessGameApp extends JFrame implements ActionListener {
         Board b = new Board(name);
         this.boards.addBoard(b);
         this.currentBoard = b;
-        //repaint
     }
 
     //MODIFIES: this
@@ -610,6 +616,8 @@ public class ChessGameApp extends JFrame implements ActionListener {
         setupPieces();
     }
 
+    //MODIFIES: this
+    //EFFECTS: repaints the board
     private void updateBoard(int[] move) {
         boardLabel.setText(currentBoard.getName());
         updatePieces(move[0],move[1],move[2],move[3]);
@@ -641,8 +649,6 @@ public class ChessGameApp extends JFrame implements ActionListener {
                 }
             }
         }
-        //boardLabel.validate();
-        //boardLabel.repaint();
     }
 
     //MODIFIES: this, board
@@ -667,11 +673,15 @@ public class ChessGameApp extends JFrame implements ActionListener {
         boardLabel.repaint();
     }
 
+    //MODIFIES: this
+    //EFFECTS: updates the whole game
     private void updateGame() {
         updateBoard();
         updateBoardList();
     }
 
+    //MODIFIES: this
+    //EFFECTS: handles user actions
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == menuBar.getMenu(0).getItem(0)) {
@@ -710,4 +720,8 @@ public class ChessGameApp extends JFrame implements ActionListener {
         moveArray[3] = toRow;
         return moveArray;
     }
+    //TODO: - progress bar for evaluations
+    //      - override exit on close to save the game before closing the application
+    //      - add functionality to make mouse moves and not typed
+    // Note: System.exit(0) closes the program
 }

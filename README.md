@@ -26,3 +26,9 @@ their weaknesses and test their strengths, while also testing some new ideas.
 ### Part 2
 - As a user, I want to be able to select the option to save my games when I quit the application.
 - As a user, I want to be able to play my old games from the saved position after I close and reopen the application.
+
+## Phase 3
+### Instructions for Grader
+- To add a new board to the list, write the board name in the cell and click the "Create" button
+- The "Delete" and "Select" button work similarly, and will modify the first board in the list with the given name
+- To save (or load) the data to (from) file, simply go the menuBar with the "File" menu and select the wanted option 

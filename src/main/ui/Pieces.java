@@ -70,7 +70,7 @@ public class Pieces {
         pieces.add(blackKing);
     }
 
-    //MODIFES: this
+    //MODIFIES: this
     //EFFECTS: scales all the images
     private void scaleImages() {
         for (ImageIcon icon : pieces) {
