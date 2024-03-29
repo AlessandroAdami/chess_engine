@@ -42,7 +42,7 @@ public class BoardList {
     }
 
     //MODIFIES: this
-    //EFFECTS: removes board with name from boards
+    //EFFECTS: removes first board with name from boards
     public Board removeBoard(String name) {
         Board removedBoard = null;
         for (Board b : boards) {
