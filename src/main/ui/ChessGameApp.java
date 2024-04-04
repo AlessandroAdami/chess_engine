@@ -14,14 +14,15 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.util.Scanner;
 
 // Chess game application. Allows the user to play various games
 // and analyze the current position in each board.
-//TODO: implement promotion
 
-public class ChessGameApp extends JFrame implements ActionListener {
+public class ChessGameApp extends JFrame implements ActionListener, WindowListener {
 
     private static final int WIDTH  = 1000;
     private static final int HEIGHT = 1000;
@@ -54,7 +55,7 @@ public class ChessGameApp extends JFrame implements ActionListener {
     public ChessGameApp() {
         jsonReader = new JsonReader(JSON_STORE);
         jsonWriter = new JsonWriter(JSON_STORE);
-        chessGame = new ChessGame();
+        chessGame = new ChessGame(); //this adds current board [0]
         pieces = new Pieces(BOARD_SIZE / 8);
         runChessGame();
     }
@@ -65,8 +66,10 @@ public class ChessGameApp extends JFrame implements ActionListener {
         boolean keepGoing = true;
         String command;
 
+        addWindowListener(this);
         setup();
         initFrame();
+
 
         while (keepGoing) {
             showOptions();
@@ -81,7 +84,6 @@ public class ChessGameApp extends JFrame implements ActionListener {
             }
         }
         printLog();
-        //System.out.println("\nNice moves!");
     }
 
     //EFFECTS: displays the window
@@ -250,7 +252,7 @@ public class ChessGameApp extends JFrame implements ActionListener {
     private void setup() {
         boards = new BoardList();
         currentBoard = new Board();
-        boards.addBoard(currentBoard);
+        boards.addBoard(currentBoard); //this adds current board [1]
         input = new Scanner(System.in);
         input.useDelimiter("\n");
     }
@@ -732,8 +734,46 @@ public class ChessGameApp extends JFrame implements ActionListener {
         }
     }
 
+    @Override
+    public void windowClosed(WindowEvent e) {
+        //do nothing
+    }
+
+    @Override
+    public void windowOpened(WindowEvent e) {
+        //loadChessGame();
+        //do nothing
+    }
+
+    //EFFECTS: saves games and prints log events as program is closing
+    @Override
+    public void windowClosing(WindowEvent e) {
+        saveChessGame();
+        printLog();
+    }
+
+    @Override
+    public void windowIconified(WindowEvent e) {
+        //do nothing
+    }
+
+    @Override
+    public void windowDeiconified(WindowEvent e) {
+        //do nothing
+    }
+
+    @Override
+    public void windowActivated(WindowEvent e) {
+        //loadChessGame();
+        //do nothing
+    }
+
+    @Override
+    public void windowDeactivated(WindowEvent e) {
+        //do nothing
+    }
+
     //TODO: - progress bar for evaluations
-    //      - override exit on close to save the game before closing the application
     //      - add functionality to make mouse moves and not typed
-    // Note: System.exit(0) closes the program
+    //      - promotion
 }

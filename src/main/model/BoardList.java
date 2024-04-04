@@ -7,7 +7,6 @@ package model;
 //TODO: getters and removers should throw exceptions
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -29,7 +28,6 @@ public class BoardList {
     //EFFECTS: removes board b from list
     public Board removeBoard(Board b) {
         if (boards.remove(b)) {
-            EventLog.getInstance().logEvent(new Event("Board \"" + b.getName() + "\" was added to list."));
             return b;
         } else {
             return null;
@@ -40,10 +38,6 @@ public class BoardList {
     //MODIFIES: this
     //EFFECTS: removes board at index i from list
     public Board removeBoard(int i) {
-        if (boards.size() < i) {
-            EventLog.getInstance().logEvent(new Event(
-                    "Board \"" + boards.get(i).getName() + "\" was removed."));
-        }
         return boards.remove(i);
     }
 

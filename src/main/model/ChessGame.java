@@ -2,6 +2,8 @@ package model;
 
 import org.json.JSONObject;
 
+//A chess game with a current board and a list of boards
+
 public class ChessGame {
 
     private BoardList boards;
