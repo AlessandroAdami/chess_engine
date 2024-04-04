@@ -3,6 +3,8 @@ package ui;
 import model.Board;
 import model.BoardList;
 import model.ChessGame;
+import model.EventLog;
+import model.Event;
 import model.exceptions.NoPieceException;
 import persistence.JsonReader;
 import persistence.JsonWriter;
@@ -17,6 +19,7 @@ import java.util.Scanner;
 
 // Chess game application. Allows the user to play various games
 // and analyze the current position in each board.
+//TODO: implement promotion
 
 public class ChessGameApp extends JFrame implements ActionListener {
 
@@ -31,8 +34,8 @@ public class ChessGameApp extends JFrame implements ActionListener {
     private ChessGame chessGame;
     private BoardList boards;
     private Board currentBoard;
-
     private Pieces pieces;
+
     private JMenuBar menuBar;
     private JPanel gameListPanel;
     private JTextField moveText;
@@ -77,7 +80,8 @@ public class ChessGameApp extends JFrame implements ActionListener {
                 processCommand(command);
             }
         }
-        System.out.println("\nNice moves!");
+        printLog();
+        //System.out.println("\nNice moves!");
     }
 
     //EFFECTS: displays the window
@@ -720,6 +724,14 @@ public class ChessGameApp extends JFrame implements ActionListener {
         moveArray[3] = toRow;
         return moveArray;
     }
+
+    //EFFECTS: prints the log of events
+    private void printLog() {
+        for (Event e : EventLog.getInstance()) {
+            System.out.println(e.getDate() + ":\n" + e.getDescription() + "\n\n");
+        }
+    }
+
     //TODO: - progress bar for evaluations
     //      - override exit on close to save the game before closing the application
     //      - add functionality to make mouse moves and not typed

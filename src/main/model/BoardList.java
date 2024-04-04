@@ -21,6 +21,7 @@ public class BoardList {
     }
 
     public void addBoard(Board b) {
+        EventLog.getInstance().logEvent(new Event("Board \"" + b.getName() + "\" was added to list."));
         boards.add(b);
     }
 
@@ -28,6 +29,7 @@ public class BoardList {
     //EFFECTS: removes board b from list
     public Board removeBoard(Board b) {
         if (boards.remove(b)) {
+            EventLog.getInstance().logEvent(new Event("Board \"" + b.getName() + "\" was added to list."));
             return b;
         } else {
             return null;
@@ -38,6 +40,10 @@ public class BoardList {
     //MODIFIES: this
     //EFFECTS: removes board at index i from list
     public Board removeBoard(int i) {
+        if (boards.size() < i) {
+            EventLog.getInstance().logEvent(new Event(
+                    "Board \"" + boards.get(i).getName() + "\" was removed."));
+        }
         return boards.remove(i);
     }
 
@@ -47,6 +53,8 @@ public class BoardList {
         Board removedBoard = null;
         for (Board b : boards) {
             if (name.equals(b.getName())) {
+                EventLog.getInstance().logEvent(new Event(
+                        "Board \"" + b.getName() + "\" was deleted and removed from list."));
                 removedBoard = removeBoard(b);
                 break;
             }
@@ -74,6 +82,8 @@ public class BoardList {
         }
         return null;
     }
+
+    //getters
 
     public Board getBoard(int i) {
         return boards.get(i);

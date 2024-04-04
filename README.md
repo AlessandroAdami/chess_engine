@@ -32,3 +32,6 @@ their weaknesses and test their strengths, while also testing some new ideas.
 - To add a new board to the list, write the board name in the cell and click the "Create" button
 - The "Delete" and "Select" button work similarly, and will modify the first board in the list with the given name
 - To save (or load) the data to (from) file, simply go the menuBar with the "File" menu and select the wanted option 
+
+### Part 4
+#### Task 2

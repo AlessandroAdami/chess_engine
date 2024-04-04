@@ -33,7 +33,7 @@ public class ChessGame {
         return json;
     }
 
-    //getters and setters
+    //getters
     public BoardList getBoards() {
         return boards;
     }
