@@ -31,11 +31,11 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
     private static final String JSON_STORE = "./data/chessgame.json";
     private JsonWriter jsonWriter;
     private JsonReader jsonReader;
-    private Scanner input;
     private ChessGame chessGame;
     private BoardList boards;
     private Board currentBoard;
     private Pieces pieces;
+    private Scanner input;
 
     private JMenuBar menuBar;
     private JPanel gameListPanel;
