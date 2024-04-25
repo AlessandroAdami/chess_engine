@@ -60,7 +60,7 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
         runChessGame();
     }
 
-    // MODIFIES: this
+    // MODIFIES: this.
     // EFFECTS: processes player's decisions
     private void runChessGame() {
         boolean keepGoing = true;
