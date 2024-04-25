@@ -10,6 +10,7 @@ package model;
 
 //TODO: - understand the relationship between checker and board
 //      - implement castling
+//      - rename the test classed to "testClassName"
 
 import org.json.JSONObject;
 
