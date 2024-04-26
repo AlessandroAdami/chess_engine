@@ -2,79 +2,57 @@ package persistence;
 
 import model.Board;
 import model.BoardList;
+import model.ChessGame;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
-
-
-import model.ChessGame;
 
 import java.io.IOException;
 
-public class JsonWriterTest {
+import static org.junit.jupiter.api.Assertions.*;
 
-    ChessGame newChessGame;
-    ChessGame complexChessGame;
+public class TestJsonReader {
     Board newBoard;
-    Board board2;
 
     @BeforeEach
     public void setup() {
-        newChessGame = new ChessGame();
-        complexChessGame = new ChessGame();
         newBoard = new Board();
-        board2 = new Board();
-        board2.setName("Board 2");
-        board2.setCanWhiteCastle("KR");
-        board2.setCanBlackCastle("RK");
-        board2.setIsWhitesTurn(false);
-        complexChessGame.addBoard(board2);
     }
 
     @Test
-    public void testWriterInvalidFile() {
+    void testReaderNonExistentFile() {
+        JsonReader reader = new JsonReader("./data/noSuchFile.json");
         try {
-            JsonWriter writer = new JsonWriter("./data/my\0illegal:fileName.json");
-            writer.open();
-            fail("IOException was expected");
+            ChessGame chessGame = reader.read();
+            fail("IOException expected");
         } catch (IOException e) {
             // pass
         }
     }
 
     @Test
-    public void testWriterNewChessGame() {
+    void testReaderNewChessGame() {
+        JsonReader reader = new JsonReader("./data/readerNewChessGameTest.json");
         try {
-            JsonWriter writer = new JsonWriter("./data/writerNewChessGameTest.json");
-            writer.open();
-            writer.write(newChessGame);
-            writer.close();
-
-            JsonReader reader = new JsonReader("./data/writerNewChessGameTest.json");
-            newChessGame = reader.read();
-            Board currentBoard = newChessGame.getCurrentBoard();
-            BoardList boards = newChessGame.getBoards();
+            ChessGame cg = reader.read();
+            Board currentBoard = cg.getCurrentBoard();
+            BoardList boards = cg.getBoards();
 
             assertTrue(currentBoard.samePosition(newBoard.getPosition()));
             assertEquals("New Board", currentBoard.getName());
             assertTrue(currentBoard.getIsWhitesTurn());
             assertEquals("RKR", currentBoard.getCanWhiteCastle());
             assertEquals("RKR", currentBoard.getCanBlackCastle());
+            assertEquals(-1, currentBoard.getEnPassantCol());
             assertEquals(1, boards.getBoards().size());
         } catch (IOException e) {
-            fail("Exception should not have been thrown");
+            fail("Couldn't read from file");
         }
     }
 
     @Test
-    public void testWriterComplexChessGame() {
+    void testReaderComplexChessGame() {
+        JsonReader reader = new JsonReader("./data/readerComplexChessGameTest.json");
         try {
-            JsonWriter writer = new JsonWriter("./data/writerComplexChessGameTest.json");
-            writer.open();
-            writer.write(complexChessGame);
-            writer.close();
-
-            JsonReader reader = new JsonReader("./data/writerComplexChessGameTest.json");
             ChessGame cg = reader.read();
             Board currentBoard = cg.getCurrentBoard();
             BoardList boards = cg.getBoards();
@@ -83,7 +61,7 @@ public class JsonWriterTest {
             assertTrue(currentBoard.samePosition(newBoard.getPosition()));
             assertEquals("New Board", currentBoard.getName());
             assertTrue(currentBoard.getIsWhitesTurn());
-            assertEquals("RKR", currentBoard.getCanWhiteCastle());
+            assertEquals("", currentBoard.getCanWhiteCastle());
             assertEquals("RKR", currentBoard.getCanBlackCastle());
             assertEquals(2, boards.getBoards().size());
 
@@ -93,8 +71,9 @@ public class JsonWriterTest {
             assertEquals("KR", board2.getCanWhiteCastle());
             assertEquals("RK", board2.getCanBlackCastle());
 
+
         } catch (IOException e) {
-            fail("Exception should not have been thrown");
+            fail("Couldn't read from file");
         }
     }
 }

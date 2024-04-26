@@ -2,9 +2,11 @@ package model;
 
 import org.json.JSONObject;
 
+import java.util.Iterator;
+
 //A chess game with a current board and a list of boards
 
-public class ChessGame {
+public class ChessGame implements Iterable<Board> {
 
     private BoardList boards;
     private Board currentBoard;
@@ -23,6 +25,7 @@ public class ChessGame {
         this.currentBoard = currentBoard;
     }
 
+    //EFFECTS: adds board to game
     public void addBoard(Board b) {
         boards.addBoard(b);
     }
@@ -33,6 +36,27 @@ public class ChessGame {
         json.put("currentBoard", currentBoard.toJson());
         json.put("boards", boards.toJson());
         return json;
+    }
+
+    //EFFECTS: returns iterator over boards
+    @Override
+    public Iterator<Board> iterator() {
+        return boards.iterator();
+    }
+
+    //EFFECTS: removes and returns the board if it is in the game
+    public Board removeBoard(String boardName) {
+        return boards.removeBoard(boardName);
+    }
+
+    //EFFECTS: true if there are no boards
+    public boolean isBoardListEmpty() {
+        return boards.isBoardListEmpty();
+    }
+
+    //EFFECTS: gets board at index i
+    public Board getBoard(int i) {
+        return boards.getBoard(i);
     }
 
     //getters

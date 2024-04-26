@@ -7,7 +7,10 @@ import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class BoardListTest {
+/**
+ * Unit tests for BoardList class
+ */
+public class TestBoardList {
 
     Board b0; //starting board
     Board b1; //empty board

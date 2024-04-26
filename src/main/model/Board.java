@@ -1,16 +1,13 @@
 package model;
 
-// Representation of a 8x8 chess board. A board is a two-dimensional 8x8 int array.
-// This first value refers to the column, the second one to the row.
-// Note: the pieces are represented as integers in the following fashion:
 // - 0 indicates an empty square (not a piece)
 // - Pawn: 1 / Knight: 2 / Bishop: 3 / Rook: 4 / Queen: 5 / King: 6
 // black pieces have negative values, white pieces have positive values
-// Moves are represented with the standard chess notation: a-h,1-8, N,B,R,K,Q (n,b,r,k,q)
 
-//TODO: - understand the relationship between checker and board
-//      - implement castling
-//      - rename the test classed to "testClassName"
+/*
+ * TODO: understand the relationship between checker and board
+ * implement castling
+ */
 
 import org.json.JSONObject;
 
@@ -24,7 +21,6 @@ public class Board {
     private int enPassantCol;
 
     // EFFECTS: constructs a new board
-    //          with name "New Board"
     public Board() {
         position = new int[][]{
                 {4, 1, 0, 0, 0, 0, -1, -4},
@@ -44,7 +40,6 @@ public class Board {
     }
 
     // EFFECTS: constructs a new board
-    //          with given name
     public Board(String name) {
         position = new int[][]{
                 {4, 1, 0, 0, 0, 0, -1, -4},
@@ -503,5 +498,4 @@ public class Board {
     public int getEnPassantCol() {
         return enPassantCol;
     }
-
 }

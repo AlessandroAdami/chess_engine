@@ -5,7 +5,6 @@ package persistence;
 //       instead of a 2D int[8][8] array
 
 
-import model.BoardList;
 import model.ChessGame;
 import org.json.JSONObject;
 

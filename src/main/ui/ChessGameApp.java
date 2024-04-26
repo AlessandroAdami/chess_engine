@@ -1,10 +1,7 @@
 package ui;
 
-import model.Board;
-import model.BoardList;
-import model.ChessGame;
-import model.EventLog;
 import model.Event;
+import model.*;
 import model.exceptions.NoPieceException;
 import persistence.JsonReader;
 import persistence.JsonWriter;
@@ -21,6 +18,7 @@ import java.util.Scanner;
 
 // Chess game application. Allows the user to play various games
 // and analyze the current position in each board.
+//TODO: - promotion
 
 public class ChessGameApp extends JFrame implements ActionListener, WindowListener {
 
@@ -29,12 +27,10 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
     private static final int BOARD_SIZE = HEIGHT - 100;
 
     private static final String JSON_STORE = "./data/chessgame.json";
-    private JsonWriter jsonWriter;
-    private JsonReader jsonReader;
+    private final JsonWriter jsonWriter;
+    private final JsonReader jsonReader;
     private ChessGame chessGame;
-    private BoardList boards;
-    private Board currentBoard;
-    private Pieces pieces;
+    private final Pieces pieces;
     private Scanner input;
 
     private JMenuBar menuBar;
@@ -55,12 +51,12 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
     public ChessGameApp() {
         jsonReader = new JsonReader(JSON_STORE);
         jsonWriter = new JsonWriter(JSON_STORE);
-        chessGame = new ChessGame(); //this adds current board [0]
+        chessGame = new ChessGame();
         pieces = new Pieces(BOARD_SIZE / 8);
         runChessGame();
     }
 
-    // MODIFIES: this.
+    // MODIFIES: this
     // EFFECTS: processes player's decisions
     private void runChessGame() {
         boolean keepGoing = true;
@@ -69,7 +65,6 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
         addWindowListener(this);
         setup();
         initFrame();
-
 
         while (keepGoing) {
             showOptions();
@@ -151,7 +146,7 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
         StringBuilder text = new StringBuilder();
         text.append("Your games:");
 
-        for (Board b : boards.getBoards()) {
+        for (Board b : chessGame) {
             text.append(System.getProperty("line.separator"));
             text.append("- ").append(b.getName());
 
@@ -168,7 +163,7 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
         moveText = new JTextField();
         moveText.setBounds(1200, 100, 100,25);
         String textString;
-        if (currentBoard.getIsWhitesTurn()) {
+        if (chessGame.getCurrentBoard().getIsWhitesTurn()) {
             textString = "White move...";
         } else {
             textString = "Black move...";
@@ -250,9 +245,6 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
     // MODIFIES: this
     // EFFECTS: initializes boards and current board
     private void setup() {
-        boards = new BoardList();
-        currentBoard = new Board();
-        boards.addBoard(currentBoard); //this adds current board [1]
         input = new Scanner(System.in);
         input.useDelimiter("\n");
     }
@@ -270,8 +262,8 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
 
     //EFFECTS: displays current board
     private void showCurrentBoard() {
-        if (currentBoard != null) {
-            System.out.println(currentBoard.getName() + ":");
+        if (chessGame.getCurrentBoard() != null) {
+            System.out.println(chessGame.getCurrentBoard().getName() + ":");
             displayCurrentBoard();
         }
     }
@@ -294,7 +286,7 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
 
             try {
                 if (command.equals("evaluate")) {
-                    System.out.println("Current evaluation = " + currentBoard.evaluatePos());
+                    System.out.println("Current evaluation = " + chessGame.getCurrentBoard().evaluatePos());
                 } else if (isValidMove(command)) {
                     makeMove(command);
                 } else {
@@ -316,7 +308,7 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
         int toRow   = Integer.parseInt(move.substring(6));
         if (0 <= fromCol && 0 <= fromRow && 0 <= toCol && 0 <= toRow
                 && fromCol < 8 && fromRow < 8 && toCol < 8 && toRow < 8) {
-            return currentBoard.isLegalMove(fromCol,fromRow,toCol,toRow);
+            return chessGame.getCurrentBoard().isLegalMove(fromCol,fromRow,toCol,toRow);
         } else {
             return false;
         }
@@ -329,8 +321,8 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
         int fromRow = Integer.parseInt(move.substring(2,3));
         int toCol   = Integer.parseInt(move.substring(4,5));
         int toRow   = Integer.parseInt(move.substring(6));
-        currentBoard.makeMove(fromCol,fromRow,toCol,toRow);
-        if (currentBoard.isPawnToPromote(toCol,toRow)) {
+        chessGame.getCurrentBoard().makeMove(fromCol,fromRow,toCol,toRow);
+        if (chessGame.getCurrentBoard().isPawnToPromote(toCol,toRow)) {
             promotePawn(toCol,toRow);
         }
     }
@@ -344,7 +336,6 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
             System.out.println("\tq -> promote pawn to queen");
             System.out.println("\tr -> promote pawn to rook");
             System.out.println("\tn -> promote pawn to knight");
-            System.out.println("\tb -> promote pawn to bishop");
 
             String command = input.next();
 
@@ -360,7 +351,8 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
             }
 
             if (promotion != 0) {
-                currentBoard.placePiece(col,row, promotion * currentBoard.getPiece(col,row));
+                chessGame.getCurrentBoard().placePiece(col,row,
+                        promotion * chessGame.getCurrentBoard().getPiece(col,row));
                 break;
             }
         }
@@ -406,9 +398,9 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
             System.out.println("back -> go back");
 
             command = input.next();
-            for (Board b : boards.getBoards()) {
+            for (Board b : chessGame) {
                 if (command.equals(b.getName())) {
-                    currentBoard = b;
+                    chessGame.setCurrentBoard(b);
                     keepGoing = false;
                     break;
                 }
@@ -423,9 +415,9 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
 
     //EFFECTS: select the board as currentBoard
     private void selectBoard(String name) {
-        for (Board b : boards.getBoards()) {
+        for (Board b : chessGame) {
             if (name.equals(b.getName())) {
-                currentBoard = b;
+                chessGame.setCurrentBoard(b);
                 break;
             }
         }
@@ -442,7 +434,7 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
             System.out.println("back -> go back");
 
             command = input.next();
-            for (Board b : boards.getBoards()) {
+            for (Board b : chessGame) {
                 if (command.equals(b.getName())) {
                     pickName(b);
                     keepGoing = false;
@@ -483,9 +475,9 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
 
             command = input.next();
 
-            Board removedBoard = boards.removeBoard(command);
+            Board removedBoard = chessGame.removeBoard(command);
             if (removedBoard != null) {
-                if (currentBoard.equals(removedBoard)) {
+                if (chessGame.getCurrentBoard().equals(removedBoard)) {
                     setNewBoard();
                 }
                 System.out.println(removedBoard.getName() + " was deleted.");
@@ -501,9 +493,9 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
     //MODIFIES: this
     //EFFECTS: deletes board
     private void deleteBoard(String name) {
-        Board removedBoard = boards.removeBoard(name);
+        Board removedBoard = chessGame.removeBoard(name);
         if (removedBoard != null) {
-            if (currentBoard.equals(removedBoard)) {
+            if (chessGame.getCurrentBoard().equals(removedBoard)) {
                 setNewBoard();
             }
         }
@@ -511,20 +503,18 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
 
     //EFFECTS: sets the first board in boards as current board
     private void setNewBoard() {
-        if (boards.isBoardListEmpty()) {
+        if (chessGame.isBoardListEmpty()) {
             Board b = new Board();
-            boards.addBoard(b);
-            this.currentBoard = b;
+            chessGame.addBoard(b);
+            this.chessGame.setCurrentBoard(b);
         } else {
-            this.currentBoard = boards.getBoard(0);
+            this.chessGame.setCurrentBoard(chessGame.getBoard(0));
         }
     }
 
     //EFFECTS: saves current chess game to file
     private void saveChessGame() {
         try {
-            chessGame.setCurrentBoard(currentBoard);
-            chessGame.setBoards(boards);
             jsonWriter.open();
             jsonWriter.write(chessGame);
             jsonWriter.close();
@@ -539,8 +529,6 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
     private void loadChessGame() {
         try {
             chessGame = jsonReader.read();
-            currentBoard = chessGame.getCurrentBoard();
-            boards = chessGame.getBoards();
             System.out.println("Games loaded from " + JSON_STORE);
 
         } catch (IOException e) {
@@ -550,7 +538,7 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
 
     //EFFECTS: prints out all the names of the boards in order
     private void printBoards() {
-        for (Board board : boards.getBoards()) {
+        for (Board board : chessGame) {
             System.out.println("- " + board.getName());
         }
     }
@@ -559,11 +547,11 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
     private void displayCurrentBoard() {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                System.out.print(currentBoard.boardToStringBoard()[i][j] + " ");
+                System.out.print(chessGame.getCurrentBoard().boardToStringBoard()[i][j] + " ");
             }
             System.out.println();
         }
-        if (currentBoard.getIsWhitesTurn()) {
+        if (chessGame.getCurrentBoard().getIsWhitesTurn()) {
             System.out.println("White to move.");
         } else {
             System.out.println("Black to move.");
@@ -578,8 +566,8 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
             System.out.println("Enter new game name: ");
             name = input.next();
             Board b = new Board(name);
-            this.boards.addBoard(b);
-            this.currentBoard = b;
+            this.chessGame.addBoard(b);
+            this.chessGame.setCurrentBoard(b);
         }
     }
 
@@ -587,8 +575,8 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
     // EFFECTS: creates new board and makes it the current board
     private void createNewBoard(String name) {
         Board b = new Board(name);
-        this.boards.addBoard(b);
-        this.currentBoard = b;
+        this.chessGame.addBoard(b);
+        this.chessGame.setCurrentBoard(b);
     }
 
     //MODIFIES: this
@@ -608,7 +596,7 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
         boardLabel.setVerticalAlignment(JLabel.CENTER);
         boardLabel.setHorizontalAlignment(JLabel.CENTER);
         boardLabel.setBorder(boardBorder);
-        boardLabel.setText(currentBoard.getName());
+        boardLabel.setText(chessGame.getCurrentBoard().getName());
         setupPieces();
 
         this.add(boardLabel);
@@ -618,14 +606,14 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
     //MODIFIES: this
     //EFFECTS: updates drawing board
     private void updateBoard() {
-        boardLabel.setText(currentBoard.getName());
+        boardLabel.setText(chessGame.getCurrentBoard().getName());
         setupPieces();
     }
 
     //MODIFIES: this
     //EFFECTS: repaints the board
     private void updateBoard(int[] move) {
-        boardLabel.setText(currentBoard.getName());
+        boardLabel.setText(chessGame.getCurrentBoard().getName());
         updatePieces(move[0],move[1],move[2],move[3]);
     }
 
@@ -638,7 +626,7 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 try {
-                    ImageIcon piece = pieces.getPieceImage(currentBoard.getPiece(i,j));
+                    ImageIcon piece = pieces.getPieceImage(chessGame.getCurrentBoard().getPiece(i,j));
                     JLabel pieceLabel = new JLabel();
                     pieceLabel.setIcon(piece);
                     pieceLabel.setBounds(
@@ -773,7 +761,4 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
         //do nothing
     }
 
-    //TODO: - progress bar for evaluations
-    //      - add functionality to make mouse moves and not typed
-    //      - promotion
 }

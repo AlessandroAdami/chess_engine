@@ -11,7 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Unit tests for the Event class
  */
-public class EventTest {
+
+public class TestEvent {
     private Event e;
     private Date d;
 

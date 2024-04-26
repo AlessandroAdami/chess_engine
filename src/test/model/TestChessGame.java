@@ -6,7 +6,10 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ChessGameTest {
+/**
+ * Unit tests for the ChessGame class
+ */
+public class TestChessGame {
 
     ChessGame chessGame;
     ChessGame chessGame0;

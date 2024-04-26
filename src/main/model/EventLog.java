@@ -11,18 +11,17 @@ import java.util.Iterator;
 
 public class EventLog implements Iterable<Event> {
 
-    // the only EventLog in the system (Singleton Design Pattern)
+    // the only EventLog in the system
     private static EventLog theLog;
     private Collection<Event> events;
 
-    // Prevent external construction (Singleton design pattern)
+    // Prevent external construction
     private EventLog() {
-        events = new ArrayList<Event>();
+        events = new ArrayList<>();
     }
 
     //EFFECTS: Gets instance of EventLog - creates it
     //         if it doesn't already exist.
-    //         (Singleton Design Pattern)
     //         returns  instance of EventLog
     public static EventLog getInstance() {
         if (theLog == null) {

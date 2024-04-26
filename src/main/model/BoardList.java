@@ -1,7 +1,6 @@
 package model;
 
-// Represents a list of boards manager. The list can be arbitrarily long.
-// Boards are listed in the order they are added to the list.
+//A list of board manager.
 
 
 //TODO: getters and removers should throw exceptions
@@ -9,14 +8,16 @@ package model;
 import org.json.JSONArray;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-public class BoardList {
+public class BoardList implements Iterable<Board> {
 
-    private ArrayList<Board> boards;
+    private List<Board> boards;
 
     // EFFECTS: creates new board list with no boards
     public BoardList() {
-        boards = new ArrayList<Board>();
+        boards = new ArrayList<>();
     }
 
     public void addBoard(Board b) {
@@ -44,16 +45,15 @@ public class BoardList {
     //MODIFIES: this
     //EFFECTS: removes first board with name from boards
     public Board removeBoard(String name) {
-        Board removedBoard = null;
         for (Board b : boards) {
             if (name.equals(b.getName())) {
                 EventLog.getInstance().logEvent(new Event(
                         "Board \"" + b.getName() + "\" was deleted and removed from list."));
-                removedBoard = removeBoard(b);
-                break;
+                boards.remove(b);
+                return b;
             }
         }
-        return removedBoard;
+        return null;
     }
 
     //EFFECTS: returns a JSON array of all the boards
@@ -65,6 +65,11 @@ public class BoardList {
         }
 
         return jsonArray;
+    }
+
+    //EFFECTS: returns iterator over boards
+    public Iterator<Board> iterator() {
+        return boards.iterator();
     }
 
     // EFFECTS: returns board with name, if none are found return null.
@@ -87,7 +92,7 @@ public class BoardList {
         return boards.isEmpty();
     }
 
-    public ArrayList<Board> getBoards() {
+    public List<Board> getBoards() {
         return boards;
     }
 

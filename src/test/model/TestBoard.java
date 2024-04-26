@@ -4,8 +4,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-
-public class BoardTest {
+/**
+ * Unit tests for Board class
+ */
+public class TestBoard {
 
     Board b0; //starting board
     Board b1; //empty board
