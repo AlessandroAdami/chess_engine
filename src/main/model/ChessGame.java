@@ -54,12 +54,13 @@ public class ChessGame implements Iterable<Board> {
         return boards.isBoardListEmpty();
     }
 
+    //getters
+
     //EFFECTS: gets board at index i
     public Board getBoard(int i) {
         return boards.getBoard(i);
     }
 
-    //getters
     public BoardList getBoards() {
         return boards;
     }

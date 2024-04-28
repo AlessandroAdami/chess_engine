@@ -2,9 +2,6 @@ package model;
 
 //A list of board manager.
 
-
-//TODO: getters and removers should throw exceptions
-
 import org.json.JSONArray;
 
 import java.util.ArrayList;

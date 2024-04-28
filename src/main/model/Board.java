@@ -1,12 +1,12 @@
 package model;
 
+//TO BE CHANGED:
 // - 0 indicates an empty square (not a piece)
 // - Pawn: 1 / Knight: 2 / Bishop: 3 / Rook: 4 / Queen: 5 / King: 6
-// black pieces have negative values, white pieces have positive values
 
 /*
  * TODO: understand the relationship between checker and board
- *  replace magic numbers with Piece.PAWN...
+ *  replace magic numbers with Piece.PAWN... look into enums
  * implement castling
  */
 
