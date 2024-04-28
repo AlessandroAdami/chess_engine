@@ -30,7 +30,7 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
     private final JsonWriter jsonWriter;
     private final JsonReader jsonReader;
     private ChessGame chessGame;
-    private final Pieces pieces;
+    private final Piece piece;
     private Scanner input;
 
     private JMenuBar menuBar;
@@ -52,7 +52,7 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
         jsonReader = new JsonReader(JSON_STORE);
         jsonWriter = new JsonWriter(JSON_STORE);
         chessGame = new ChessGame();
-        pieces = new Pieces(BOARD_SIZE / 8);
+        piece = new Piece(BOARD_SIZE / 8);
         runChessGame();
     }
 
@@ -626,7 +626,7 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 try {
-                    ImageIcon piece = pieces.getPieceImage(chessGame.getCurrentBoard().getPiece(i,j));
+                    ImageIcon piece = this.piece.getPieceImage(chessGame.getCurrentBoard().getPiece(i,j));
                     JLabel pieceLabel = new JLabel();
                     pieceLabel.setIcon(piece);
                     pieceLabel.setBounds(

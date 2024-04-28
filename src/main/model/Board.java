@@ -6,6 +6,7 @@ package model;
 
 /*
  * TODO: understand the relationship between checker and board
+ *  replace magic numbers with Piece.PAWN...
  * implement castling
  */
 
@@ -78,25 +79,26 @@ public class Board {
     //          and the square the piece wants to go to.
     public boolean isLegalMove(int fromCol, int fromRow, int toCol, int toRow) {
         int piece = this.position[fromCol][fromRow];
-        boolean rightTurnToMove = (((piece > 0) && isWhitesTurn)
-                || (piece < 0) && (!isWhitesTurn));
+        boolean rightTurnToMove = (((piece > 0) && isWhitesTurn) || (piece < 0) && (!isWhitesTurn));
         boolean hasPieceMoved = (fromCol != toCol || fromRow != toRow);
         boolean toEnemyOrEmptySquare = (piece * this.position[toCol][toRow] <= 0);
-        boolean isValidMoveForPiece;
+        boolean isValidMoveForPiece = false;
         switch (piece) {
-            case -1: case 1: isValidMoveForPiece = this.isLegalPawnMove(fromCol,fromRow,toCol,toRow);
+            case -Piece.PAWN: case Piece.PAWN: isValidMoveForPiece = this.isLegalPawnMove(fromCol,fromRow,toCol,toRow);
                 break;
-            case -2: case 2:  isValidMoveForPiece = this.isLegalKnightMove(fromCol,fromRow,toCol,toRow);
-            break;
-            case -3: case 3: isValidMoveForPiece = this.isLegalBishopMove(fromCol,fromRow,toCol,toRow);
-            break;
-            case - 4: case 4: isValidMoveForPiece = this.isLegalRookMove(fromCol,fromRow,toCol,toRow);
+            case -Piece.KNIGHT: case Piece.KNIGHT:
+                isValidMoveForPiece = this.isLegalKnightMove(fromCol,fromRow,toCol,toRow);
                 break;
-            case -5: case 5: isValidMoveForPiece = this.isLegalQueenMove(fromCol,fromRow,toCol,toRow);
+            case -Piece.BISHOP: case Piece.BISHOP:
+                isValidMoveForPiece = this.isLegalBishopMove(fromCol,fromRow,toCol,toRow);
                 break;
-            case -6: case 6: isValidMoveForPiece = this.isLegalKingMove(fromCol,fromRow,toCol,toRow);
+            case -Piece.ROOK: case Piece.ROOK: isValidMoveForPiece = this.isLegalRookMove(fromCol,fromRow,toCol,toRow);
                 break;
-            default: isValidMoveForPiece = false;
+            case -Piece.QUEEN: case Piece.QUEEN:
+                isValidMoveForPiece = this.isLegalQueenMove(fromCol,fromRow,toCol,toRow);
+                break;
+            case -Piece.KING: case Piece.KING: isValidMoveForPiece = this.isLegalKingMove(fromCol,fromRow,toCol,toRow);
+                break;
         }
         return rightTurnToMove && hasPieceMoved && toEnemyOrEmptySquare && isValidMoveForPiece;
     }
@@ -346,7 +348,7 @@ public class Board {
     //EFFECTS: true if pawn on the square must be promoted
     public boolean isPawnToPromote(int col,int row) {
         int pawn = position[col][row];
-        return (row == 7 && pawn == 1) || (row == 0 && pawn == - 1);
+        return (row == 7 && pawn == Piece.PAWN) || (row == 0 && pawn == -Piece.PAWN);
     }
 
     //EFFECTS: changes the turn (whose move it is)
@@ -444,13 +446,12 @@ public class Board {
         return true;
     }
 
-    // MODIFIES: this
-    // EFFECTS: puts piece on col,row of this board
+    // getters and setters
+
     public void placePiece(int col,int row, int piece) {
         position[col][row] = piece;
     }
 
-    // getters and setters
     public int getPiece(int col, int row) {
         return position[col][row];
     }

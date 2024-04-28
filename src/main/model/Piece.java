@@ -7,9 +7,9 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-//Manages images of pieces.
+//Manages pieces' images and number values. Note: black must have *-1 value of white pieces.
 
-public class Pieces {
+public class Piece {
 
     private List<ImageIcon> pieces;
     private int scale;
@@ -25,9 +25,16 @@ public class Pieces {
     private ImageIcon blackQueen;
     private ImageIcon whiteKing;
     private ImageIcon blackKing;
+    public static final int NONE   = 0;
+    public static final int PAWN   = 1;
+    public static final int KNIGHT = 2;
+    public static final int BISHOP = 3;
+    public static final int ROOK   = 4;
+    public static final int QUEEN  = 5;
+    public static final int KING   = 6;
 
     //EFFECTS: retrieves the images of the pieces and rescales them
-    public Pieces(int scale) {
+    public Piece(int scale) {
         this.scale = scale;
         this.pieces = new ArrayList<>();
         createPieces();
@@ -51,7 +58,6 @@ public class Pieces {
         blackQueen  = new ImageIcon("./data/blackQueen.png");
         blackKing   = new ImageIcon("./data/blackKing.png");
     }
-
 
     //MODIFIES: this
     //EFFECTS: adds pieces to the list
@@ -101,19 +107,4 @@ public class Pieces {
             default: throw new NoPieceException();
         }
     }
-
-    //getters
-
-    public List<ImageIcon> getPieces() {
-        return pieces;
-    }
-
-    public ImageIcon getPieceAtIndex(int i) {
-        return pieces.get(i);
-    }
-
-    public int getScale() {
-        return scale;
-    }
-
 }
