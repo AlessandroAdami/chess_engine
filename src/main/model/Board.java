@@ -6,8 +6,8 @@ package model;
 
 /*
  * TODO: understand the relationship between checker and board
- *  replace magic numbers with Piece.PAWN... look into enums
  * implement castling
+ * make solid with exceptions
  */
 
 import org.json.JSONObject;
@@ -23,16 +23,7 @@ public class Board {
 
     // EFFECTS: constructs a new board
     public Board() {
-        position = new int[][]{
-                {4, 1, 0, 0, 0, 0, -1, -4},
-                {2, 1, 0, 0, 0, 0, -1, -2},
-                {3, 1, 0, 0, 0, 0, -1, -3},
-                {5, 1, 0, 0, 0, 0, -1, -5},
-                {6, 1, 0, 0, 0, 0, -1, -6},
-                {3, 1, 0, 0, 0, 0, -1, -3},
-                {2, 1, 0, 0, 0, 0, -1, -2},
-                {4, 1, 0, 0, 0, 0, -1, -4},
-        };
+        createNewBoard();
         name = "New Board";
         isWhitesTurn = true;
         canWhiteCastle = "RKR";
@@ -42,21 +33,49 @@ public class Board {
 
     // EFFECTS: constructs a new board
     public Board(String name) {
-        position = new int[][]{
-                {4, 1, 0, 0, 0, 0, -1, -4},
-                {2, 1, 0, 0, 0, 0, -1, -2},
-                {3, 1, 0, 0, 0, 0, -1, -3},
-                {5, 1, 0, 0, 0, 0, -1, -5},
-                {6, 1, 0, 0, 0, 0, -1, -6},
-                {3, 1, 0, 0, 0, 0, -1, -3},
-                {2, 1, 0, 0, 0, 0, -1, -2},
-                {4, 1, 0, 0, 0, 0, -1, -4},
-        };
+        createNewBoard();
         this.name = name;
         isWhitesTurn = true;
         canWhiteCastle = "RKR";
         canBlackCastle = "RKR";
         enPassantCol = -1;
+    }
+
+    private void createNewBoard() {
+        position = new int[8][8];
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                int color = 0;
+                if (2 <= j && j <= 5) {
+                    position[i][j] = Piece.NONE;
+                } else if (j < 2) {
+                    color = Piece.WHITE;
+                } else {
+                    color = Piece.BLACK;
+                }
+                assignPieceToSquare(i, j, color);
+            }
+        }
+    }
+
+    private void assignPieceToSquare(int i, int j, int color) {
+        if (j == 1 || j == 6) {
+            position[i][j] = Piece.PAWN * color;
+        } else {
+            int piece = i % 7;
+            switch (piece) {
+                case 0: position[i][j] = Piece.ROOK * color;
+                    break;
+                case 1: case 6: position[i][j] = Piece.KNIGHT * color;
+                    break;
+                case 2: case 5: position[i][j] = Piece.BISHOP * color;
+                    break;
+                case 3: position[i][j] = Piece.QUEEN * color;
+                    break;
+                case 4: position[i][j] = Piece.KING * color;
+                    break;
+            }
+        }
     }
 
     // REQUIRES: fromCol,fromRow,toCol,toRow are in [0,7]
@@ -106,7 +125,7 @@ public class Board {
     //EFFECTS: moves piece from square to square
     private void movePiece(int piece, int fromCol, int fromRow, int toCol, int toRow) {
         enPassantCaptures(fromCol,fromRow,toCol,toRow);
-        this.position[fromCol][fromRow] = 0;
+        this.position[fromCol][fromRow] = Piece.NONE;
         this.position[toCol][toRow] = piece;
     }
 
@@ -126,9 +145,9 @@ public class Board {
             hasNotMoved = (fromRow == 6);
             enPassantRow = 2;
         }
-        oneStep = (fromCol == toCol) && (fromRow + pawn == toRow) && position[toCol][toRow] == 0;
+        oneStep = (fromCol == toCol) && (fromRow + pawn == toRow) && position[toCol][toRow] == Piece.NONE;
         twoStep = (fromCol == toCol) && (fromRow + (2 * pawn) == toRow) && hasNotMoved
-                && (this.position[fromCol][fromRow + pawn] == 0)  && position[toCol][toRow] == 0;
+                && (this.position[fromCol][fromRow + pawn] == 0)  && position[toCol][toRow] == Piece.NONE;
         captures = (fromRow + pawn == toRow)
                     && (fromCol == toCol - 1 || fromCol == toCol + 1)
                     && this.position[toCol][toRow] * pawn < 0;
@@ -145,7 +164,7 @@ public class Board {
             int enPassantRow = (pawn > 0) ? 4 : 3;
             boolean enPassant = (enPassantCol == toCol) && (enPassantRow == fromRow);
             if (enPassant) {
-                this.position[enPassantCol][enPassantRow] = 0;
+                this.position[enPassantCol][enPassantRow] = Piece.NONE;
             }
         }
     }
@@ -183,7 +202,7 @@ public class Board {
     private boolean isBishopPathEmpty(int fromCol, int fromRow, int toCol, int colDir, int rowDir) {
         boolean throughEmptySquares = true;
         for (int col = fromCol + colDir, row = fromRow + rowDir; col != toCol; col = col + colDir, row = row + rowDir) {
-            if (this.position[col][row] != 0) {
+            if (this.position[col][row] != Piece.NONE) {
                 throughEmptySquares = false;
                 break;
             }
@@ -205,14 +224,14 @@ public class Board {
         boolean throughEmptySquares = true;
         if (rowDir == 0) {
             for (int col = fromCol + colDir; col != toCol; col = col + colDir) {
-                if (this.position[col][fromRow] != 0) {
+                if (this.position[col][fromRow] != Piece.NONE) {
                     throughEmptySquares = false;
                     break;
                 }
             }
         } else {
             for (int row = fromRow + rowDir; row != toRow; row = row + rowDir) {
-                if (this.position[fromCol][row] != 0) {
+                if (this.position[fromCol][row] != Piece.NONE) {
                     throughEmptySquares = false;
                     break;
                 }
@@ -336,7 +355,7 @@ public class Board {
         boolean isEmpty = true;
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                if (position[i][j] != 0) {
+                if (position[i][j] != Piece.NONE) {
                     isEmpty = false;
                     break;
                 }
