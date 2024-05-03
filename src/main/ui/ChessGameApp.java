@@ -2,6 +2,7 @@ package ui;
 
 import model.Event;
 import model.*;
+import model.exceptions.BoardSquareOutOfBoundsException;
 import model.exceptions.NoPieceException;
 import persistence.JsonReader;
 import persistence.JsonWriter;
@@ -287,41 +288,27 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
             try {
                 if (command.equals("evaluate")) {
                     System.out.println("Current evaluation = " + chessGame.getCurrentBoard().evaluatePos());
-                } else if (isValidMove(command)) {
-                    makeMove(command);
                 } else {
-                    System.out.println("Not a valid move.");
+                    makeMove(stringToMove(command));
                 }
             } catch (NumberFormatException e) {
                 System.out.println("\nNot a valid move format, try: '1,1,1,3'");
+            } catch (BoardSquareOutOfBoundsException e) {
+                System.out.println("\nNot a valid move, select proper squares");
             }
 
             showCurrentBoard();
         }
     }
 
-    //EFFECTS: true if move is valid in current Board
-    private boolean isValidMove(String move) throws NumberFormatException {
-        int fromCol = Integer.parseInt(move.substring(0,1));
-        int fromRow = Integer.parseInt(move.substring(2,3));
-        int toCol   = Integer.parseInt(move.substring(4,5));
-        int toRow   = Integer.parseInt(move.substring(6));
-        if (0 <= fromCol && 0 <= fromRow && 0 <= toCol && 0 <= toRow
-                && fromCol < 8 && fromRow < 8 && toCol < 8 && toRow < 8) {
-            return chessGame.getCurrentBoard().isLegalMove(fromCol,fromRow,toCol,toRow);
-        } else {
-            return false;
-        }
-    }
-
     //MODIFIES: this
     //EFFECTS: makes the move on the current board
-    private void makeMove(String move) {
-        int fromCol = Integer.parseInt(move.substring(0,1));
-        int fromRow = Integer.parseInt(move.substring(2,3));
-        int toCol   = Integer.parseInt(move.substring(4,5));
-        int toRow   = Integer.parseInt(move.substring(6));
-        chessGame.getCurrentBoard().makeMove(fromCol,fromRow,toCol,toRow);
+    private void makeMove(Move move) throws BoardSquareOutOfBoundsException {
+        int fromCol = move.getFromCol();
+        int fromRow = move.getFromRow();
+        int toCol   = move.getToCol();
+        int toRow   = move.getToRow();
+        chessGame.getCurrentBoard().makeMove(new Move(fromCol,fromRow,toCol,toRow));
         if (chessGame.getCurrentBoard().isPawnToPromote(toCol,toRow)) {
             promotePawn(toCol,toRow);
         }
@@ -612,9 +599,9 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
 
     //MODIFIES: this
     //EFFECTS: repaints the board
-    private void updateBoard(int[] move) {
+    private void updateBoard(Move move) {
         boardLabel.setText(chessGame.getCurrentBoard().getName());
-        updatePieces(move[0],move[1],move[2],move[3]);
+        updatePieces(move);
     }
 
     //MODIFIES: this, board
@@ -647,7 +634,11 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
 
     //MODIFIES: this, board
     //EFFECTS: redraws the pieces on the board
-    private void updatePieces(int fromCol,int fromRow,int toCol,int toRow) {
+    private void updatePieces(Move move) {
+        int toCol = move.getToCol();
+        int toRow = move.getToRow();
+        int fromCol = move.getFromCol();
+        int fromRow = move.getFromRow();
         int squareImageScale = (HEIGHT - 120) / 8;
         JLabel deletePieceLabel = piecesLabels[toCol][toRow];
         if (deletePieceLabel != null) {
@@ -684,10 +675,12 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
         } else if (e.getSource() == menuBar.getMenu(0).getItem(1)) {
             saveChessGame();
         } else if (e.getSource() == moveButton) {
-            String move = moveText.getText();
-            if (isValidMove(move)) {
+            try {
+                Move move = stringToMove(moveText.getText());
                 makeMove(move);
-                updateBoard(stringToMove(move));
+                updateBoard(move);
+            } catch (BoardSquareOutOfBoundsException ex) {
+                System.out.println(ex.getMessage());
             }
         } else if (e.getSource() == createNewBoardButton) {
             createNewBoard(newBoardName.getText());
@@ -702,17 +695,12 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
     }
 
     //EFFECTS: returns a move string into a move array
-    private int[] stringToMove(String move) {
-        int fromCol = Integer.parseInt(move.substring(0,1));
-        int fromRow = Integer.parseInt(move.substring(2,3));
-        int toCol   = Integer.parseInt(move.substring(4,5));
-        int toRow   = Integer.parseInt(move.substring(6));
-        int[] moveArray = new int[4];
-        moveArray[0] = fromCol;
-        moveArray[1] = fromRow;
-        moveArray[2] = toCol;
-        moveArray[3] = toRow;
-        return moveArray;
+    private Move stringToMove(String moveString) throws BoardSquareOutOfBoundsException {
+        int fromCol = Integer.parseInt(moveString.substring(0,1));
+        int fromRow = Integer.parseInt(moveString.substring(2,3));
+        int toCol   = Integer.parseInt(moveString.substring(4,5));
+        int toRow   = Integer.parseInt(moveString.substring(6));
+        return new Move(fromCol,fromRow,toCol,toRow);
     }
 
     //EFFECTS: prints the log of events

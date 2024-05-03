@@ -8,12 +8,12 @@
             1,
             0,
             0,
+            1,
             0,
             0,
-            -1,
             -4,
             2,
-            1,
+            0,
             0,
             0,
             0,
@@ -69,7 +69,7 @@
             -1,
             -4
         ],
-        "isWhitesTurn": true,
+        "isWhitesTurn": false,
         "canWhiteCastle": "RKR"
     }],
     "currentBoard": {
@@ -81,12 +81,12 @@
             1,
             0,
             0,
+            1,
             0,
             0,
-            -1,
             -4,
             2,
-            1,
+            0,
             0,
             0,
             0,
@@ -142,7 +142,7 @@
             -1,
             -4
         ],
-        "isWhitesTurn": true,
+        "isWhitesTurn": false,
         "canWhiteCastle": "RKR"
     }
 }

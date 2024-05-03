@@ -1,13 +1,11 @@
 package model;
 
-//TO BE CHANGED:
-// - 0 indicates an empty square (not a piece)
-// - Pawn: 1 / Knight: 2 / Bishop: 3 / Rook: 4 / Queen: 5 / King: 6
-
+//Represents the classic 8x8 chessboard
 /*
  * TODO: understand the relationship between checker and board
- * implement castling
- * make solid with exceptions
+ *  move class: look up how to unpack fields of a array
+ *  implement castling
+ *  make robust with exceptions
  */
 
 import org.json.JSONObject;
@@ -21,7 +19,8 @@ public class Board {
     private String canBlackCastle;
     private int enPassantCol;
 
-    // EFFECTS: constructs a new board
+
+    // EFFECTS: construct new board
     public Board() {
         createNewBoard();
         name = "New Board";
@@ -31,7 +30,7 @@ public class Board {
         enPassantCol = -1;
     }
 
-    // EFFECTS: constructs a new board
+    // EFFECTS: constructs board with given name
     public Board(String name) {
         createNewBoard();
         this.name = name;
@@ -78,63 +77,63 @@ public class Board {
         }
     }
 
-    // REQUIRES: fromCol,fromRow,toCol,toRow are in [0,7]
     // MODIFIES: this
     // EFFECTS: if move is legal, moves selected piece to square and captures any piece in
     //          the to square. Otherwise, do nothing
-    public void makeMove(int fromCol, int fromRow, int toCol, int toRow) {
+    public void makeMove(Move move) {
+        int fromCol = move.getFromCol();
+        int fromRow = move.getFromRow();
+        int toRow = move.getToRow();
         int piece = this.position[fromCol][fromRow];
-        if (this.isLegalMove(fromCol, fromRow, toCol, toRow)) {
-            movePiece(piece, fromCol,fromRow,toCol,toRow);
+        if (this.isLegalMove(move)) {
+            movePiece(piece, move);
             nextTurn();
             updateCastling(fromCol, fromRow, piece);
             enPassantCol = updateEnPassantCol(piece, fromCol, fromRow, toRow);
         }
     }
 
-    // REQUIRES: fromCol,fromRow,toCol,toRow are in [0,7]
     // EFFECTS: true if the move is legal on current the board
-    //          moves is defined by the square the piece is on
-    //          and the square the piece wants to go to.
-    public boolean isLegalMove(int fromCol, int fromRow, int toCol, int toRow) {
-        int piece = this.position[fromCol][fromRow];
+    public boolean isLegalMove(Move move) {
+        int piece = this.position[move.getFromCol()][move.getFromRow()];
         boolean rightTurnToMove = (((piece > 0) && isWhitesTurn) || (piece < 0) && (!isWhitesTurn));
-        boolean hasPieceMoved = (fromCol != toCol || fromRow != toRow);
-        boolean toEnemyOrEmptySquare = (piece * this.position[toCol][toRow] <= 0);
+        boolean hasPieceMoved = (move.getFromCol() != move.getToCol() || move.getFromRow() != move.getToRow());
+        boolean toEnemyOrEmptySquare = (piece * this.position[move.getToCol()][move.getToRow()] <= 0);
         boolean isValidMoveForPiece = false;
         switch (piece) {
-            case -Piece.PAWN: case Piece.PAWN: isValidMoveForPiece = this.isLegalPawnMove(fromCol,fromRow,toCol,toRow);
+            case -Piece.PAWN: case Piece.PAWN: isValidMoveForPiece = this.isLegalPawnMove(move);
                 break;
             case -Piece.KNIGHT: case Piece.KNIGHT:
-                isValidMoveForPiece = this.isLegalKnightMove(fromCol,fromRow,toCol,toRow);
+                isValidMoveForPiece = this.isLegalKnightMove(move);
                 break;
             case -Piece.BISHOP: case Piece.BISHOP:
-                isValidMoveForPiece = this.isLegalBishopMove(fromCol,fromRow,toCol,toRow);
+                isValidMoveForPiece = this.isLegalBishopMove(move);
                 break;
-            case -Piece.ROOK: case Piece.ROOK: isValidMoveForPiece = this.isLegalRookMove(fromCol,fromRow,toCol,toRow);
+            case -Piece.ROOK: case Piece.ROOK: isValidMoveForPiece = this.isLegalRookMove(move);
                 break;
             case -Piece.QUEEN: case Piece.QUEEN:
-                isValidMoveForPiece = this.isLegalQueenMove(fromCol,fromRow,toCol,toRow);
+                isValidMoveForPiece = this.isLegalQueenMove(move);
                 break;
-            case -Piece.KING: case Piece.KING: isValidMoveForPiece = this.isLegalKingMove(fromCol,fromRow,toCol,toRow);
+            case -Piece.KING: case Piece.KING: isValidMoveForPiece = this.isLegalKingMove(move);
                 break;
         }
         return rightTurnToMove && hasPieceMoved && toEnemyOrEmptySquare && isValidMoveForPiece;
     }
 
     //EFFECTS: moves piece from square to square
-    private void movePiece(int piece, int fromCol, int fromRow, int toCol, int toRow) {
-        enPassantCaptures(fromCol,fromRow,toCol,toRow);
-        this.position[fromCol][fromRow] = Piece.NONE;
-        this.position[toCol][toRow] = piece;
+    private void movePiece(int piece,Move move) {
+        enPassantCaptures(move);
+        this.position[move.getFromCol()][move.getFromRow()] = Piece.NONE;
+        this.position[move.getToCol()][move.getToRow()] = piece;
     }
 
     //EFFECTS: true if pawn move is legal
-    private boolean isLegalPawnMove(int fromCol,int fromRow,int toCol,int toRow) {
+    private boolean isLegalPawnMove(Move move) {
+        int fromCol = move.getFromCol();
+        int fromRow = move.getFromRow();
+        int toCol = move.getToCol();
+        int toRow = move.getToRow();
         int pawn = this.position[fromCol][fromRow];
-        boolean oneStep;
-        boolean twoStep;
-        boolean captures;
         boolean hasNotMoved;
         boolean enPassant;
         int enPassantRow;
@@ -145,10 +144,10 @@ public class Board {
             hasNotMoved = (fromRow == 6);
             enPassantRow = 2;
         }
-        oneStep = (fromCol == toCol) && (fromRow + pawn == toRow) && position[toCol][toRow] == Piece.NONE;
-        twoStep = (fromCol == toCol) && (fromRow + (2 * pawn) == toRow) && hasNotMoved
+        boolean oneStep = (fromCol == toCol) && (fromRow + pawn == toRow) && position[toCol][toRow] == Piece.NONE;
+        boolean twoStep = (fromCol == toCol) && (fromRow + (2 * pawn) == toRow) && hasNotMoved
                 && (this.position[fromCol][fromRow + pawn] == 0)  && position[toCol][toRow] == Piece.NONE;
-        captures = (fromRow + pawn == toRow)
+        boolean captures = (fromRow + pawn == toRow)
                     && (fromCol == toCol - 1 || fromCol == toCol + 1)
                     && this.position[toCol][toRow] * pawn < 0;
         enPassant = (enPassantCol == toCol) && (toRow == enPassantRow);
@@ -158,11 +157,11 @@ public class Board {
 
     //MODIFIES: this
     //EFFECTS: captures en-passant
-    private void enPassantCaptures(int fromCol, int fromRow, int toCol, int toRow) {
-        if (isLegalPawnMove(fromCol,fromRow,toCol,toRow)) {
-            int pawn = position[fromCol][fromRow];
+    private void enPassantCaptures(Move move) {
+        if (isLegalPawnMove(move)) {
+            int pawn = position[move.getFromCol()][move.getFromRow()];
             int enPassantRow = (pawn > 0) ? 4 : 3;
-            boolean enPassant = (enPassantCol == toCol) && (enPassantRow == fromRow);
+            boolean enPassant = (enPassantCol == move.getToCol()) && (enPassantRow == move.getFromRow());
             if (enPassant) {
                 this.position[enPassantCol][enPassantRow] = Piece.NONE;
             }
@@ -183,14 +182,18 @@ public class Board {
     }
 
     //EFFECTS: true if knight move is legal
-    private boolean isLegalKnightMove(int fromCol,int fromRow,int toCol,int toRow) {
-        int rowDelta = Math.abs(toRow - fromRow);
-        int colDelta = Math.abs(toCol - fromCol);
+    private boolean isLegalKnightMove(Move move) {
+        int rowDelta = Math.abs(move.getToRow() - move.getFromRow());
+        int colDelta = Math.abs(move.getToCol() - move.getFromCol());
         return (rowDelta * colDelta == 2);
     }
 
     //EFFECTS: true if bishop move is legal
-    private boolean isLegalBishopMove(int fromCol,int fromRow,int toCol,int toRow) {
+    private boolean isLegalBishopMove(Move move) {
+        int fromCol = move.getFromCol();
+        int fromRow = move.getFromRow();
+        int toCol = move.getToCol();
+        int toRow = move.getToRow();
         boolean goodBishopMove = Math.abs(fromCol - toCol) == Math.abs(fromRow - toRow);
         int colDir = (int) Math.signum(toCol - fromCol);
         int rowDir = (int) Math.signum(toRow - fromRow);
@@ -211,7 +214,11 @@ public class Board {
     }
 
     //EFFECTS: true if rook move is legal
-    private boolean isLegalRookMove(int fromCol,int fromRow,int toCol,int toRow) {
+    private boolean isLegalRookMove(Move move) {
+        int fromCol = move.getFromCol();
+        int fromRow = move.getFromRow();
+        int toCol = move.getToCol();
+        int toRow = move.getToRow();
         boolean goodRookMove = (fromCol == toCol || fromRow == toRow);
         int colDir = (int) Math.signum(toCol - fromCol);
         int rowDir = (int) Math.signum(toRow - fromRow);
@@ -241,13 +248,17 @@ public class Board {
     }
 
     //EFFECTS: true if queen move is legal
-    private boolean isLegalQueenMove(int fromCol, int fromRow,int toCol,int toRow) {
-        return isLegalBishopMove(fromCol, fromRow, toCol, toRow)
-                || isLegalRookMove(fromCol,fromRow,toCol,toRow);
+    private boolean isLegalQueenMove(Move move) {
+        return isLegalBishopMove(move)
+                || isLegalRookMove(move);
     }
 
     //EFFECTS: true if king move is legal
-    private boolean isLegalKingMove(int fromCol,int fromRow,int toCol,int toRow) {
+    private boolean isLegalKingMove(Move move) {
+        int fromCol = move.getFromCol();
+        int fromRow = move.getFromRow();
+        int toCol = move.getToCol();
+        int toRow = move.getToRow();
         boolean isLeftOrRight = (Math.abs(toCol - fromCol) == 1) && fromRow == toRow;
         boolean isUpOrDown = (Math.abs(toRow - fromRow) == 1) && fromCol == toCol;
         boolean isDiagonal = (Math.abs(toCol - fromCol) == 1) && (Math.abs(toRow - fromRow) == 1);
@@ -289,8 +300,6 @@ public class Board {
     }
 
     // EFFECTS: sends each piece to a string for printing purposes.
-    //          it also puts the board in the right position array-wise
-    //          notice the resulting board has black on top
     public String[][] boardToStringBoard() {
         String[][] stringBoard = new String[8][8];
         for (int i = 0; i < 8; i++) {

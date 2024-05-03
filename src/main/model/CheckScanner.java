@@ -1,7 +1,10 @@
 package model;
 
+import model.exceptions.BoardSquareOutOfBoundsException;
+
 //A scanner that looks for checks in a position.
-//TODO: handle position[][] out of bounds with exceptions
+//TODO: remove magic numbers
+
 public class CheckScanner {
 
     private Board board;
@@ -268,7 +271,13 @@ public class CheckScanner {
                 if ((kingRow + j < 0) || (kingRow + j > 7)) {
                     continue;
                 }
-                if (board.isLegalMove(kingCol,kingRow, kingCol + i, kingRow + j)) {
+                Move move = null;
+                try {
+                    move = new Move(kingCol,kingRow, kingCol + i, kingRow + j);
+                } catch (BoardSquareOutOfBoundsException e) {
+                    //move is illegal
+                }
+                if (board.isLegalMove(move)) {
                     return false;
                 }
             }
@@ -280,7 +289,13 @@ public class CheckScanner {
     private boolean canAttackerBeCaptured() {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                if (board.isLegalMove(i,j,checkingPieceCol,checkingPieceRow)) {
+                Move move;
+                try {
+                    move = new Move(i,j,checkingPieceCol,checkingPieceRow);
+                } catch (BoardSquareOutOfBoundsException e) {
+                    continue;
+                }
+                if (board.isLegalMove(move)) {
                     return true;
                 }
             }
@@ -306,7 +321,13 @@ public class CheckScanner {
             for (int j = checkingPieceRow + delRow; j != kingRow; j = j + delRow) {
                 for (int c = 0; c < 8; c++) {
                     for (int r = 0; r < 8; r++) {
-                        if (board.isLegalMove(c,r,i,j)) {
+                        Move move;
+                        try {
+                            move = new Move(c,r,i,j);
+                        } catch (BoardSquareOutOfBoundsException e) {
+                            continue;
+                        }
+                        if (board.isLegalMove(move)) {
                             return true;
                         }
                     }
@@ -325,13 +346,19 @@ public class CheckScanner {
         }
     }
 
-    //EFFECTS: true if attacking rook and be blocked in the column
+    //EFFECTS: true if attacking rook can be blocked in the column
     private boolean canRookColBeBlocked() {
         int delCol = (int) Math.signum(kingCol - checkingPieceCol);
         for (int i = checkingPieceCol + delCol; i != kingCol; i = i + delCol) {
             for (int c = 0; c < 8; c++) {
                 for (int r = 0; r < 8; r++) {
-                    if (board.isLegalMove(c,r,i,kingRow)) {
+                    Move move;
+                    try {
+                        move = new Move(c,r,i,kingRow);
+                    } catch (BoardSquareOutOfBoundsException e) {
+                        continue;
+                    }
+                    if (board.isLegalMove(move)) {
                         return true;
                     }
                 }
@@ -340,13 +367,19 @@ public class CheckScanner {
         return false;
     }
 
-    //EFFECTS: true if attacking rook and be blocked in the row
+    //EFFECTS: true if attacking rook can be blocked in the row
     private boolean canRookRowBeBlocked() {
         int delRow = (int) Math.signum(kingRow - checkingPieceRow);
         for (int i = checkingPieceRow + delRow; i != kingRow; i = i + delRow) {
             for (int c = 0; c < 8; c++) {
                 for (int r = 0; r < 8; r++) {
-                    if (board.isLegalMove(c,r,kingCol,i)) {
+                    Move move;
+                    try {
+                        move = new Move(c,r,kingCol,i);
+                    } catch (BoardSquareOutOfBoundsException e) {
+                        continue;
+                    }
+                    if (board.isLegalMove(move)) {
                         return true;
                     }
                 }
