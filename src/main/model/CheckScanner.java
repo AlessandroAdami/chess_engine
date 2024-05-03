@@ -3,7 +3,6 @@ package model;
 import model.exceptions.BoardSquareOutOfBoundsException;
 
 //A scanner that looks for checks in a position.
-//TODO: remove magic numbers
 
 public class CheckScanner {
 
@@ -24,7 +23,7 @@ public class CheckScanner {
         this.board = b;
         this.position = b.getPosition();
         this.isWhitesTurn = b.getIsWhitesTurn();
-        this.kingColor = isWhitesTurn ? 1 : -1;
+        this.kingColor = isWhitesTurn ? Piece.WHITE : Piece.BLACK;
         this.kingCol = findKingCol(kingColor);
         this.kingRow = findKingRow(kingColor);
         this.checkingPieceCol = -1;
@@ -37,7 +36,7 @@ public class CheckScanner {
     public void updateScanner() {
         this.position = board.getPosition();
         this.isWhitesTurn = board.getIsWhitesTurn();
-        this.kingColor = isWhitesTurn ? 1 : -1;
+        this.kingColor = isWhitesTurn ? Piece.WHITE : Piece.BLACK;
         this.kingCol = findKingCol(kingColor);
         this.kingRow = findKingRow(kingColor);
         this.checkingPieceCol = -1;
@@ -62,7 +61,7 @@ public class CheckScanner {
     private int findKingCol(int color) {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                if (position[i][j] == 6 * color) {
+                if (position[i][j] == Piece.KING * color) {
                     return i;
                 }
             }
@@ -74,7 +73,7 @@ public class CheckScanner {
     private int findKingRow(int color) {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                if (position[i][j] == 6 * color) {
+                if (position[i][j] == Piece.KING * color) {
                     return j;
                 }
             }
@@ -102,15 +101,15 @@ public class CheckScanner {
             return false;
         }
         if (col - 1 >= 0) {
-            minusCol = position[col - 1][row + color] == color * -1;
+            minusCol = position[col - 1][row + color] == color * -Piece.PAWN;
             if (minusCol) {
-                setCheckingPiece(col - 1, row + color,1);
+                setCheckingPiece(col - 1, row + color,Piece.PAWN);
             }
         }
         if (col + 1 <= 7) {
-            plusCol = position[col + 1][row + color] == color * -1;
+            plusCol = position[col + 1][row + color] == color * -Piece.PAWN;
             if (plusCol) {
-                setCheckingPiece(col + 1, row + color,1);
+                setCheckingPiece(col + 1, row + color,Piece.PAWN);
             }
         }
         return  minusCol || plusCol;
@@ -123,12 +122,12 @@ public class CheckScanner {
             for (int rowDel = -2; rowDel <= 2; rowDel++) {
                 if (colDel * rowDel == 2 || colDel * rowDel == -2) {
                     try {
-                        if (position[col + colDel][row + rowDel] == 2 * color * -1) {
-                            setCheckingPiece(col + colDel,row + rowDel,2);
+                        if (position[col + colDel][row + rowDel] == Piece.KNIGHT * color * -1) {
+                            setCheckingPiece(col + colDel,row + rowDel,Piece.KNIGHT);
                             return true;
                         }
                     } catch (IndexOutOfBoundsException e) {
-                        continue;
+                        //continue;
                     }
 
                 }
@@ -147,20 +146,20 @@ public class CheckScanner {
     //EFFECTS: true if square is attacked by enemy rook on the column
     private boolean isAttackedByRookCol(int col, int row, int color) {
         for (int colDelUp = 1; colDelUp <= 7 - col; colDelUp++) {
-            if ((position[col + colDelUp][row] == 4 * color * -1)
-                    || (position[col + colDelUp][row] == 5 * color * -1)) {
-                setCheckingPiece(col + colDelUp,row,4);
+            if ((position[col + colDelUp][row] == Piece.ROOK * color * -1)
+                    || (position[col + colDelUp][row] == Piece.QUEEN * color * -1)) {
+                setCheckingPiece(col + colDelUp,row,Piece.ROOK);
                 return true;
-            } else if (position[col + colDelUp][row] != 0) {
+            } else if (position[col + colDelUp][row] != Piece.NONE) {
                 break;
             }
         }
         for (int colDelDown = -1; col + colDelDown >= 0; colDelDown--) {
-            if ((position[col + colDelDown][row] == 4 * color * -1)
-                    || (position[col + colDelDown][row] == 5 * color * -1)) {
-                setCheckingPiece(col + colDelDown,row,4);
+            if ((position[col + colDelDown][row] == Piece.ROOK * color * -1)
+                    || (position[col + colDelDown][row] == Piece.QUEEN * color * -1)) {
+                setCheckingPiece(col + colDelDown,row,Piece.ROOK);
                 return true;
-            } else if (position[col + colDelDown][row] != 0) {
+            } else if (position[col + colDelDown][row] != Piece.NONE) {
                 break;
             }
         }
@@ -171,20 +170,20 @@ public class CheckScanner {
     //EFFECTS: true if square is attacked by enemy rook on the row
     private boolean isAttackedByRookRow(int col, int row, int color) {
         for (int rowDelRight = 1; rowDelRight <= 7 - row; rowDelRight++) {
-            if ((position[col][row + rowDelRight] == 4 * color * -1)
-                    || (position[col][row + rowDelRight] == 5 * color * -1)) {
-                setCheckingPiece(col,row + rowDelRight,4);
+            if ((position[col][row + rowDelRight] == Piece.ROOK * color * -1)
+                    || (position[col][row + rowDelRight] == Piece.QUEEN * color * -1)) {
+                setCheckingPiece(col,row + rowDelRight,Piece.ROOK);
                 return true;
-            } else if (position[col][row + rowDelRight] != 0) {
+            } else if (position[col][row + rowDelRight] != Piece.NONE) {
                 break;
             }
         }
         for (int rowDelLeft = -1; row + rowDelLeft >= 0; rowDelLeft--) {
-            if ((position[col][row + rowDelLeft] == 4 * color * -1)
-                    || (position[col][row + rowDelLeft] == 5 * color * -1)) {
-                setCheckingPiece(col,row + rowDelLeft,4);
+            if ((position[col][row + rowDelLeft] == Piece.ROOK * color * -1)
+                    || (position[col][row + rowDelLeft] == Piece.QUEEN * color * -1)) {
+                setCheckingPiece(col,row + rowDelLeft,Piece.ROOK);
                 return true;
-            } else if (position[col][row + rowDelLeft] != 0) {
+            } else if (position[col][row + rowDelLeft] != Piece.NONE) {
                 break;
             }
         }
@@ -201,20 +200,20 @@ public class CheckScanner {
     //EFFECTS: true if square is attacked by enemy bishop on upward column
     private boolean isAttackedByBishopUp(int col, int row, int color) {
         for (int delUpRight = 1; delUpRight <= 7 - col && delUpRight <= 7 - row; delUpRight++) {
-            if ((position[col + delUpRight][row + delUpRight] == 3 * color * -1)
-                    || (position[col + delUpRight][row + delUpRight] == 5 * color * -1)) {
-                setCheckingPiece(col + delUpRight,row + delUpRight,3);
+            if ((position[col + delUpRight][row + delUpRight] == Piece.BISHOP * color * -1)
+                    || (position[col + delUpRight][row + delUpRight] == Piece.QUEEN * color * -1)) {
+                setCheckingPiece(col + delUpRight,row + delUpRight,Piece.BISHOP);
                 return true;
-            } else if (position[col + delUpRight][row + delUpRight] != 0) {
+            } else if (position[col + delUpRight][row + delUpRight] != Piece.NONE) {
                 break;
             }
         }
         for (int delDownLeft = -1; col + delDownLeft >= 0 && row + delDownLeft >= 0; delDownLeft--) {
-            if ((position[col + delDownLeft][row + delDownLeft] == 3 * color * -1)
-                    || (position[col + delDownLeft][row + delDownLeft] == 5 * color * -1)) {
-                setCheckingPiece(col + delDownLeft,row + delDownLeft,3);
+            if ((position[col + delDownLeft][row + delDownLeft] == Piece.BISHOP * color * -1)
+                    || (position[col + delDownLeft][row + delDownLeft] == Piece.QUEEN * color * -1)) {
+                setCheckingPiece(col + delDownLeft,row + delDownLeft,Piece.BISHOP);
                 return true;
-            } else if (position[col + delDownLeft][row + delDownLeft] != 0) {
+            } else if (position[col + delDownLeft][row + delDownLeft] != Piece.NONE) {
                 break;
             }
         }
@@ -224,20 +223,20 @@ public class CheckScanner {
     //EFFECTS: true if square is attacked by enemy bishop on downwards column
     private boolean isAttackedByBishopDown(int col, int row, int color) {
         for (int delUpLeft = 1; col + delUpLeft * -1 >= 0 && delUpLeft <= 7 - row; delUpLeft++) {
-            if ((position[col + delUpLeft * -1][row + delUpLeft] == 3 * color * -1)
-                    || (position[col + delUpLeft * -1][row + delUpLeft] == 5 * color * -1)) {
-                setCheckingPiece(col + delUpLeft * -1,row + delUpLeft,3);
+            if ((position[col + delUpLeft * -1][row + delUpLeft] == Piece.BISHOP * color * -1)
+                    || (position[col + delUpLeft * -1][row + delUpLeft] == Piece.QUEEN * color * -1)) {
+                setCheckingPiece(col + delUpLeft * -1,row + delUpLeft,Piece.BISHOP);
                 return true;
-            } else if (position[col + delUpLeft * -1][row + delUpLeft] != 0) {
+            } else if (position[col + delUpLeft * -1][row + delUpLeft] != Piece.NONE) {
                 break;
             }
         }
         for (int delDownRight = 1; col + delDownRight <= 7 && row + delDownRight * -1 >= 0; delDownRight++) {
-            if ((position[col + delDownRight][row + delDownRight * -1] == 3 * color * -1)
-                    || (position[col + delDownRight][row + delDownRight * -1] == 5 * color * -1)) {
-                setCheckingPiece(col + delDownRight,row + delDownRight * -1,3);
+            if ((position[col + delDownRight][row + delDownRight * -1] == Piece.BISHOP * color * -1)
+                    || (position[col + delDownRight][row + delDownRight * -1] == Piece.QUEEN * color * -1)) {
+                setCheckingPiece(col + delDownRight,row + delDownRight * -1,Piece.BISHOP);
                 return true;
-            } else if (position[col + delDownRight][row + delDownRight * -1] != 0) {
+            } else if (position[col + delDownRight][row + delDownRight * -1] != Piece.NONE) {
                 break;
             }
         }
@@ -260,7 +259,7 @@ public class CheckScanner {
 
     //EFFECTS: true if king doesn't have legal moves
     private boolean kingHasNoMoves() {
-        int color = isWhitesTurn ? 1 : -1;
+        int color = isWhitesTurn ? Piece.WHITE : Piece.BLACK;
         int kingCol = findKingCol(color);
         int kingRow = findKingRow(color);
         for (int i = -1; i <= 1; i++) {
@@ -271,14 +270,13 @@ public class CheckScanner {
                 if ((kingRow + j < 0) || (kingRow + j > 7)) {
                     continue;
                 }
-                Move move = null;
                 try {
-                    move = new Move(kingCol,kingRow, kingCol + i, kingRow + j);
+                    Move move = new Move(kingCol,kingRow, kingCol + i, kingRow + j);
+                    if (board.isLegalMove(move)) {
+                        return false;
+                    }
                 } catch (BoardSquareOutOfBoundsException e) {
                     //move is illegal
-                }
-                if (board.isLegalMove(move)) {
-                    return false;
                 }
             }
         }
@@ -306,9 +304,9 @@ public class CheckScanner {
     //EFFECTS: true if attacker can be blocked
     private boolean canAttackerBeBlocked() {
         switch (checkingPieceVal) {
-            case 3: return canBishopBeBlocked();
-            case 4: return canRookBeBlocked();
-            default: return false; //case: 1 and 2
+            case Piece.BISHOP: return canBishopBeBlocked();
+            case Piece.ROOK: return canRookBeBlocked();
+            default: return false; //cases: pawn and knight
         }
     }
 

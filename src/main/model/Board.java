@@ -3,9 +3,7 @@ package model;
 //Represents the classic 8x8 chessboard
 /*
  * TODO: understand the relationship between checker and board
- *  move class: look up how to unpack fields of a array
  *  implement castling
- *  make robust with exceptions
  */
 
 import org.json.JSONObject;
@@ -20,7 +18,7 @@ public class Board {
     private int enPassantCol;
 
 
-    // EFFECTS: construct new board
+    // EFFECTS: constructs new board
     public Board() {
         createNewBoard();
         name = "New Board";
