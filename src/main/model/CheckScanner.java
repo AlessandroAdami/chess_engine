@@ -21,19 +21,11 @@ public class CheckScanner {
     //EFFECTS: constructs a new scanner from the given board
     public CheckScanner(Board b) {
         this.board = b;
-        this.position = b.getPosition();
-        this.isWhitesTurn = b.getIsWhitesTurn();
-        this.kingColor = isWhitesTurn ? Piece.WHITE : Piece.BLACK;
-        this.kingCol = findKingCol(kingColor);
-        this.kingRow = findKingRow(kingColor);
-        this.checkingPieceCol = -1;
-        this.checkingPieceRow = -1;
-        this.checkingPieceVal = -1;
-        this.isDoubleCheck = false;
+        this.update();
     }
 
     //EFFECTS: updates the scanner with the current board
-    public void updateScanner() {
+    public void update() {
         this.position = board.getPosition();
         this.isWhitesTurn = board.getIsWhitesTurn();
         this.kingColor = isWhitesTurn ? Piece.WHITE : Piece.BLACK;
@@ -83,7 +75,7 @@ public class CheckScanner {
 
     //MODIFIES: this
     //EFFECTS: returns true if square is attacked by enemy piece
-    private boolean isInCheck(int col,int row,int color) {
+    public boolean isInCheck(int col,int row,int color) {
         boolean rook = isAttackedByRook(col,row,color);
         boolean bishop = isAttackedByBishop(col,row,color);
         boolean knight = isAttackedByKnight(col,row,color);

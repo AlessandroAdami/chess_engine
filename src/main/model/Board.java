@@ -17,25 +17,30 @@ public class Board {
     private String canBlackCastle;
     private int enPassantCol;
 
+    private CheckScanner checkScanner;
+
 
     // EFFECTS: constructs new board
     public Board() {
-        createNewBoard();
-        name = "New Board";
-        isWhitesTurn = true;
-        canWhiteCastle = "RKR";
-        canBlackCastle = "RKR";
-        enPassantCol = -1;
+        this.createNewBoard();
+        this.name = "New Board";
+        this.isWhitesTurn = true;
+        this.canWhiteCastle = "RKR";
+        this.canBlackCastle = "RKR";
+        this.enPassantCol = -1;
+        this.checkScanner = new CheckScanner(this);
+
     }
 
     // EFFECTS: constructs board with given name
     public Board(String name) {
-        createNewBoard();
+        this.createNewBoard();
         this.name = name;
-        isWhitesTurn = true;
-        canWhiteCastle = "RKR";
-        canBlackCastle = "RKR";
-        enPassantCol = -1;
+        this.isWhitesTurn = true;
+        this.canWhiteCastle = "RKR";
+        this.canBlackCastle = "RKR";
+        this.enPassantCol = -1;
+        this.checkScanner = new CheckScanner(this);
     }
 
     private void createNewBoard() {
@@ -121,6 +126,7 @@ public class Board {
     //EFFECTS: moves piece from square to square
     private void movePiece(int piece,Move move) {
         enPassantCaptures(move);
+        //castle(move);
         this.position[move.getFromCol()][move.getFromRow()] = Piece.NONE;
         this.position[move.getToCol()][move.getToRow()] = piece;
     }
@@ -260,7 +266,34 @@ public class Board {
         boolean isLeftOrRight = (Math.abs(toCol - fromCol) == 1) && fromRow == toRow;
         boolean isUpOrDown = (Math.abs(toRow - fromRow) == 1) && fromCol == toCol;
         boolean isDiagonal = (Math.abs(toCol - fromCol) == 1) && (Math.abs(toRow - fromRow) == 1);
-        return isLeftOrRight || isUpOrDown || isDiagonal;
+        boolean isCastlingLegal = isLegalCastleMove(move);
+        return isLeftOrRight || isUpOrDown || isDiagonal || isCastlingLegal;
+    }
+
+    //EFFECTS: true if castling is possible
+    //TODO: must be adjourned for checks
+    private boolean isLegalCastleMove(Move move) {
+        int toCol = move.getToCol();
+        int row = move.getFromRow();
+        if (toCol == 6 && (row == 0 && (canWhiteCastle.equals("KR") || canWhiteCastle.equals("RKR")))) {
+            return true;
+        } else if (toCol == 2 && (row == 0 && (canWhiteCastle.equals("RK") || canWhiteCastle.equals("RKR")))) {
+            return true;
+        } else if (toCol == 6 && (row == 0 && (canBlackCastle.equals("KR") || canBlackCastle.equals("RKR")))) {
+            return true;
+        } else if (toCol == 2 && (row == 0 && (canBlackCastle.equals("RK") || canBlackCastle.equals("RKR")))) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private boolean canXShortCastle(int color) {
+        return false;
+    }
+
+    private boolean canXLongCastle(int color) {
+        return false;
     }
 
     // EFFECTS: evaluates the current board position

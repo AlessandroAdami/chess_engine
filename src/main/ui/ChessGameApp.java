@@ -10,20 +10,19 @@ import persistence.JsonWriter;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
+import java.awt.event.*;
 import java.io.IOException;
 import java.util.Scanner;
 
 // Chess game application. Allows the user to play various games
 // and analyze the current position in each board.
 //TODO: - promotion
+//   clean this up
+//  figure out moving with mouse
 
 public class ChessGameApp extends JFrame implements ActionListener, WindowListener {
 
-    private static final int WIDTH  = 1000;
+    private static final int WIDTH = 1000;
     private static final int HEIGHT = 1000;
     private static final int BOARD_SIZE = HEIGHT - 100;
 
@@ -47,6 +46,12 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
     private JButton selectBoardButton;
     private JTextField selectBoardName;
     private JTextArea boardListText;
+    //moving pieces
+    private JLabel selectedPiece;
+    private int fromCol;
+    private int fromRow;
+    private int toCol;
+    private int toRow;
 
     //EFFECTS: constructs and runs ChessGameApp
     public ChessGameApp() {
@@ -88,7 +93,7 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
         this.setLayout(null);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(true);
-        this.setSize(WIDTH,HEIGHT);
+        this.setSize(WIDTH, HEIGHT);
         this.initComponents();
     }
 
@@ -130,10 +135,10 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
     private void setupGameListPanel() {
         gameListPanel = new JPanel();
         boardListText = new JTextArea();
-        gameListPanel.setBounds(0,0, (WIDTH - BOARD_SIZE) * 2, HEIGHT);
-        Border gameListPanelBorder = BorderFactory.createLineBorder(Color.cyan,3);
+        gameListPanel.setBounds(0, 0, (WIDTH - BOARD_SIZE) * 2, HEIGHT);
+        Border gameListPanelBorder = BorderFactory.createLineBorder(Color.cyan, 3);
         gameListPanel.setBorder(gameListPanelBorder);
-        boardListText.setBounds(0,0,1000,300);
+        boardListText.setBounds(0, 0, 1000, 300);
         int backgroundColor = gameListPanel.getBackground().getRGB();
         boardListText.setBackground(new Color(backgroundColor));
         updateBoardList();
@@ -160,9 +165,9 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
     private void setupMakeMove() {
         moveButton = new JButton("Move");
         moveButton.setFocusable(false);
-        moveButton.setBounds(1310,100,90,25);
+        moveButton.setBounds(1310, 100, 90, 25);
         moveText = new JTextField();
-        moveText.setBounds(1200, 100, 100,25);
+        moveText.setBounds(1200, 100, 100, 25);
         String textString;
         if (chessGame.getCurrentBoard().getIsWhitesTurn()) {
             textString = "White move...";
@@ -181,9 +186,9 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
     private void setupCreateNewBoard() {
         createNewBoardButton = new JButton("Create");
         createNewBoardButton.setFocusable(false);
-        createNewBoardButton.setBounds(1310,200,90,25);
+        createNewBoardButton.setBounds(1310, 200, 90, 25);
         newBoardName = new JTextField();
-        newBoardName.setBounds(1200,200,100,25);
+        newBoardName.setBounds(1200, 200, 100, 25);
         newBoardName.setText("Create board...");
         createNewBoardButton.addActionListener(this);
         this.add(createNewBoardButton);
@@ -195,9 +200,9 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
     private void setupDeleteBoard() {
         deleteBoardButton = new JButton("Delete");
         deleteBoardButton.setFocusable(false);
-        deleteBoardButton.setBounds(1310,300,90,25);
+        deleteBoardButton.setBounds(1310, 300, 90, 25);
         deleteBoardName = new JTextField();
-        deleteBoardName.setBounds(1200,300,90,25);
+        deleteBoardName.setBounds(1200, 300, 90, 25);
         deleteBoardName.setText("Delete board...");
         deleteBoardButton.addActionListener(this);
         this.add(deleteBoardButton);
@@ -209,9 +214,9 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
     private void setupSelectBoard() {
         selectBoardButton = new JButton("Select");
         selectBoardButton.setFocusable(false);
-        selectBoardButton.setBounds(1310,400,90,25);
+        selectBoardButton.setBounds(1310, 400, 90, 25);
         selectBoardName = new JTextField();
-        selectBoardName.setBounds(1200,400,90,25);
+        selectBoardName.setBounds(1200, 400, 90, 25);
         selectBoardName.setText("Select board...");
         selectBoardButton.addActionListener(this);
         this.add(selectBoardButton);
@@ -304,19 +309,18 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
     //MODIFIES: this
     //EFFECTS: makes the move on the current board
     private void makeMove(Move move) throws BoardSquareOutOfBoundsException {
-        int fromCol = move.getFromCol();
-        int fromRow = move.getFromRow();
-        int toCol   = move.getToCol();
-        int toRow   = move.getToRow();
-        chessGame.getCurrentBoard().makeMove(new Move(fromCol,fromRow,toCol,toRow));
-        if (chessGame.getCurrentBoard().isPawnToPromote(toCol,toRow)) {
-            promotePawn(toCol,toRow);
+        int toCol = move.getToCol();
+        int toRow = move.getToRow();
+        chessGame.getCurrentBoard().makeMove(move);
+        if (chessGame.getCurrentBoard().isPawnToPromote(toCol, toRow)) {
+            promotePawn(toCol, toRow);
         }
     }
 
     //MODIFIES: this
     //EFFECTS: lets player pick a piece to promote a pawn to
-    private void promotePawn(int col,int row) {
+    @SuppressWarnings({"checkstyle:MethodLength", "checkstyle:SuppressWarnings"})
+    private void promotePawn(int col, int row) {
         int promotion = 0;
         while (true) {
             System.out.println("Your pawn is promoting!\n");
@@ -327,25 +331,30 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
             String command = input.next();
 
             switch (command) {
-                case "q": promotion = 5;
-                break;
-                case "r": promotion = 4;
-                break;
-                case "b": promotion = 3;
-                break;
-                case "n": promotion = 2;
-                break;
+                case "q":
+                    promotion = 5;
+                    break;
+                case "r":
+                    promotion = 4;
+                    break;
+                case "b":
+                    promotion = 3;
+                    break;
+                case "n":
+                    promotion = 2;
+                    break;
             }
 
             if (promotion != 0) {
-                chessGame.getCurrentBoard().placePiece(col,row,
-                        promotion * chessGame.getCurrentBoard().getPiece(col,row));
+                chessGame.getCurrentBoard().placePiece(col, row,
+                        promotion * chessGame.getCurrentBoard().getPiece(col, row));
                 break;
             }
         }
     }
 
     //EFFECTS: allows user to play or delete a game in the list
+    @SuppressWarnings({"checkstyle:MethodLength", "checkstyle:SuppressWarnings"})
     private void manageBoards() {
         String command;
         boolean keepGoing = true;
@@ -359,13 +368,16 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
             command = input.next();
 
             switch (command) {
-                case "select": selectBoard();
+                case "select":
+                    selectBoard();
                     keepGoing = false;
                     break;
-                case "rename": renameBoard();
+                case "rename":
+                    renameBoard();
                     keepGoing = false;
                     break;
-                case "delete": deleteBoard();
+                case "delete":
+                    deleteBoard();
                     keepGoing = false;
                     break;
                 default:
@@ -573,21 +585,20 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
         ImageIcon oldIcon = new ImageIcon("./data/chessBoard.png");
         Image oldImage = oldIcon.getImage();
         int size = HEIGHT - 120;
-        Image scaledImage = oldImage.getScaledInstance(size,size, Image.SCALE_SMOOTH);
+        Image scaledImage = oldImage.getScaledInstance(size, size, Image.SCALE_SMOOTH);
         ImageIcon chessBoardImage = new ImageIcon(scaledImage);
-        Border boardBorder = BorderFactory.createLineBorder(Color.cyan,3);//change this to colorless
         boardLabel.setIcon(chessBoardImage);
         boardLabel.setHorizontalTextPosition(JLabel.CENTER);
         boardLabel.setVerticalTextPosition(JLabel.TOP);
         boardLabel.setBounds(250, 0, size, size + 50);
         boardLabel.setVerticalAlignment(JLabel.CENTER);
         boardLabel.setHorizontalAlignment(JLabel.CENTER);
-        boardLabel.setBorder(boardBorder);
         boardLabel.setText(chessGame.getCurrentBoard().getName());
         setupPieces();
 
         this.add(boardLabel);
         this.setIconImage(scaledImage);
+        boardLabel.addMouseListener(new Input());
     }
 
     //MODIFIES: this
@@ -613,12 +624,12 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 try {
-                    ImageIcon piece = this.piece.getPieceImage(chessGame.getCurrentBoard().getPiece(i,j));
+                    ImageIcon piece = this.piece.getPieceImage(chessGame.getCurrentBoard().getPiece(i, j));
                     JLabel pieceLabel = new JLabel();
                     pieceLabel.setIcon(piece);
                     pieceLabel.setBounds(
-                              i * squareImageScale,
-                            - 80 + (8 - j) * squareImageScale,
+                            i * squareImageScale,
+                            -80 + (8 - j) * squareImageScale,
                             squareImageScale,
                             squareImageScale);
                     pieceLabel.setVerticalAlignment(JLabel.CENTER);
@@ -650,7 +661,7 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
         piecesLabels[toCol][toRow] = movedPiece;
         movedPiece.setBounds(
                 toCol * squareImageScale,
-                - 80 + (8 - toRow) * squareImageScale,
+                -80 + (8 - toRow) * squareImageScale,
                 squareImageScale,
                 squareImageScale);
 
@@ -696,11 +707,11 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
 
     //EFFECTS: returns a move string into a move array
     private Move stringToMove(String moveString) throws BoardSquareOutOfBoundsException {
-        int fromCol = Integer.parseInt(moveString.substring(0,1));
-        int fromRow = Integer.parseInt(moveString.substring(2,3));
-        int toCol   = Integer.parseInt(moveString.substring(4,5));
-        int toRow   = Integer.parseInt(moveString.substring(6));
-        return new Move(fromCol,fromRow,toCol,toRow);
+        int fromCol = Integer.parseInt(moveString.substring(0, 1));
+        int fromRow = Integer.parseInt(moveString.substring(2, 3));
+        int toCol = Integer.parseInt(moveString.substring(4, 5));
+        int toRow = Integer.parseInt(moveString.substring(6));
+        return new Move(fromCol, fromRow, toCol, toRow);
     }
 
     //EFFECTS: prints the log of events
@@ -712,13 +723,10 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
 
     @Override
     public void windowClosed(WindowEvent e) {
-        //do nothing
     }
 
     @Override
     public void windowOpened(WindowEvent e) {
-        //loadChessGame();
-        //do nothing
     }
 
     //EFFECTS: saves games and prints log events as program is closing
@@ -730,23 +738,44 @@ public class ChessGameApp extends JFrame implements ActionListener, WindowListen
 
     @Override
     public void windowIconified(WindowEvent e) {
-        //do nothing
     }
 
     @Override
     public void windowDeiconified(WindowEvent e) {
-        //do nothing
     }
 
     @Override
     public void windowActivated(WindowEvent e) {
-        //loadChessGame();
-        //do nothing
     }
 
     @Override
     public void windowDeactivated(WindowEvent e) {
-        //do nothing
     }
 
+    private void resetMove() {
+        fromRow = -1;
+        fromCol = -1;
+        toRow = -1;
+        toCol = -1;
+    }
+
+    private class Input extends MouseAdapter {
+
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+
+        }
+
+
+        @Override
+        public void mouseDragged(MouseEvent e) {
+
+        }
+    }
 }

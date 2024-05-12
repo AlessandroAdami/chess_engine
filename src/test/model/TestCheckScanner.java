@@ -108,16 +108,16 @@ public class TestCheckScanner {
     @Test
     void testKingNotInCheck() {
         assertFalse(checkScanner.isChecked());
-        checkScanner.updateScanner();
+        checkScanner.update();
         assertFalse(checkScanner.isCheckMated());
     }
 
     @Test
     void testKingInRookCheck() {
         board.setPosition(rookCheck);
-        checkScanner.updateScanner();
+        checkScanner.update();
         assertTrue(checkScanner.isChecked());
-        checkScanner.updateScanner();
+        checkScanner.update();
         assertFalse(checkScanner.isCheckMated());
     }
 
@@ -125,25 +125,25 @@ public class TestCheckScanner {
     void testKingInBishopCheck() {
         board.setPosition(bishopCheck);
         board.nextTurn();
-        checkScanner.updateScanner();
+        checkScanner.update();
         assertTrue(checkScanner.isChecked());
-        checkScanner.updateScanner();
+        checkScanner.update();
         assertFalse(checkScanner.isCheckMated());
     }
 
     @Test
     void testKingInKnightCheck() {
         board.setPosition(knightCheck);
-        checkScanner.updateScanner();
+        checkScanner.update();
         assertTrue(checkScanner.isChecked());
-        checkScanner.updateScanner();
+        checkScanner.update();
         assertFalse(checkScanner.isCheckMated());
     }
 
     @Test
     void testKingInQueenCheckDiag() {
         board.setPosition(queenCheckDiagonal);
-        checkScanner.updateScanner();
+        checkScanner.update();
         assertTrue(checkScanner.isChecked());
         assertFalse(checkScanner.isCheckMated());
     }
@@ -151,27 +151,27 @@ public class TestCheckScanner {
     @Test
     void testKingInQueenCheckLine() {
         board.setPosition(queenCheckLine);
-        checkScanner.updateScanner();
+        checkScanner.update();
         assertTrue(checkScanner.isChecked());
-        checkScanner.updateScanner();
+        checkScanner.update();
         assertFalse(checkScanner.isCheckMated());
     }
 
     @Test
     void testKingInPawnCheck() {
         board.setPosition(pawnCheck);
-        checkScanner.updateScanner();
+        checkScanner.update();
         assertTrue(checkScanner.isChecked());
-        checkScanner.updateScanner();
+        checkScanner.update();
         assertFalse(checkScanner.isCheckMated());
     }
 
     @Test
     void testKingDoubleCheck() {
         board.setPosition(doubleCheck);
-        checkScanner.updateScanner();
+        checkScanner.update();
         assertTrue(checkScanner.isChecked());
-        checkScanner.updateScanner();
+        checkScanner.update();
         assertFalse(checkScanner.isCheckMated());
 
     }
@@ -179,9 +179,9 @@ public class TestCheckScanner {
     @Test
     void testKingCheckMated() {
         board.setPosition(checkMate);
-        checkScanner.updateScanner();
+        checkScanner.update();
         assertTrue(checkScanner.isChecked());
-        checkScanner.updateScanner();
+        checkScanner.update();
         //assertTrue(checkScanner.isCheckMated());
     }
 }
