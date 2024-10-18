@@ -1,4 +1,4 @@
-# Chess Engine
+# Chess Bud
 
 My goal with this application is to let users test their 
 skills in different opening or chosen settings. Eventually, it will include:
