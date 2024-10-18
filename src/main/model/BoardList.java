@@ -2,6 +2,7 @@ package model;
 
 //A list of board manager.
 
+import model.Board;
 import org.json.JSONArray;
 
 import java.util.ArrayList;

@@ -14,6 +14,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
 
+//TODO: fix this
+
 public class JsonReader {
     private String source;
 
@@ -83,24 +85,15 @@ public class JsonReader {
         bl.addBoard(parseBoard(board));
     }
 
-    //TODO: change parseBoard to create a new check-scanner
-    //      (and eventually bot) for the board
 
     // MODIFIES: bl
     // EFFECTS: returns parsed board to board list
     private Board parseBoard(JSONObject jsonObject) {
         String name = jsonObject.getString("name");
-        JSONArray jsonPosition = jsonObject.getJSONArray("position");
-        boolean isWhitesTurn = jsonObject.getBoolean("isWhitesTurn");
-        String canWhiteCastle = jsonObject.getString("canWhiteCastle");
-        String canBlackCastle = jsonObject.getString("canBlackCastle");
+        String fenPosition = jsonObject.getString("position");
 
-        int[][] position = toPositionArray(jsonPosition);
-        Board board = new Board(name);
-        board.setPosition(position);
-        board.setIsWhitesTurn(isWhitesTurn);
-        board.setCanWhiteCastle(canWhiteCastle);
-        board.setCanBlackCastle(canBlackCastle);
+        Board board = new Board();
+        board.loadPositionFromFen(fenPosition);
 
         return board;
     }

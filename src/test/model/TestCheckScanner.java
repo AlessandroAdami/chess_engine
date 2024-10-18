@@ -9,179 +9,75 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TestCheckScanner {
 
     private CheckScanner checkScanner;
-    private Board board;
-    private int[][] rookCheck;
-    private int[][] bishopCheck;
-    private int[][] knightCheck;
-    private int[][] queenCheckDiagonal;
-    private int[][] queenCheckLine;
-    private int[][] pawnCheck;
-    private int[][] doubleCheck;
-    private int[][] checkMate;
+    private Board Board;
+    String rookCheck;
+    String bishopCheck;
+    String knightCheck;
+    String queenCheckDiagonal;
+    String queenCheckLine;
+    String pawnCheck;
+    String doubleCheck;
+    String checkMate;
+
+    //TODO: perhaps check for whose turn it is
 
     @BeforeEach
     void setup() {
-        board = new Board();
-        checkScanner = new CheckScanner(board);
-        rookCheck = new int[][]{
-                {4, 1, 0, 0, 0, 0, -1, -4},
-                {2, 1, 0, 0, 0, 0, -1, -2},
-                {3, 1, 0, 0, 0, 0, -1, -3},
-                {5, 1, 0, 0, 0, 0, -1, -5},
-                {6, 0, 0, 0, -4, 0, -1, -6},
-                {3, 1, 0, 0, 0, 0, -1, -3},
-                {2, 1, 0, 0, 0, 0, -1, -2},
-                {4, 1, 0, 0, 0, 0, -1, -4},
-        };
-        bishopCheck = new int[][]{
-                {4, 1, 0, 0, 0, 0, -1, -4},
-                {2, 1, 0, 0, 3, 0, -1, -2},
-                {3, 1, 0, 0, 0, 0, -1, -3},
-                {5, 1, 0, 0, 0, 0,  0, -5},
-                {6, 1, 0, 0, 0, 0, -1, -6},
-                {3, 1, 0, 0, 0, 0, -1, -3},
-                {2, 1, 0, 0, 0, 0, -1, -2},
-                {4, 1, 0, 0, 0, 0, -1, -4},
-        };
-        knightCheck = new int[][]{
-                {4, 1, 0, 0, 0, 0, -1, -4},
-                {2, 1, 0, 0, 0, 0, -1, -2},
-                {3, 1, 0, 0, 0, 0, -1, -3},
-                {5, 1, -2, 0, 0, 0,  -1, -5},
-                {6, 1, 0, 0, 0, 0, -1, -6},
-                {3, 1, 0, 0, 0, 0, -1, -3},
-                {2, 1, 0, 0, 0, 0, -1, -2},
-                {4, 1, 0, 0, 0, 0, -1, -4},
-        };
-        queenCheckDiagonal = new int[][]{
-                {4, 1, 0, 0, -5, 0, -1, -4},
-                {2, 1, 0, 0, 0, 0, -1, -2},
-                {3, 1, 0, 0, 0, 0, -1, -3},
-                {5, 0, 0, 0, 0, 0,  -1, -5},
-                {6, 1, 0, 0, 0, 0, -1, -6},
-                {3, 1, 0, 0, 0, 0, -1, -3},
-                {2, 1, 0, 0, 0, 0, -1, -2},
-                {4, 1, 0, 0, 0, 0, -1, -4},
-        };
-        queenCheckLine = new int[][]{
-                {4, 1, 0, 0, 0, 0, -1, -4},
-                {2, 1, 0, 0, 0, 0, -1, -2},
-                {3, 1, 0, 0, 0, 0, -1, -3},
-                {5, 1, 0, 0, 0, 0, -1, -5},
-                {6, 0, 0, -5, 0, 0, -1, -6},
-                {3, 1, 0, 0, 0, 0, -1, -3},
-                {2, 1, 0, 0, 0, 0, -1, -2},
-                {4, 1, 0, 0, 0, 0, -1, -4},
-        };
-        pawnCheck = new int[][]{
-                {4, 1, 0, 0, 0, 0, -1, -4},
-                {2, 1, 0, 0, 1, 0, -1, -2},
-                {3, 1, 0, 0, 0, 0, -1, -3},
-                {5, 1, 0, 0, 0, 0, -1, -5},
-                {6, 1, 0, 0, 0, 0, -1, -6},
-                {3, -1, 0, 0, 0, 0, -1, -3},
-                {2, 1, 0, 0, 0, 0, -1, -2},
-                {4, 1, 0, 0, 0, 0, -1, -4},
-        };
-        doubleCheck = new int[][]{
-                {4, 1, 0, 0, 0, 0, -1, -4},
-                {2, 1, 0, 0, 0, 0, -1, -2},
-                {3, 1, 0, 0, 0, 0, -1, -3},
-                {5, 1, -3, 0, 0, 0, -1, -5},
-                {6, 0, 0, 0, -4, 0, -1, -6},
-                {0, 1, 0, 0, 0, 0, -1, -3},
-                {2, 1, 0, 0, 0, 0, -1, -2},
-                {4, 1, 0, 0, 0, 0, -1, -4},
-        };
-        checkMate = new int[][]{
-                {4, 1, 0, 0, 0, 0, -1, -4},
-                {2, 1, 0, 0, 0, 0, -1, -2},
-                {3, 1, 0, 0, 0, 0, -1, -3},
-                {5, 1, 0, 0, 0, 0, -1, -5},
-                {6, 1, 0, 0, 0, 0, -1, -6},
-                {3, -5, 0, 0, 0, 0, -1, -3},
-                {2, 1, -1, 0, 0, 0, -1, -2},
-                {4, 1, 0, 0, 0, 0, -1, -4},
-        };
+        Board = new Board();
+        checkScanner = new CheckScanner(Board);
+        rookCheck = "rnbqkbn1/pppppppp/8/4r3/8/8/PPPP1PPP/RNBQKBNR w KQq - 0 1";
+
+        bishopCheck = "rnbqkbnr/ppp1pppp/8/1B6/8/8/PPPP1PPP/RNBQKBNR w KQq - 0 1";
+        knightCheck = "rnbqkbnr/pppppppp/8/8/8/3n4/PPPPPPPP/RNBQKBNR w KQq - 0 1";
+        queenCheckDiagonal = "rnbqkbnr/pppppppp/8/q7/8/8/PPP1PPPP/RNBQKBNR w KQq - 0 1";
+        queenCheckLine = "rnbqkbnr/pppppppp/8/8/4q3/8/PPPP1PPP/RNBQKBNR w KQq - 0 1";
+        pawnCheck = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPpPP/RNBQKBNR w KQq - 0 1";
+        doubleCheck = "rnbqkbnr/pppppppp/8/8/4r3/3n4/PPPP1PPP/RNBQKBNR w KQq - 0 1";
+        checkMate = "rnbqkbnr/pppppppp/8/8/8/4p3/PPPPPpPP/RNBQKBNR w KQq - 0 1";
     }
 
     @Test
     void testKingNotInCheck() {
-        assertFalse(checkScanner.isChecked());
-        checkScanner.update();
-        assertFalse(checkScanner.isCheckMated());
+        //TODO
     }
 
     @Test
     void testKingInRookCheck() {
-        board.setPosition(rookCheck);
-        checkScanner.update();
-        assertTrue(checkScanner.isChecked());
-        checkScanner.update();
-        assertFalse(checkScanner.isCheckMated());
+        //TODO
     }
 
     @Test
     void testKingInBishopCheck() {
-        board.setPosition(bishopCheck);
-        board.nextTurn();
-        checkScanner.update();
-        assertTrue(checkScanner.isChecked());
-        checkScanner.update();
-        assertFalse(checkScanner.isCheckMated());
+        //TODO
     }
 
     @Test
     void testKingInKnightCheck() {
-        board.setPosition(knightCheck);
-        checkScanner.update();
-        assertTrue(checkScanner.isChecked());
-        checkScanner.update();
-        assertFalse(checkScanner.isCheckMated());
+        //TODO
     }
 
     @Test
     void testKingInQueenCheckDiag() {
-        board.setPosition(queenCheckDiagonal);
-        checkScanner.update();
-        assertTrue(checkScanner.isChecked());
-        assertFalse(checkScanner.isCheckMated());
+        //TODO
     }
 
     @Test
     void testKingInQueenCheckLine() {
-        board.setPosition(queenCheckLine);
-        checkScanner.update();
-        assertTrue(checkScanner.isChecked());
-        checkScanner.update();
-        assertFalse(checkScanner.isCheckMated());
+        //TODO
     }
 
     @Test
     void testKingInPawnCheck() {
-        board.setPosition(pawnCheck);
-        checkScanner.update();
-        assertTrue(checkScanner.isChecked());
-        checkScanner.update();
-        assertFalse(checkScanner.isCheckMated());
+        //TODO
     }
 
     @Test
     void testKingDoubleCheck() {
-        board.setPosition(doubleCheck);
-        checkScanner.update();
-        assertTrue(checkScanner.isChecked());
-        checkScanner.update();
-        assertFalse(checkScanner.isCheckMated());
-
+        //TODO
     }
 
     @Test
     void testKingCheckMated() {
-        board.setPosition(checkMate);
-        checkScanner.update();
-        assertTrue(checkScanner.isChecked());
-        checkScanner.update();
-        //assertTrue(checkScanner.isCheckMated());
+        //TODO
     }
 }

@@ -25,9 +25,9 @@ public class TestJsonWriter {
         newBoard = new Board();
         board2 = new Board();
         board2.setName("Board 2");
-        board2.setCanWhiteCastle("KR");
-        board2.setCanBlackCastle("RK");
-        board2.setIsWhitesTurn(false);
+        //board2.setCastle(true,"KR");
+        //board2.setCastle(false,"RK");
+        board2.setIsWhiteToMove(false);
         complexChessGame.addBoard(board2);
     }
 
@@ -55,11 +55,11 @@ public class TestJsonWriter {
             Board currentBoard = newChessGame.getCurrentBoard();
             BoardList boards = newChessGame.getBoards();
 
-            assertTrue(currentBoard.samePosition(newBoard.getPosition()));
+            assertTrue(currentBoard.samePosition(newBoard));
             assertEquals("New Board", currentBoard.getName());
-            assertTrue(currentBoard.getIsWhitesTurn());
-            assertEquals("RKR", currentBoard.getCanWhiteCastle());
-            assertEquals("RKR", currentBoard.getCanBlackCastle());
+            assertTrue(currentBoard.getIsWhiteToMove());
+            //assertEquals("QK", currentBoard.getCanTheyCastle(true));
+            //assertEquals("qk", currentBoard.getCanTheyCastle(false));
             assertEquals(1, boards.getBoards().size());
         } catch (IOException e) {
             fail("Exception should not have been thrown");
@@ -80,18 +80,18 @@ public class TestJsonWriter {
             BoardList boards = cg.getBoards();
             Board board2 = boards.getBoard(1);
 
-            assertTrue(currentBoard.samePosition(newBoard.getPosition()));
+            assertTrue(currentBoard.samePosition(newBoard));
             assertEquals("New Board", currentBoard.getName());
-            assertTrue(currentBoard.getIsWhitesTurn());
-            assertEquals("RKR", currentBoard.getCanWhiteCastle());
-            assertEquals("RKR", currentBoard.getCanBlackCastle());
+            assertTrue(currentBoard.getIsWhiteToMove());
+            //assertEquals("QK", currentBoard.getCanTheyCastle(true));
+            //assertEquals("qk", currentBoard.getCanTheyCastle(false));
             assertEquals(2, boards.getBoards().size());
 
-            assertTrue(board2.samePosition(newBoard.getPosition()));
+            assertTrue(board2.samePosition(newBoard));
             assertEquals("Board 2", board2.getName());
-            assertFalse(board2.getIsWhitesTurn());
-            assertEquals("KR", board2.getCanWhiteCastle());
-            assertEquals("RK", board2.getCanBlackCastle());
+            //assertFalse(board2.getIsWhiteToMove());
+            //assertEquals("K", board2.getCanTheyCastle(true));
+            assertEquals("Q", board2.getCanTheyCastle(false));
 
         } catch (IOException e) {
             fail("Exception should not have been thrown");

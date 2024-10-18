@@ -3,7 +3,6 @@ package model;
 import java.util.Calendar;
 import java.util.Date;
 
-
 // Represents an event.
 
 public class Event {

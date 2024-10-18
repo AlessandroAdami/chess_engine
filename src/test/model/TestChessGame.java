@@ -32,18 +32,18 @@ public class TestChessGame {
 
     @Test
     void testChessGame() {
-        assertTrue(chessGame.getCurrentBoard().getIsWhitesTurn());
+        assertTrue(chessGame.getCurrentBoard().getIsWhiteToMove());
         assertEquals("Board 0", chessGame.getCurrentBoard().getName());
-        assertTrue(chessGame.getBoards().getBoard(0).getIsWhitesTurn());
+        assertTrue(chessGame.getBoards().getBoard(0).getIsWhiteToMove());
         assertEquals("Board 0", chessGame.getBoards().getBoard(0).getName());
-        assertTrue(chessGame.getBoards().getBoard(1).getIsWhitesTurn());
+        assertTrue(chessGame.getBoards().getBoard(1).getIsWhiteToMove());
         assertEquals("Board 1", chessGame.getBoards().getBoard(1).getName());
 
-        assertTrue(chessGame0.getCurrentBoard().getIsWhitesTurn());
+        assertTrue(chessGame0.getCurrentBoard().getIsWhiteToMove());
         assertEquals("Board 0", chessGame0.getCurrentBoard().getName());
-        assertTrue(chessGame0.getBoards().getBoard(0).getIsWhitesTurn());
+        assertTrue(chessGame0.getBoards().getBoard(0).getIsWhiteToMove());
         assertEquals("Board 0", chessGame0.getBoards().getBoard(0).getName());
-        assertTrue(chessGame0.getBoards().getBoard(1).getIsWhitesTurn());
+        assertTrue(chessGame0.getBoards().getBoard(1).getIsWhiteToMove());
         assertEquals("Board 1", chessGame0.getBoards().getBoard(1).getName());
     }
 }

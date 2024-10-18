@@ -23,16 +23,18 @@ public class TestBoardList {
     @BeforeEach
     public void setup() {
         b0 = new Board();
-        b1 = new Board(); b1.clearBoard();
-        b2 = new Board(); b2.clearBoard();
-        b3 = new Board(); b3.clearBoard();
-        b4 = new Board(); b4.clearBoard();
-        b5 = new Board(); b5.clearBoard();
+        b1 = new Board();
+        b2 = new Board();
+        b3 = new Board();
+        b4 = new Board();
+        b5 = new Board();
         boardList = new BoardList();
+        /*
         b2.placePiece(4,3,6);
         b3.placePiece(4,3,5);
         b4.placePiece(4,3,-2);
         b5.placePiece(4,4,-3);
+         */
         b0.setName("starting");
         b1.setName("empty");
         b2.setName("King");

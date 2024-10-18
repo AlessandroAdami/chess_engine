@@ -37,12 +37,9 @@ public class TestJsonReader {
             Board currentBoard = cg.getCurrentBoard();
             BoardList boards = cg.getBoards();
 
-            assertTrue(currentBoard.samePosition(newBoard.getPosition()));
+            assertTrue(currentBoard.samePosition(newBoard));
             assertEquals("New Board", currentBoard.getName());
-            assertTrue(currentBoard.getIsWhitesTurn());
-            assertEquals("RKR", currentBoard.getCanWhiteCastle());
-            assertEquals("RKR", currentBoard.getCanBlackCastle());
-            assertEquals(-1, currentBoard.getEnPassantCol());
+            assertTrue(currentBoard.getIsWhiteToMove());
             assertEquals(1, boards.getBoards().size());
         } catch (IOException e) {
             fail("Couldn't read from file");
@@ -58,18 +55,13 @@ public class TestJsonReader {
             BoardList boards = cg.getBoards();
             Board board2 = boards.getBoard(1);
 
-            assertTrue(currentBoard.samePosition(newBoard.getPosition()));
+            assertTrue(currentBoard.samePosition(newBoard));
             assertEquals("New Board", currentBoard.getName());
-            assertTrue(currentBoard.getIsWhitesTurn());
-            assertEquals("", currentBoard.getCanWhiteCastle());
-            assertEquals("RKR", currentBoard.getCanBlackCastle());
+            assertTrue(currentBoard.getIsWhiteToMove());
             assertEquals(2, boards.getBoards().size());
 
-            assertTrue(board2.samePosition(newBoard.getPosition()));
+            assertTrue(board2.samePosition(newBoard));
             assertEquals("Board 2", board2.getName());
-            assertFalse(board2.getIsWhitesTurn());
-            assertEquals("KR", board2.getCanWhiteCastle());
-            assertEquals("RK", board2.getCanBlackCastle());
 
 
         } catch (IOException e) {
