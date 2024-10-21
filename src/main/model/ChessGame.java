@@ -61,6 +61,10 @@ public class ChessGame implements Iterable<Board> {
         return boards.getBoard(i);
     }
 
+    public Board getBoard(String name) {
+        return boards.getBoard(name);
+    }
+
     public BoardList getBoards() {
         return boards;
     }

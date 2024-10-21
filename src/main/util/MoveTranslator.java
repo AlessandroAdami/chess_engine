@@ -6,7 +6,7 @@ import model.pieces.Piece;
 
 /**
  * Translator to convert an object Move into classic algebraic notation
- * For on the notation consult
+ * For on the notation consult <a href="https://en.wikipedia.org/wiki/Algebraic_notation_(chess)">...</a>
  */
 
 public class MoveTranslator {

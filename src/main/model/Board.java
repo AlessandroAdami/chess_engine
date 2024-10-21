@@ -3,7 +3,6 @@ package model;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import model.pieces.*;
@@ -12,6 +11,7 @@ import org.json.JSONObject;
 public class Board extends JPanel {
 
     //TODO: NB: a game is uniquely identifies by a series of fen strings
+    // that  indicates a way to keep track of the moves in the game
 
     private static final String fenStartingPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
@@ -49,7 +49,6 @@ public class Board extends JPanel {
 
     public Board() {
         this("New Game");
-
     }
 
     public Piece getPiece(int col, int row) {
@@ -81,10 +80,7 @@ public class Board extends JPanel {
         if (move.piece.moveCollidesWithPiece(move.newCol,move.newRow)) {
             return false;
         }
-        if (checkScanner.isKingChecked(move)) {
-            return false;
-        }
-        return true;
+        return !checkScanner.isKingChecked(move);
     }
 
     public boolean sameTeam(Piece p1, Piece p2) {
@@ -171,7 +167,14 @@ public class Board extends JPanel {
 
     }
 
+    //TODO: update so that there is the option to choose what to promote to
     private void promotePawn(Move move) {
+        JPanel promoteOption = new JPanel();
+        promoteOption.setPreferredSize(new Dimension(4 * tileSize, 4 * tileSize));
+        this.add(promoteOption);
+
+
+
         pieceList.add(new Queen(this, move.newCol,move.newRow,move.piece.isWhite));
         capture(move.piece);
     }
@@ -310,7 +313,7 @@ public class Board extends JPanel {
                 for (int c = 0; c < cols; c++) {
 
                     if (isValidMove(new Move(this, selectedPiece, c, r))) {
-                        g2d.setColor(new Color(45, 139, 112));
+                        g2d.setColor(new Color(133, 217, 191));
                         g2d.fillRect(c * tileSize, r * tileSize, tileSize, tileSize);
                     }
                 }
