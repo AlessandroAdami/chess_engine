@@ -5,6 +5,7 @@ import model.*;
 import persistence.JsonReader;
 import persistence.JsonWriter;
 import util.ChessGameActionListener;
+import util.ChessGameWindowListener;
 import util.SelectButtonListener;
 
 import javax.swing.*;
@@ -21,12 +22,9 @@ public class ChessGameApp {
     private JFrame frame;
     private ChessGame chessGame;
 
-    private static final String JSON_STORE = "./data/chessgame.json";
-    private final JsonWriter jsonWriter;
-    private final JsonReader jsonReader;
-
     private ArrayList<SelectButtonListener> buttonList;
     private ChessGameActionListener actionListener;
+    private ChessGameWindowListener windowListener;
 
     private JMenuBar menuBar;
     private JButton createNewBoardButton;
@@ -35,8 +33,6 @@ public class ChessGameApp {
 
     //EFFECTS: constructs and runs ChessGameApp
     public ChessGameApp() {
-        jsonReader = new JsonReader(JSON_STORE);
-        jsonWriter = new JsonWriter(JSON_STORE);
         chessGame = new ChessGame();
         init();
     }
@@ -58,11 +54,13 @@ public class ChessGameApp {
         frame.add(chessGame.getCurrentBoard());
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.addWindowListener(windowListener);
     }
 
 
     private void initListeners() {
-        this.actionListener = new ChessGameActionListener();
+        this.actionListener = new ChessGameActionListener(chessGame);
+        this.windowListener = new ChessGameWindowListener(this);
         this.buttonList = new ArrayList<>();
     }
 
@@ -84,6 +82,7 @@ public class ChessGameApp {
         JMenuItem saveItem = new JMenuItem("Save games to file");
         fileMenu.add(loadItem);
         fileMenu.add(saveItem);
+        fileMenu.addActionListener(actionListener);
 
         menuBar.add(fileMenu);
         menuBar.setVisible(true);
@@ -132,26 +131,13 @@ public class ChessGameApp {
 
     //EFFECTS: saves current chess game to file
     public void saveChessGame() {
-        try {
-            jsonWriter.open();
-            jsonWriter.write(chessGame);
-            jsonWriter.close();
-            EventLog.getInstance().logEvent(new Event("Games saved to " + JSON_STORE));
-        } catch (IOException e) {
-            EventLog.getInstance().logEvent(new Event("Unable to write to file: " + JSON_STORE));
-        }
+        chessGame.saveChessGame();
     }
 
     //MODIFIES: this
     //EFFECTS: loads chess game from file
     private void loadChessGame() {
-        try {
-            chessGame = jsonReader.read();
-            EventLog.getInstance().logEvent(new Event("Games loaded from " + JSON_STORE));
-
-        } catch (IOException e) {
-            EventLog.getInstance().logEvent(new Event("Unable to write to file: " + JSON_STORE));
-        }
+        chessGame.loadChessGame();
     }
 
     // MODIFIES: this

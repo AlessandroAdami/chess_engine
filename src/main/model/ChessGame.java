@@ -1,7 +1,10 @@
 package model;
 
 import org.json.JSONObject;
+import persistence.JsonReader;
+import persistence.JsonWriter;
 
+import java.io.IOException;
 import java.util.Iterator;
 
 //A chess game with a current board and a list of boards
@@ -10,12 +13,17 @@ public class ChessGame implements Iterable<Board> {
 
     private BoardList boards;
     private Board currentBoard;
+    private static final String JSON_STORE = "./data/chessgame.json";
+    private final JsonWriter jsonWriter;
+    private final JsonReader jsonReader;
 
     //EFFECTS: constructs a chess game with an empty list and a new board
     public ChessGame() {
         this.boards = new BoardList();
         this.currentBoard = new Board();
         boards.addBoard(currentBoard);
+        jsonReader = new JsonReader(JSON_STORE);
+        jsonWriter = new JsonWriter(JSON_STORE);
     }
 
     //REQUIRES: currentBoards is in boardList
@@ -23,6 +31,8 @@ public class ChessGame implements Iterable<Board> {
     public ChessGame(BoardList boardList, Board currentBoard) {
         this.boards = boardList;
         this.currentBoard = currentBoard;
+        jsonReader = new JsonReader(JSON_STORE);
+        jsonWriter = new JsonWriter(JSON_STORE);
     }
 
     //EFFECTS: adds board to game
@@ -36,6 +46,32 @@ public class ChessGame implements Iterable<Board> {
         json.put("currentBoard", currentBoard.toJson());
         json.put("boards", boards.toJson());
         return json;
+    }
+
+    //EFFECTS: saves current chess game to file
+    public void saveChessGame() {
+        try {
+            jsonWriter.open();
+            jsonWriter.write(this);
+            jsonWriter.close();
+            EventLog.getInstance().logEvent(new Event("Games saved to " + JSON_STORE));
+        } catch (IOException e) {
+            EventLog.getInstance().logEvent(new Event("Unable to write to file: " + JSON_STORE));
+        }
+    }
+
+    //MODIFIES: this
+    //EFFECTS: loads chess game from file
+    public void loadChessGame() {
+        try {
+            ChessGame game = jsonReader.read();
+            this.boards = game.getBoards();
+            this.currentBoard = game.getCurrentBoard();
+            EventLog.getInstance().logEvent(new Event("Games loaded from " + JSON_STORE));
+
+        } catch (IOException e) {
+            EventLog.getInstance().logEvent(new Event("Unable to write to file: " + JSON_STORE));
+        }
     }
 
     //EFFECTS: returns iterator over boards
