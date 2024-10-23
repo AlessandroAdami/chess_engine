@@ -2,15 +2,12 @@ package ui;
 
 import model.Event;
 import model.*;
-import persistence.JsonReader;
-import persistence.JsonWriter;
 import util.ChessGameActionListener;
 import util.ChessGameWindowListener;
 import util.SelectButtonListener;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
 import java.util.ArrayList;
 
 /** Chess game application. Allows the user to play various games
@@ -20,7 +17,7 @@ import java.util.ArrayList;
 public class ChessGameApp {
 
     private JFrame frame;
-    private ChessGame chessGame;
+    public ChessGame chessGame;
 
     private ArrayList<SelectButtonListener> buttonList;
     private ChessGameActionListener actionListener;
@@ -38,10 +35,9 @@ public class ChessGameApp {
     }
 
     private void init() {
-        initFrame();
-
-        initComponents();
         initListeners();
+        initFrame();
+        initComponents();
     }
 
     private void initFrame() {

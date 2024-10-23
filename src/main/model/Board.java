@@ -3,6 +3,8 @@ package model;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import model.pieces.*;
@@ -16,6 +18,8 @@ public class Board extends JPanel {
     private static final String fenStartingPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
     private String fenPosition;
+    private int halfMove; //= #white moves + #black moves
+    private int fullMove; //= #black moves
 
     private String name;
 
@@ -93,12 +97,14 @@ public class Board extends JPanel {
 
     public void makeMove(Move move) {
 
+        //handle pawn moves
         if (move.piece.name.equals("Pawn")) {
             movePawn(move);
         } else {
             enPassantTile = -1;
         }
 
+        //handle king moves
         if (move.piece.name.equals("King")) {
             moveKing(move);
         }
@@ -114,6 +120,11 @@ public class Board extends JPanel {
         capture(move.capture);
 
         isWhiteToMove = !isWhiteToMove;
+
+        halfMove++;
+        if (move.piece.isWhite) {
+            fullMove++;
+        }
 
         updateGameState();
 
@@ -164,7 +175,6 @@ public class Board extends JPanel {
         if (move.newRow == colorIndex) {
             promotePawn(move);
         }
-
     }
 
     //TODO: update so that there is the option to choose what to promote to
@@ -172,8 +182,6 @@ public class Board extends JPanel {
         JPanel promoteOption = new JPanel();
         promoteOption.setPreferredSize(new Dimension(4 * tileSize, 4 * tileSize));
         this.add(promoteOption);
-
-
 
         pieceList.add(new Queen(this, move.newCol,move.newRow,move.piece.isWhite));
         capture(move.piece);
@@ -187,6 +195,8 @@ public class Board extends JPanel {
         return row * rows + col;
     }
 
+
+
     Piece findKing(boolean isWhite) {
         for (Piece p : pieceList) {
             if (isWhite == p.isWhite && p.name.equals("King")) {
@@ -197,6 +207,8 @@ public class Board extends JPanel {
     }
 
     public void loadPositionFromFen(String fenString) {
+        this.fenPosition = fenStartingPosition;
+
 
         pieceList.clear();
         String[] parts = fenString.split(" ");
@@ -248,16 +260,16 @@ public class Board extends JPanel {
             bqr.isFirstMove = parts[2].contains("q");
         }
         Piece bkr = getPiece(7,0);
-        if (bqr instanceof Rook) {
-            bqr.isFirstMove = parts[2].contains("k");
+        if (bkr instanceof Rook) {
+            bkr.isFirstMove = parts[2].contains("k");
         }
         Piece wqr = getPiece(0,7);
-        if (bqr instanceof Rook) {
-            bqr.isFirstMove = parts[2].contains("Q");
+        if (wqr instanceof Rook) {
+            wqr.isFirstMove = parts[2].contains("Q");
         }
         Piece wkr = getPiece(7,7);
-        if (bqr instanceof Rook) {
-            bqr.isFirstMove = parts[2].contains("K");
+        if (wkr instanceof Rook) {
+            wkr.isFirstMove = parts[2].contains("K");
         }
 
         //en passant square
@@ -268,8 +280,8 @@ public class Board extends JPanel {
         }
     }
 
-
     private void updateGameState() {
+        updateFenPosition();
         Piece king = findKing(isWhiteToMove);
 
         if (checkScanner.isGameOver(king)) {
@@ -284,7 +296,6 @@ public class Board extends JPanel {
         }
     }
 
-    //TODO: this is not entirely correct
     private boolean insufficientMaterial(boolean isWhite) {
         ArrayList<String> names = pieceList.stream()
                 .filter(p -> p.isWhite == isWhite)
@@ -307,7 +318,7 @@ public class Board extends JPanel {
                 g2d.fillRect(c * tileSize, r * tileSize, tileSize, tileSize);
             }
         }
-        // paint hightlights
+        // paint highlights
         if (selectedPiece != null) {
             for (int r = 0; r < rows; r++) {
                 for (int c = 0; c < cols; c++) {
@@ -326,14 +337,81 @@ public class Board extends JPanel {
         }
     }
 
-    //TODO: complete json methods
+    /**
+     * updated fenString to the current board state
+     */
+    private void updateFenPosition() {
+
+        Map<String, Character> pieceToLetter = Map.of(
+                "Pawn", 'P',
+                "Rook", 'R',
+                "Knight", 'N',
+                "Bishop", 'B',
+                "Queen", 'Q',
+                "King", 'K'
+        );
+        String[][] board = new String[8][8];
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                board[i][j] = " ";
+            }
+        }
+        for (Piece p : pieceList) {
+            int c = p.col;
+            int r = p.row;
+            String name = p.getName();
+            Character ch = pieceToLetter.get(name);
+            String letter = ch.toString();
+            if (!p.isWhite) {
+                letter = letter.toLowerCase();
+            }
+            board[r][c] = letter;
+        }
+
+        StringBuilder fen = new StringBuilder();
+
+        for (int i = 0; i < 8; i++) {
+            int emptyCount = 0;
+
+            for (int j = 0; j < 8; j++) {
+                if (board[i][j].equals(" ")) {
+                    emptyCount++;
+                } else {
+                    if (emptyCount > 0) {
+                        fen.append(emptyCount); // Add empty squares count
+                        emptyCount = 0;
+                    }
+                    fen.append(board[i][j]); // Add the piece symbol
+                }
+            }
+
+            if (emptyCount > 0) {
+                fen.append(emptyCount); // Add any remaining empty squares
+            }
+
+            if (i < 7) {
+                fen.append('/'); // Add row separator
+            }
+        }
+
+        String turn = isWhiteToMove ? " w" : " b";
+        fen.append(turn);
+        String castle = " " + getCanTheyCastle(true) + getCanTheyCastle(false);
+        fen.append(castle);
+        String enPassant = " " + getEnPassantTile();
+        fen.append(enPassant);
+        String moves = " " + halfMove + " " + fullMove;
+        fen.append(moves);
+
+        // Return the FEN string
+        fenPosition = fen.toString();
+    }
 
     //EFFECTS: return board as json object
     public JSONObject toJson() {
         JSONObject json = new JSONObject();
         json.put("position", fenPosition);
         json.put("name", name);
-
         return json;
     }
 
@@ -383,26 +461,39 @@ public class Board extends JPanel {
         return "";
     }
 
-    //TODO: finish this
-    public void setCastle(boolean isWhite, String castleStr) {
-
-        String[] parts = fenPosition.split(" ");
-        String[] castleArray = parts[2].split(""); //= [K][Q][k][q]
-
-        String[] newCastleArray = new String[4];
-
-        for (int i = 0; i < castleArray.length; i++) {
-            if (castleArray[i].equals("K")) {
-                for (int j = 0; j < i; j++) {
-                    newCastleArray[j] = "";
-                }
-                newCastleArray[0] = "K";
-            }
-
-            if (castleArray[1].equals("Q"))
-                return;
+    /**
+     *
+     * @return the tile where an enPassant COULD happen in algebraic notation
+     */
+    private String getEnPassantTile() {
+        if (enPassantTile == -1) {
+            return "-";
         }
 
-        this.fenPosition = String.join(" ", parts);
+        int row = 8 - (enPassantTile / 8);
+        int col = enPassantTile % 8;
+        String rowStr = Integer.toString(row);
+        String colStr;
+        switch (col) {
+            case 0: colStr = "a";
+                break;
+            case 1: colStr = "b";
+                break;
+            case 2: colStr = "c";
+                break;
+            case 3: colStr = "d";
+                break;
+            case 4: colStr = "e";
+                break;
+            case 5: colStr = "f";
+                break;
+            case 6: colStr = "g";
+                break;
+            case 7: colStr = "h";
+                break;
+            default: colStr = "-";
+        }
+
+        return colStr + rowStr;
     }
 }

@@ -11,7 +11,7 @@ import java.util.List;
 
 public class BoardList implements Iterable<Board> {
 
-    private List<Board> boards;
+    private final List<Board> boards;
 
     // EFFECTS: creates new board list with no boards
     public BoardList() {

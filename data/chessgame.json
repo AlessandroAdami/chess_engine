@@ -1,4 +1,10 @@
 {
-    "boards": [{"name": "New Game"}],
-    "currentBoard": {"name": "New Game"}
+    "boards": [{
+        "name": "New Game",
+        "position": "rnbqkbnr/pppppp1p/8/6p1/4P3/8/PPPP1PPP/RNBQKBNR w QKqk g6 2 1"
+    }],
+    "currentBoard": {
+        "name": "New Game",
+        "position": "rnbqkbnr/pppppp1p/8/6p1/4P3/8/PPPP1PPP/RNBQKBNR w QKqk g6 2 1"
+    }
 }

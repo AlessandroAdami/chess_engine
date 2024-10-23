@@ -14,8 +14,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
 
-//TODO: fix this
-
 public class JsonReader {
     private String source;
 
@@ -94,30 +92,8 @@ public class JsonReader {
 
         Board board = new Board();
         board.loadPositionFromFen(fenPosition);
+        board.setName(name);
 
         return board;
     }
-
-    //EFFECTS: returns the JSONArray as a (board) position array
-    private int[][] toPositionArray(JSONArray jsonPositionArray) {
-        int[][] position = new int[8][8];
-        int[] numArray = toNumArray(jsonPositionArray);
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                position[i][j] = numArray[(i * 8) + j];
-            }
-        }
-
-        return position;
-    }
-
-    //EFFECTS: returns the JSONArray as an integer array
-    private int[] toNumArray(JSONArray jsonPositionArray) {
-        int[] numArray = new int[64];
-        for (int i = 0; i < 64; i++) {
-            numArray[i] = jsonPositionArray.getInt(i);
-        }
-        return numArray;
-    }
-
 }

@@ -1,8 +1,7 @@
 package persistence;
 
 // A writer that writes JSON representation of ChessGame to file
-// Note: the JSON object saves the board as a 1D int[64] array
-//       instead of a 2D int[8][8] array
+// Note: the JSON object saves the board as its fen string
 
 
 import model.ChessGame;
@@ -15,7 +14,7 @@ import java.io.PrintWriter;
 public class JsonWriter {
     private static final int indentFactor = 4;
     private PrintWriter writer;
-    private String destination;
+    private final String destination;
 
     // EFFECTS: constructs a writer to write to destination file
     public JsonWriter(String destination) {
