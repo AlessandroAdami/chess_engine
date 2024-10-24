@@ -22,7 +22,7 @@ public class ChessGameWindowListener implements WindowListener {
     public void windowClosing(WindowEvent e) {
         this.app.saveChessGame();
         this.app.printLog();
-        System.out.println(this.app.chessGame.getCurrentBoard().getFenPosition());//TODO: remove this after fixing updateFen() in board
+        System.out.println(this.app.chessGame.getCurrentBoard().getFenPosition());
     }
 
     @Override

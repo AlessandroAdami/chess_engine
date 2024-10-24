@@ -1,6 +1,6 @@
 package model;
 
-import org.junit.jupiter.api.BeforeEach;
+import model.pieces.Piece;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -9,158 +9,78 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestBoard {
 
-    Board b0; //starting board
-    Board b1; //empty board
-    Board b2; //white king on e4
-    Board b3; // this board:
-    /*
-                {0, 0, 0, 0, 0, 0, 0, 0},
-                {0, r, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, r, 0, r, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0},
-                {0, r, 0, 0, Q, 0, r, 0},
-                {0, 0, 0, 0, 0, r, 0, 0},
-                {0, 0, r, 0, r, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0},
-     */
-    Board b4; //black knight on e4
-    Board b5; //this board:
-    /*
-                {0, 0, 0, 0, 0, 0, 0, 0},
-                {0, R, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, R, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, b, 0, 0, 0},
-                {0, 0, 0, 0, 0, R, 0, 0},
-                {0, 0, R, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0},
-     */
-    Board b6; //this board:
-    /*
-                {0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, P, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0},
-                {0, P, 0, 0, r, 0, P, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, P, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0},
-     */
-    Board b7; //this board:
-    /*
-                {0, 0, 0, 0, 0, 0, 0, 0},
-                {p, 0, p, 0, 0, 0, 0, 0},
-                {0, 0, P, 0, 0, 0, 0, 0},
-                {0, 0, 0, r, 0, p, 0, 0},
-                {0, 0, 0, 0, P, 0, R, 0},
-                {0, 0, p, 0, 0, 0, 0, 0},
-                {P, 0, P, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0},
-     */
-
-    Board b8;
-
-    @BeforeEach
-    void setup() {
-        b0 = new Board("starting");
-        b1 = new Board();
-        b2 = new Board("king");
-        b3 = new Board("queen");
-        b4 = new Board("knight");
-        b5 = new Board("bishop");
-        b6 = new Board("rook");
-        b7 = new Board("pawns");
-        b8 = new Board("promotion");
-
-        //update boards using fen strings
-
-    }
+    Board board = new Board("board name");
 
     @Test
     void testGetName() {
-        assertEquals("starting",b0.getName());
-        assertEquals("New Board",b1.getName());
-    }
-
-    @Test
-    void testIsEmpty() {
-        assertFalse(b0.isEmpty());
-        assertTrue(b1.isEmpty());
-    }
-
-    @Test
-    void testClearBoard() {
-        //TODO
+        assertEquals("board name",board.getName());
     }
 
     @Test
     void testEvaluatePos() {
+        assertEquals(0,board.evaluatePos());
+        board.loadPositionFromFen("r1bqkbnr/pppp1ppp/n3P3/8/8/8/PPP2PPP/RNBQK1NR w KQkq - 0 1");
+        assertEquals(-3,board.evaluatePos());
+        board.loadPositionFromFen("r2qkbn1/pppp1ppp/8/8/4P3/2N5/P1P2PPP/R1BQKB1R w KQq - 0 1");
+        assertEquals(7,board.evaluatePos());
+    }
+
+    @Test
+    void testIsValidPawnMove(){
+        //push twice first move
+        board = new Board("board name");
+        Piece e2Pawn = board.getPiece(4,6);
+        Move e4 = new Move(board,e2Pawn,4,4);
+        assertTrue(board.isValidMove(e4));
+        board.makeMove(e4);
+        //push one square first move
+        Piece e7Pawn = board.getPiece(4,1);
+        Move e6 = new Move(board,e7Pawn,4,2);
+        assertTrue(board.isValidMove(e6));
+        //enPassant
+        board.loadPositionFromFen("rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 3");
+        Piece e5Pawn = board.getPiece(4,3);
+        Move exf6 = new Move(board,e5Pawn,5,2);
+        assertTrue(board.isValidMove(exf6));
+        //capture
+        board.loadPositionFromFen("rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2");
+        Piece e4Pawn = board.getPiece(4,4);
+        Move exd5 = new Move(board,e4Pawn,3,3);
+        assertTrue(board.isValidMove(exd5));
+    }
+
+    @Test
+    void testIsValidKingMove() {
         //TODO
     }
 
     @Test
-    void testIsLegalPawnMove(){
+    void testIsValidQueenMove(){
         //TODO
     }
 
     @Test
-    void testIsLegalKingMove() {
+    void testIsValidKnightMove() {
         //TODO
     }
 
     @Test
-    void testIsLegalQueenMove(){
+    void testIsValidBishopMove() {
         //TODO
     }
 
     @Test
-    void testIsLegalKnightMove() {
+    void testIsValidRookMove() {
         //TODO
     }
 
     @Test
-    void testIsLegalBishopMove() {
+    void testMakeMove() {
         //TODO
     }
 
     @Test
-    void testIsLegalRookMove() {
-        //TODO
-
-    }
-
-    @Test
-    void testIsLegalMove() {
-        //TODO
-    }
-
-    @Test
-    void testMovePiece() {
-        //TODO
-    }
-
-    @Test
-    void testBoardToStringBoard() {
-        //TODO
-    }
-
-    @Test
-    void testIsSamePosition() {
-        //TODO
-    }
-
-    @Test
-    void testIsPawnToPromote() {
-        //TODO
-    }
-
-    @Test
-    void testUpdateWhiteCastling() {
-        //TODO
-    }
-
-    @Test
-    void testUpdateBlackCastling() {
+    void testUpdateCastling() {
         //TODO
     }
 

@@ -83,14 +83,14 @@ public class TestJsonWriter {
             assertTrue(currentBoard.samePosition(newBoard));
             assertEquals("New Board", currentBoard.getName());
             assertTrue(currentBoard.getIsWhiteToMove());
-            //assertEquals("QK", currentBoard.getCanTheyCastle(true));
-            //assertEquals("qk", currentBoard.getCanTheyCastle(false));
+            assertEquals("QK", currentBoard.getCanTheyCastle(true));
+            assertEquals("qk", currentBoard.getCanTheyCastle(false));
             assertEquals(2, boards.getBoards().size());
 
             assertTrue(board2.samePosition(newBoard));
             assertEquals("Board 2", board2.getName());
-            //assertFalse(board2.getIsWhiteToMove());
-            //assertEquals("K", board2.getCanTheyCastle(true));
+            assertFalse(board2.getIsWhiteToMove());
+            assertEquals("K", board2.getCanTheyCastle(true));
             assertEquals("Q", board2.getCanTheyCastle(false));
 
         } catch (IOException e) {

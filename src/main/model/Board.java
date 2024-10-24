@@ -12,9 +12,6 @@ import org.json.JSONObject;
 
 public class Board extends JPanel {
 
-    //TODO: NB: a game is uniquely identifies by a series of fen strings
-    // that  indicates a way to keep track of the moves in the game
-
     private static final String fenStartingPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
     private String fenPosition;
@@ -177,7 +174,6 @@ public class Board extends JPanel {
         }
     }
 
-    //TODO: update so that there is the option to choose what to promote to
     private void promotePawn(Move move) {
         JPanel promoteOption = new JPanel();
         promoteOption.setPreferredSize(new Dimension(4 * tileSize, 4 * tileSize));
@@ -416,15 +412,22 @@ public class Board extends JPanel {
     }
 
     public int evaluatePos() {
-        return 1;
+        int eval = 0;
+        Map<String,Integer> nameToVal = Map.of(
+                "Pawn",1,
+                "Knight",3,
+                "Bishop",3,
+                "Rook",5,
+                "Queen",9,
+                "King",0);
+        for (Piece p : pieceList) {
+            eval += p.isWhite ? nameToVal.get(p.name) : - nameToVal.get(p.name);
+        }
+        return eval;
     }
 
     public boolean samePosition(Board other) {
         return fenPosition.equals(other.getFenPosition());
-    }
-
-    public boolean isEmpty() {
-        return pieceList.isEmpty();
     }
 
     //getters & setters
@@ -459,6 +462,10 @@ public class Board extends JPanel {
             return queen;
         }
         return "";
+    }
+
+    public String getName() {
+        return name;
     }
 
     /**
