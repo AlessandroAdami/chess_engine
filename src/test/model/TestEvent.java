@@ -26,6 +26,9 @@ public class TestEvent {
         d = Calendar.getInstance().getTime();   // (2)
     }
 
+    /**
+     * Note: this test might fail when it should pass due to speed of execution
+     */
     @Test
     public void testEvent() {
         assertEquals("Sensor open at door", e.getDescription());

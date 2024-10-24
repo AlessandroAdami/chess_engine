@@ -12,35 +12,16 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestBoardList {
 
-    Board b0; //starting board
-    Board b1; //empty board
-    Board b2; //white king on e4
-    Board b3; //white queen on e4
-    Board b4; //black knight on e4
-    Board b5; //black bishop on e5
-    BoardList boardList;
+    Board b0 = new Board("Zero");
+    Board b1 = new Board("One");
+    Board b2 = new Board("Two");
+    Board b3 = new Board("Three");
+    Board b4 = new Board("Four");
+    Board b5 = new Board("Five");
+    BoardList boardList = new BoardList();
 
     @BeforeEach
     public void setup() {
-        b0 = new Board();
-        b1 = new Board();
-        b2 = new Board();
-        b3 = new Board();
-        b4 = new Board();
-        b5 = new Board();
-        boardList = new BoardList();
-        /*
-        b2.placePiece(4,3,6);
-        b3.placePiece(4,3,5);
-        b4.placePiece(4,3,-2);
-        b5.placePiece(4,4,-3);
-         */
-        b0.setName("starting");
-        b1.setName("empty");
-        b2.setName("King");
-        b3.setName("Queen");
-        b4.setName("Knight");
-        b5.setName("Bishop");
         boardList.addBoard(b0);
         boardList.addBoard(b1);
         boardList.addBoard(b2);
@@ -51,15 +32,15 @@ public class TestBoardList {
 
     @Test
     public void testRemoveBoardString() {
-        assertEquals(b0,boardList.removeBoard("starting"));
-        assertEquals(b1,boardList.removeBoard("empty"));
+        assertEquals(b0,boardList.removeBoard("Zero"));
+        assertEquals(b1,boardList.removeBoard("One"));
         assertNull(boardList.removeBoard("NoBoard"));
         assertEquals(4,boardList.getBoards().size());
-        assertEquals(b5,boardList.removeBoard("Bishop"));
+        assertEquals(b5,boardList.removeBoard("Five"));
         assertEquals(3,boardList.getBoards().size());
-        assertEquals(b2,boardList.removeBoard("King"));
-        assertEquals(b3,boardList.removeBoard("Queen"));
-        assertEquals(b4,boardList.removeBoard("Knight"));
+        assertEquals(b2,boardList.removeBoard("Two"));
+        assertEquals(b3,boardList.removeBoard("Three"));
+        assertEquals(b4,boardList.removeBoard("Four"));
         assertEquals(0,boardList.getBoards().size());
     }
 
@@ -93,15 +74,15 @@ public class TestBoardList {
 
     @Test
     public void testGetBoardString() {
-        assertEquals(b0,boardList.getBoard("starting"));
-        assertEquals(b1,boardList.getBoard("empty"));
+        assertEquals(b0,boardList.getBoard("Zero"));
+        assertEquals(b1,boardList.getBoard("One"));
         assertEquals(6,boardList.getBoards().size());
-        assertEquals(b5,boardList.getBoard("Bishop"));
+        assertEquals(b5,boardList.getBoard("Five"));
         assertNull(boardList.getBoard("NoBoard"));
         assertEquals(6,boardList.getBoards().size());
-        assertEquals(b2,boardList.getBoard("King"));
-        assertEquals(b3,boardList.getBoard("Queen"));
-        assertEquals(b4,boardList.getBoard("Knight"));
+        assertEquals(b2,boardList.getBoard("Two"));
+        assertEquals(b3,boardList.getBoard("Three"));
+        assertEquals(b4,boardList.getBoard("Four"));
         assertEquals(6,boardList.getBoards().size());
     }
 

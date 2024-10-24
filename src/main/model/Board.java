@@ -436,6 +436,10 @@ public class Board extends JPanel {
         return pieceList;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public boolean getIsWhiteToMove() {
         return isWhiteToMove;
     }

@@ -28,7 +28,6 @@ public class TestBoard {
     @Test
     void testIsValidPawnMove(){
         //push twice first move
-        board = new Board("board name");
         Piece e2Pawn = board.getPiece(4,6);
         Move e4 = new Move(board,e2Pawn,4,4);
         assertTrue(board.isValidMove(e4));
@@ -51,37 +50,94 @@ public class TestBoard {
 
     @Test
     void testIsValidKingMove() {
-        //TODO
+        //white king on e4 that can move anywhere, black king on b4 can move anywhere
+        board.loadPositionFromFen("8/8/7P/8/1k2K3/8/8/8 w - - 0 1");
+        //up
+        Piece king = board.findKing(true);
+        Move Ke5 = new Move(board,king,4,3);
+        assertTrue(board.isValidMove(Ke5));
+        board.makeMove(Ke5);
+        // down
+        king = board.findKing(false);
+        Move Kb3 = new Move(board,king,2,5);
+        assertTrue(board.isValidMove(Kb3));
+        board.makeMove(Kb3);
+        //diagonal
+        king = board.findKing(true);
+        Move Kf6 = new Move(board,king,5,2);
+        assertTrue(board.isValidMove(Kf6));
     }
 
     @Test
     void testIsValidQueenMove(){
-        //TODO
+        board.loadPositionFromFen("1k6/8/8/2q5/4Q3/8/8/5K2 w - - 0 1");
+        //up
+        Piece wQueen = board.getPiece(4,4);
+        Move Qe7 = new Move(board,wQueen,4,1);
+        assertTrue(board.isValidMove(Qe7));
+        board.makeMove(Qe7);
+        //down
+        Piece bQueen = board.getPiece(2,3);
+        Move Qc2 = new Move(board,bQueen,2,6);
+        assertTrue(board.isValidMove(Qc2));
+        board.makeMove(Qc2);
+        //diagonal
+        Move Qa3 = new Move(board,wQueen,0,5);
+        assertTrue(board.isValidMove(Qa3));
     }
 
     @Test
     void testIsValidKnightMove() {
-        //TODO
+        board.loadPositionFromFen("1k6/7P/8/2n5/4N3/8/8/5K2 w - - 0 1");
+        //up one right two
+        Piece wKnight= board.getPiece(4,4);
+        Move Ng5 = new Move(board,wKnight,6,3);
+        assertTrue(board.isValidMove(Ng5));
+        board.makeMove(Ng5);
+        //down two left one
+        Piece bKnight = board.getPiece(2,3);
+        Move Nb3 = new Move(board,bKnight,1,5);
+        assertTrue(board.isValidMove(Nb3));
+        board.makeMove(Nb3);
+        // up two left one
+        Move Nf7 = new Move(board,wKnight,5,1);
+        assertTrue(board.isValidMove(Nf7));
     }
 
     @Test
     void testIsValidBishopMove() {
-        //TODO
+
+        board.loadPositionFromFen("1k6/7P/8/2b5/4B3/8/8/5K2 w - - 0 1");
+        //up right
+        Piece wBishop = board.getPiece(4,4);
+        Move Bg6 = new Move(board,wBishop,6,2);
+        assertTrue(board.isValidMove(Bg6));
+        board.makeMove(Bg6);
+        // down left
+        Piece bBishop = board.getPiece(2,3);
+        Move Ba3 = new Move(board,bBishop,0,5);
+        assertTrue(board.isValidMove(Ba3));
+        board.makeMove(Ba3);
+        // up left
+        Move Be8 = new Move(board,wBishop,4,0);
+        assertTrue(board.isValidMove(Be8));
     }
 
     @Test
     void testIsValidRookMove() {
-        //TODO
+        board.loadPositionFromFen("1k6/8/8/2r5/4R3/8/8/5K2 w - - 0 1");
+        //up
+        Piece wRook = board.getPiece(4,4);
+        Move Re7 = new Move(board,wRook,4,1);
+        assertTrue(board.isValidMove(Re7));
+        board.makeMove(Re7);
+        //down
+        Piece bRook = board.getPiece(2,3);
+        Move Rc2 = new Move(board,bRook,2,6);
+        assertTrue(board.isValidMove(Rc2));
+        board.makeMove(Rc2);
+        // right
+        Move Rh7 = new Move(board,wRook,7,1);
+        assertTrue(board.isValidMove(Rh7));
     }
-
-    @Test
-    void testMakeMove() {
-        //TODO
-    }
-
-    @Test
-    void testUpdateCastling() {
-        //TODO
-    }
-
 }
