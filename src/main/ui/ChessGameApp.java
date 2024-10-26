@@ -2,13 +2,12 @@ package ui;
 
 import model.Event;
 import model.*;
-import util.ChessGameActionListener;
+import util.ChessGameButtonManager;
+import util.ChessGameMenuManager;
 import util.ChessGameWindowListener;
-import util.SelectButtonListener;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 
 /** Chess game application. Allows the user to play various games
  * and analyze the current position in each board.
@@ -17,16 +16,11 @@ import java.util.ArrayList;
 public class ChessGameApp {
 
     private JFrame frame;
-    public ChessGame chessGame;
+    private final ChessGame chessGame;
 
-    private ArrayList<SelectButtonListener> buttonList;
-    private ChessGameActionListener actionListener;
     private ChessGameWindowListener windowListener;
-
-    private JMenuBar menuBar;
-    private JButton createNewBoardButton;
-    private JTextField newBoardName;
-
+    private ChessGameButtonManager buttonManager;
+    private ChessGameMenuManager menuManager;
 
     //EFFECTS: constructs and runs ChessGameApp
     public ChessGameApp() {
@@ -47,17 +41,17 @@ public class ChessGameApp {
         frame.setLayout(new GridBagLayout());
         frame.setMinimumSize(new Dimension(1000,1000));
         frame.setLocationRelativeTo(null);
+        //Board b = chessGame.getCurrentBoard();
+        //b.setBounds(1000,500,50,50);
         frame.add(chessGame.getCurrentBoard());
+
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.addWindowListener(windowListener);
     }
 
-
     private void initListeners() {
-        this.actionListener = new ChessGameActionListener(chessGame);
         this.windowListener = new ChessGameWindowListener(this);
-        this.buttonList = new ArrayList<>();
     }
 
     //MODIFIES: this
@@ -65,37 +59,8 @@ public class ChessGameApp {
     private void initComponents() {
         ImageIcon imageIcon = new ImageIcon("./data/icon.png");
         frame.setIconImage(imageIcon.getImage());
-        setupMenuBar();
-        setupCreateNewBoard();
-    }
-
-    //MODIFIES: this
-    //EFFECTS: sets up menu bar
-    private void setupMenuBar() {
-        menuBar = new JMenuBar();
-        JMenu fileMenu = new JMenu("File");
-        JMenuItem loadItem = new JMenuItem("Load games from file");
-        JMenuItem saveItem = new JMenuItem("Save games to file");
-        fileMenu.add(loadItem);
-        fileMenu.add(saveItem);
-        fileMenu.addActionListener(actionListener);
-
-        menuBar.add(fileMenu);
-        menuBar.setVisible(true);
-        frame.setJMenuBar(menuBar);
-    }
-
-    //MODIFIES: this
-    //EFFECTS: sets up create new board button/text
-    private void setupCreateNewBoard() {
-        createNewBoardButton = new JButton("New Game");
-        createNewBoardButton.setFocusable(false);
-        createNewBoardButton.setBounds(4000, 200, 90, 25);
-        newBoardName = new JTextField();
-        newBoardName.setBounds(4000, 200, 100, 25);
-        newBoardName.setText("Create board...");
-        frame.add(createNewBoardButton);
-        frame.add(newBoardName);
+        menuManager = new ChessGameMenuManager(this,frame);
+        buttonManager = new ChessGameButtonManager(this,frame);
     }
 
     //EFFECTS: select the board as currentBoard
@@ -132,8 +97,9 @@ public class ChessGameApp {
 
     //MODIFIES: this
     //EFFECTS: loads chess game from file
-    private void loadChessGame() {
+    public void loadChessGame() {
         chessGame.loadChessGame();
+        init();
     }
 
     // MODIFIES: this
@@ -155,5 +121,9 @@ public class ChessGameApp {
         for (Event e : EventLog.getInstance()) {
             System.out.println(e.getDate() + ":\n" + e.getDescription() + "\n\n");
         }
+    }
+
+    public ChessGame getChessGame() {
+        return this.chessGame;
     }
 }

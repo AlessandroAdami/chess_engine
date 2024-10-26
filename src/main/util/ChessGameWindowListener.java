@@ -2,6 +2,7 @@ package util;
 
 import ui.ChessGameApp;
 
+import javax.swing.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
@@ -22,7 +23,7 @@ public class ChessGameWindowListener implements WindowListener {
     public void windowClosing(WindowEvent e) {
         this.app.saveChessGame();
         this.app.printLog();
-        System.out.println(this.app.chessGame.getCurrentBoard().getFenPosition());
+        System.out.println(this.app.getChessGame().getCurrentBoard().getFenPosition());
     }
 
     @Override

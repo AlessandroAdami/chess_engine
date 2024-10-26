@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import model.pieces.*;
@@ -122,9 +121,7 @@ public class Board extends JPanel {
         if (move.piece.isWhite) {
             fullMove++;
         }
-
         updateGameState();
-
     }
 
     private void moveKing(Move move) {
@@ -473,7 +470,6 @@ public class Board extends JPanel {
     }
 
     /**
-     *
      * @return the tile where an enPassant COULD happen in algebraic notation
      */
     private String getEnPassantTile() {

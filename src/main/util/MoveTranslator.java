@@ -21,9 +21,9 @@ public class MoveTranslator {
 
     //returns move in algebraic notation
     public String algebraicNotationMove() {
-        String piece = pieceToString(move.getPiece().getName());//KQRNB
-        String letter = colToLetterString(move.getNewRow());    //abcdefgh
-        String number = rowToNumberString(move.getNewCol());    //12345678
+        String piece = pieceToString(move.getPiece().getName());
+        String letter = colToLetterString(move.getNewRow());
+        String number = rowToNumberString(move.getNewCol());
 
         String conflict = checkForConflict(move.getPiece());
 
