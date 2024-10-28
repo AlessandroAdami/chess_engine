@@ -38,7 +38,7 @@ public class TestJsonReader {
             BoardList boards = cg.getBoards();
 
             assertTrue(currentBoard.samePosition(newBoard));
-            assertEquals("New Board", currentBoard.getName());
+            assertEquals("New Game", currentBoard.getName());
             assertTrue(currentBoard.getIsWhiteToMove());
             assertEquals(1, boards.getBoards().size());
         } catch (IOException e) {
@@ -55,14 +55,16 @@ public class TestJsonReader {
             BoardList boards = cg.getBoards();
             Board board2 = boards.getBoard(1);
 
+            newBoard.loadPositionFromFen("r2qkb1r/pb1n1p2/2p1pP2/1p4B1/2pP4/2N5/PP3PPP/R2QKB1R w KQkq - 1 12");
             assertTrue(currentBoard.samePosition(newBoard));
-            assertEquals("New Board", currentBoard.getName());
+            assertEquals("game 1", currentBoard.getName());
             assertTrue(currentBoard.getIsWhiteToMove());
             assertEquals(2, boards.getBoards().size());
 
+            newBoard.loadPositionFromFen("r1bqkb1r/1p1n1ppp/p2ppn2/6B1/3NPP2/2N2Q2/PPP3PP/R3KB1R b KQkq - 2 8");
             assertTrue(board2.samePosition(newBoard));
-            assertEquals("Board 2", board2.getName());
-
+            assertFalse(board2.getIsWhiteToMove());
+            assertEquals("game 2", board2.getName());
 
         } catch (IOException e) {
             fail("Couldn't read from file");

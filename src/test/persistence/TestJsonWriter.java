@@ -25,8 +25,6 @@ public class TestJsonWriter {
         newBoard = new Board();
         board2 = new Board();
         board2.setName("Board 2");
-        //board2.setCastle(true,"KR");
-        //board2.setCastle(false,"RK");
         board2.setIsWhiteToMove(false);
         complexChessGame.addBoard(board2);
     }
@@ -56,10 +54,8 @@ public class TestJsonWriter {
             BoardList boards = newChessGame.getBoards();
 
             assertTrue(currentBoard.samePosition(newBoard));
-            assertEquals("New Board", currentBoard.getName());
+            assertEquals("New Game", currentBoard.getName());
             assertTrue(currentBoard.getIsWhiteToMove());
-            //assertEquals("QK", currentBoard.getCanTheyCastle(true));
-            //assertEquals("qk", currentBoard.getCanTheyCastle(false));
             assertEquals(1, boards.getBoards().size());
         } catch (IOException e) {
             fail("Exception should not have been thrown");

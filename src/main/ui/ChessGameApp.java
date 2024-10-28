@@ -41,8 +41,6 @@ public class ChessGameApp {
         frame.setLayout(new GridBagLayout());
         frame.setMinimumSize(new Dimension(1000,1000));
         frame.setLocationRelativeTo(null);
-        //Board b = chessGame.getCurrentBoard();
-        //b.setBounds(1000,500,50,50);
         frame.add(chessGame.getCurrentBoard());
 
         frame.setVisible(true);
@@ -99,7 +97,22 @@ public class ChessGameApp {
     //EFFECTS: loads chess game from file
     public void loadChessGame() {
         chessGame.loadChessGame();
-        init();
+        updateComponents();
+    }
+
+    //updates all components including (board list and current board)
+    public void updateComponents() {
+        frame.getContentPane().removeAll();  // Clear the frame’s content pane
+
+        // Reset and reinitialize components
+        initComponents();
+
+        // Refresh frame with updated game data
+        frame.add(chessGame.getCurrentBoard());
+
+        // Revalidate and repaint to ensure changes take effect
+        frame.revalidate();
+        frame.repaint();
     }
 
     // MODIFIES: this
