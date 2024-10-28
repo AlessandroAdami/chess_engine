@@ -94,4 +94,18 @@ public class BoardList implements Iterable<Board> {
         return boards;
     }
 
+    //TODO: decide weather to save a list of boards or a list of compressed boards
+    private class BoardListIterator implements Iterator<Board> {
+
+        @Override
+        public boolean hasNext() {
+            return false;
+        }
+
+        @Override
+        public Board next() {
+            return null;
+        }
+    }
+
 }

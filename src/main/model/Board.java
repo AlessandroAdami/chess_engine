@@ -500,7 +500,6 @@ public class Board extends JPanel {
                 break;
             default: colStr = "-";
         }
-
         return colStr + rowStr;
     }
 }
