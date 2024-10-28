@@ -9,7 +9,7 @@ import java.util.Iterator;
 
 //A chess game with a current board and a list of boards
 
-public class ChessGame implements Iterable<Board> {
+public class ChessGame implements Iterable<CompressedBoard> {
 
     private BoardList boards;
     private Board currentBoard;
@@ -76,7 +76,7 @@ public class ChessGame implements Iterable<Board> {
 
     //EFFECTS: returns iterator over boards
     @Override
-    public Iterator<Board> iterator() {
+    public Iterator<CompressedBoard> iterator() {
         return boards.iterator();
     }
 
@@ -91,6 +91,7 @@ public class ChessGame implements Iterable<Board> {
     }
 
     //getters
+
 
     //EFFECTS: gets board at index i
     public Board getBoard(int i) {

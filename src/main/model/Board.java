@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import model.pieces.*;
@@ -169,6 +170,10 @@ public class Board extends JPanel {
         if (move.newRow == colorIndex) {
             promotePawn(move);
         }
+    }
+
+    public static String getFenStartingPosition() {
+        return fenStartingPosition;
     }
 
     private void promotePawn(Move move) {
@@ -402,10 +407,7 @@ public class Board extends JPanel {
 
     //EFFECTS: return board as json object
     public JSONObject toJson() {
-        JSONObject json = new JSONObject();
-        json.put("position", fenPosition);
-        json.put("name", name);
-        return json;
+        return (new CompressedBoard(this)).toJson();
     }
 
     public int evaluatePos() {
@@ -425,6 +427,19 @@ public class Board extends JPanel {
 
     public boolean samePosition(Board other) {
         return fenPosition.equals(other.getFenPosition());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Board)) return false;
+        Board board = (Board) o;
+        return Objects.equals(getFenPosition(), board.getFenPosition()) && Objects.equals(getName(), board.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getFenPosition(), getName());
     }
 
     //getters & setters
