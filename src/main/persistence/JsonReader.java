@@ -5,6 +5,7 @@ package persistence;
 import model.Board;
 import model.BoardList;
 import model.ChessGame;
+import model.CompressedBoard;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -55,7 +56,8 @@ public class JsonReader {
     //EFFECTS: adds current board to chess game
     private void addCurrentBoard(ChessGame cg, JSONObject jsonObject) {
         JSONObject currentJsonBoard = jsonObject.getJSONObject("currentBoard");
-        Board currentBoard = parseBoard(currentJsonBoard);
+        CompressedBoard currentCompressedBoard = parseCompressedBoard(currentJsonBoard);
+        Board currentBoard = currentCompressedBoard.getBoard();
         cg.setCurrentBoard(currentBoard);
     }
 
@@ -73,27 +75,17 @@ public class JsonReader {
         JSONArray jsonArray = jsonObject.getJSONArray("boards");
         for (Object json : jsonArray) {
             JSONObject nextBoard = (JSONObject) json;
-            addBoard(bl, nextBoard);
+            CompressedBoard b = parseCompressedBoard(nextBoard);
+            bl.addBoard(b);
         }
     }
 
-    //MODIFIES: bl
-    //EFFECTS: adds parsed board to bl
-    private void addBoard(BoardList bl, JSONObject board) {
-        bl.addBoard(parseBoard(board));
-    }
-
-
     // MODIFIES: bl
     // EFFECTS: returns parsed board to board list
-    private Board parseBoard(JSONObject jsonObject) {
+    private CompressedBoard parseCompressedBoard(JSONObject jsonObject) {
         String name = jsonObject.getString("name");
         String fenPosition = jsonObject.getString("position");
 
-        Board board = new Board();
-        board.loadPositionFromFen(fenPosition);
-        board.setName(name);
-
-        return board;
+        return new CompressedBoard(name,fenPosition);
     }
 }

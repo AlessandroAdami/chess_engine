@@ -207,7 +207,6 @@ public class Board extends JPanel {
     public void loadPositionFromFen(String fenString) {
         this.fenPosition = fenStartingPosition;
 
-
         pieceList.clear();
         String[] parts = fenString.split(" ");
 

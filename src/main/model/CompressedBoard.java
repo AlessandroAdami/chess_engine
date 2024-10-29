@@ -23,6 +23,11 @@ public class CompressedBoard {
         this.fenPosition = Board.getFenStartingPosition();
     }
 
+    public CompressedBoard(String name,String fenPosition) {
+        this.name = name;
+        this.fenPosition = fenPosition;
+    }
+
     public String getName() {
         return this.name;
     }
