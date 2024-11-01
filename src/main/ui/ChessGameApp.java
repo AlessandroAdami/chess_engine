@@ -2,24 +2,23 @@ package ui;
 
 import model.Event;
 import model.*;
-import util.ChessGameButtonManager;
 import util.ChessGameMenuManager;
 import util.ChessGameWindowListener;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Iterator;
 
 /** Chess game application. Allows the user to play various games
  * and analyze the current position in each board.
  */
 
-public class ChessGameApp {
+public class ChessGameApp implements Iterable<CompressedBoard> {
 
     private JFrame frame;
     private final ChessGame chessGame;
 
     private ChessGameWindowListener windowListener;
-    private ChessGameButtonManager buttonManager;
     private ChessGameMenuManager menuManager;
 
     //EFFECTS: constructs and runs ChessGameApp
@@ -39,7 +38,7 @@ public class ChessGameApp {
         frame.setTitle("ChessBud");
         frame.getContentPane().setBackground(new Color(8, 30, 56));
         frame.setLayout(new GridBagLayout());
-        frame.setMinimumSize(new Dimension(1000,1000));
+        frame.setMinimumSize(new Dimension(1500,1500));
         frame.setLocationRelativeTo(null);
         frame.add(chessGame.getCurrentBoard());
 
@@ -58,7 +57,6 @@ public class ChessGameApp {
         ImageIcon imageIcon = new ImageIcon("./data/icon.png");
         frame.setIconImage(imageIcon.getImage());
         menuManager = new ChessGameMenuManager(this,frame);
-        buttonManager = new ChessGameButtonManager(this,frame);
     }
 
     //EFFECTS: select the board as currentBoard
@@ -117,12 +115,6 @@ public class ChessGameApp {
 
     // MODIFIES: this
     // EFFECTS: creates new board and makes it the current board
-    private void createNewBoard() {
-        this.createNewBoard("New Game");
-    }
-
-    // MODIFIES: this
-    // EFFECTS: creates new board and makes it the current board
     private void createNewBoard(String name) {
         Board b = new Board(name);
         this.chessGame.addBoard(b);
@@ -136,7 +128,12 @@ public class ChessGameApp {
         }
     }
 
-    public ChessGame getChessGame() {
-        return this.chessGame;
+    public Board getCurrentBoard() {
+        return this.chessGame.getCurrentBoard();
+    }
+
+    @Override
+    public Iterator<CompressedBoard> iterator() {
+        return this.chessGame.iterator();
     }
 }
