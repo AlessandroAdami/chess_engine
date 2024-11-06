@@ -17,8 +17,9 @@ public class ChessGameMenuManager implements ActionListener {
     private JMenuItem loadItem;
     private JMenuItem saveItem;
     private JMenuItem newGame;
+    private JMenu gamesMenu;
 
-    private ArrayList<JMenuItem> games;
+    private final ArrayList<JMenuItem> games = new ArrayList<>(); // keeping track of Items that select games
 
     public ChessGameMenuManager(ChessGameApp app, JFrame frame) {
         this.app = app;
@@ -50,10 +51,17 @@ public class ChessGameMenuManager implements ActionListener {
     }
 
     private void initGamesMenu() {
-        JMenu gamesMenu = new JMenu("Games");
+        gamesMenu = new JMenu("Games");
+        updateGamesMenu();
+    }
+
+    private void updateGamesMenu() {
         for (CompressedBoard b : app) {
-            //games.add(new JMenuItem(b.getName()));
-            gamesMenu.add(new JMenuItem("Board: " + b.getName()));
+            JMenuItem boardSelect = new JMenuItem("Board: " + b.getName());
+            boardSelect.setName(b.getName());
+            games.add(boardSelect);
+            gamesMenu.add(boardSelect);
+            boardSelect.addActionListener(this);
         }
         menuBar.add(gamesMenu);
     }
@@ -67,7 +75,14 @@ public class ChessGameMenuManager implements ActionListener {
             app.saveChessGame();
             System.out.println("Games saved to file");
         } else if (e.getSource() == newGame) {
-            //app.newGame();
+            app.newGame();
+        } else {
+            for (JMenuItem gameItem : games) {
+                if (e.getSource() == gameItem) {
+                    app.setBoard(gameItem.getName());
+                    break;
+                }
+            }
         }
     }
 }

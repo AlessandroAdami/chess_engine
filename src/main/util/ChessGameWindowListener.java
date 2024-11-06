@@ -1,5 +1,6 @@
 package util;
 
+import model.CompressedBoard;
 import ui.ChessGameApp;
 
 import javax.swing.*;
@@ -24,6 +25,9 @@ public class ChessGameWindowListener implements WindowListener {
         this.app.saveChessGame();
         this.app.printLog();
         System.out.println(this.app.getCurrentBoard().getFenPosition());
+        for (CompressedBoard b : app) {
+            System.out.println(b.getName());
+        }
     }
 
     @Override

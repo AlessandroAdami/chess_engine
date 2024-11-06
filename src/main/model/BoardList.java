@@ -74,11 +74,10 @@ public class BoardList implements Iterable<CompressedBoard> {
         return boards.iterator();
     }
 
-    // EFFECTS: returns board with name, if none are found return null.
-    public Board getBoard(String name) {
+    public CompressedBoard getBoard(String name) {
         for (CompressedBoard b : boards) {
             if (name.equals(b.getName())) {
-                return b.getBoard();
+                return b;
             }
         }
         return null;

@@ -40,6 +40,10 @@ public class ChessGame implements Iterable<CompressedBoard> {
         boards.addBoard(b);
     }
 
+    public void addBoard(CompressedBoard b) {
+        boards.addBoard(b);
+    }
+
     //EFFECTS: returns chess game as a json object
     public JSONObject toJson() {
         JSONObject json = new JSONObject();
@@ -80,25 +84,9 @@ public class ChessGame implements Iterable<CompressedBoard> {
         return boards.iterator();
     }
 
-    //EFFECTS: removes and returns the board if it is in the game
-    public Board removeBoard(String boardName) {
-        return boards.removeBoard(boardName);
-    }
-
-    //EFFECTS: true if there are no boards
-    public boolean isBoardListEmpty() {
-        return boards.isBoardListEmpty();
-    }
-
     //getters
 
-
-    //EFFECTS: gets board at index i
-    public Board getBoard(int i) {
-        return boards.getBoard(i);
-    }
-
-    public Board getBoard(String name) {
+    public CompressedBoard getBoard(String name) {
         return boards.getBoard(name);
     }
 
@@ -115,6 +103,16 @@ public class ChessGame implements Iterable<CompressedBoard> {
     }
 
     public void setCurrentBoard(Board b) {
+        saveCurrentBoard();
         this.currentBoard = b;
+    }
+
+    private void saveCurrentBoard() {
+        String name = currentBoard.getName();
+        for (CompressedBoard b : boards) {
+            if (b.getName().equals(name)) {
+                b.load(currentBoard);
+            }
+        }
     }
 }

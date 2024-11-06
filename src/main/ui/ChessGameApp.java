@@ -21,16 +21,13 @@ public class ChessGameApp implements Iterable<CompressedBoard> {
     private ChessGameWindowListener windowListener;
     private ChessGameMenuManager menuManager;
 
-    //EFFECTS: constructs and runs ChessGameApp
+    /**
+     * Starts the app
+     */
     public ChessGameApp() {
         chessGame = new ChessGame();
-        init();
-    }
-
-    private void init() {
-        initListeners();
+        this.windowListener = new ChessGameWindowListener(this);
         initFrame();
-        initComponents();
     }
 
     private void initFrame() {
@@ -42,48 +39,37 @@ public class ChessGameApp implements Iterable<CompressedBoard> {
         frame.setLocationRelativeTo(null);
         frame.add(chessGame.getCurrentBoard());
 
+        ImageIcon imageIcon = new ImageIcon("./data/icon.png");
+        frame.setIconImage(imageIcon.getImage());
+        menuManager = new ChessGameMenuManager(this,frame);
+
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.addWindowListener(windowListener);
     }
 
-    private void initListeners() {
-        this.windowListener = new ChessGameWindowListener(this);
-    }
-
-    //MODIFIES: this
-    //EFFECTS: initializes components
-    private void initComponents() {
-        ImageIcon imageIcon = new ImageIcon("./data/icon.png");
-        frame.setIconImage(imageIcon.getImage());
-        menuManager = new ChessGameMenuManager(this,frame);
-    }
-
     //EFFECTS: select the board as currentBoard
-    private void selectBoard(String name) {
-        chessGame.setCurrentBoard(chessGame.getBoard(name));
-    }
-
-    //MODIFIES: this
-    //EFFECTS: deletes board
-    private void deleteBoard(String name) {
-        Board removedBoard = chessGame.removeBoard(name);
-        if (removedBoard != null) {
-            if (chessGame.getCurrentBoard().equals(removedBoard)) {
-                setNewBoard();
-            }
+    public void setBoard(String name) {
+        CompressedBoard b = chessGame.getBoard(name);
+        if (b != null) {
+            chessGame.setCurrentBoard(b.getBoard());
+            updateComponents();
         }
     }
 
-    //EFFECTS: sets the first board in boards as current board
-    private void setNewBoard() {
-        if (chessGame.isBoardListEmpty()) {
-            Board b = new Board();
-            chessGame.addBoard(b);
-            this.chessGame.setCurrentBoard(b);
-        } else {
-            this.chessGame.setCurrentBoard(chessGame.getBoard(0));
-        }
+    //updates all components including (board list and current board)
+    public void updateComponents() {
+        frame.getContentPane().removeAll();  // Clear the frame’s content pane
+
+        // Reset and reinitialize menuManager
+        menuManager = new ChessGameMenuManager(this,frame);
+
+        // Refresh frame with updated game data
+        frame.add(chessGame.getCurrentBoard());
+
+        // Revalidate and repaint to ensure changes take effect
+        frame.revalidate();
+        frame.repaint();
     }
 
     //EFFECTS: saves current chess game to file
@@ -98,34 +84,16 @@ public class ChessGameApp implements Iterable<CompressedBoard> {
         updateComponents();
     }
 
-    //updates all components including (board list and current board)
-    public void updateComponents() {
-        frame.getContentPane().removeAll();  // Clear the frame’s content pane
-
-        // Reset and reinitialize components
-        initComponents();
-
-        // Refresh frame with updated game data
-        frame.add(chessGame.getCurrentBoard());
-
-        // Revalidate and repaint to ensure changes take effect
-        frame.revalidate();
-        frame.repaint();
-    }
-
-    // MODIFIES: this
-    // EFFECTS: creates new board and makes it the current board
-    private void createNewBoard(String name) {
-        Board b = new Board(name);
-        this.chessGame.addBoard(b);
-        this.chessGame.setCurrentBoard(b);
-    }
-
     //EFFECTS: prints the log of events
     public void printLog() {
         for (Event e : EventLog.getInstance()) {
             System.out.println(e.getDate() + ":\n" + e.getDescription() + "\n\n");
         }
+    }
+
+    public void newGame() {
+        chessGame.addBoard(new CompressedBoard());
+        updateComponents();
     }
 
     public Board getCurrentBoard() {

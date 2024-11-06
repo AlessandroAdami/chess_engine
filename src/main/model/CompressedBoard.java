@@ -12,9 +12,19 @@ public class CompressedBoard {
 
     private String name;
     private String fenPosition;
+    private static int code = 0;
+
+    public CompressedBoard() {
+        this("Game " + code);
+        code++;
+    }
 
     public CompressedBoard(Board board) {
         this.name = board.getName();
+        this.fenPosition = board.getFenPosition();
+    }
+
+    public void load(Board board) {
         this.fenPosition = board.getFenPosition();
     }
 
