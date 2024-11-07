@@ -35,8 +35,8 @@ public class ChessGameMenuManager implements ActionListener {
     private void initMenuBar() {
         //add file menu
         JMenu fileMenu = new JMenu("File");
-        loadItem = new JMenuItem("Load games from file");
-        saveItem = new JMenuItem("Save games to file");
+        loadItem = new JMenuItem("Load games");
+        saveItem = new JMenuItem("Save games");
         loadItem.addActionListener(this);
         saveItem.addActionListener(this);
         fileMenu.add(loadItem);

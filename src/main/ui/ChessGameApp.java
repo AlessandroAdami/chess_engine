@@ -35,7 +35,7 @@ public class ChessGameApp implements Iterable<CompressedBoard> {
         frame.setTitle("ChessBud");
         frame.getContentPane().setBackground(new Color(8, 30, 56));
         frame.setLayout(new GridBagLayout());
-        frame.setMinimumSize(new Dimension(1500,1500));
+        frame.setMinimumSize(new Dimension(800,800));
         frame.setLocationRelativeTo(null);
         frame.add(chessGame.getCurrentBoard());
 

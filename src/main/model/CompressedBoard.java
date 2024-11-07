@@ -20,7 +20,8 @@ public class CompressedBoard {
     }
 
     public CompressedBoard(Board board) {
-        this.name = board.getName();
+        this.name = "Game " + code;
+        code++;
         this.fenPosition = board.getFenPosition();
     }
 

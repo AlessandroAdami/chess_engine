@@ -1,20 +1,10 @@
 {
-    "boards": [
-        {
-            "name": "New Game",
-            "position": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-        },
-        {
-            "name": "Game 0",
-            "position": "rnbqkbnr/ppp2ppp/4p3/3p4/3PP3/8/PPP2PPP/RNBQKBNR w QKqk d6 4 2"
-        },
-        {
-            "name": "Game 1",
-            "position": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-        }
-    ],
+    "boards": [{
+        "name": "New Game",
+        "position": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+    }],
     "currentBoard": {
-        "name": "Game 0",
+        "name": "New Game",
         "position": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     }
 }
