@@ -1,8 +1,6 @@
 package model.pieces;
 
 import model.Board;
-
-
 import java.awt.*;
 
 public class Piece {
