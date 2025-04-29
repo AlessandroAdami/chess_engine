@@ -1,10 +1,16 @@
 {
-    "boards": [{
-        "name": "Game 0",
-        "position": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-    }],
+    "boards": [
+        {
+            "name": "Game 0",
+            "position": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+        },
+        {
+            "name": "Game 1",
+            "position": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+        }
+    ],
     "currentBoard": {
-        "name": "Game 1",
-        "position": "rnbqkbnr/ppp2ppp/4p3/8/3PN3/8/PPP2PPP/R1BQKBNR b QKqk - 7 4"
+        "name": "Game 2",
+        "position": "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w QKqk e6 2 1"
     }
 }
