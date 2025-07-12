@@ -1,0 +1,335 @@
+#include "../include/chess_board.h"
+#include "../include/movement_validator.h"
+#include <gtest/gtest.h>
+
+TEST(MovementValidatorTest, PawnGoodMovement) {
+    ChessBoard board;
+    board.loadFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+
+    MovementValidator validator(&board);
+
+    Move pushOne{6, 4, 5, 4};
+    EXPECT_TRUE(validator.isValidMove(pushOne));
+
+    Move pushTwo{6, 4, 4, 4};
+    EXPECT_TRUE(validator.isValidMove(pushTwo));
+
+    board.loadFEN(
+        "rnbqkbnr/ppp1p1pp/8/3p1p2/3PP3/8/PPP2PPP/RNBQKBNR w KQkq - 0 3");
+
+    Move captureLeft{4, 4, 3, 3};
+    EXPECT_TRUE(validator.isValidMove(captureLeft));
+
+    Move captureRight{4, 4, 3, 5};
+    EXPECT_TRUE(validator.isValidMove(captureRight));
+
+    board.loadFEN(
+        "r1bqkbnr/ppp3Pp/2n1p3/3p4/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 5");
+
+    Move promoteQueen{1, 6, 0, 7, ColoredPiece(WHITE, QUEEN)};
+    EXPECT_TRUE(validator.isValidMove(promoteQueen));
+
+    Move promoteRook{1, 6, 0, 7, ColoredPiece(WHITE, ROOK)};
+    EXPECT_TRUE(validator.isValidMove(promoteRook));
+
+    Move promoteBishop{1, 6, 0, 7, ColoredPiece(WHITE, BISHOP)};
+    EXPECT_TRUE(validator.isValidMove(promoteBishop));
+
+    Move promoteKnight{1, 6, 0, 7, ColoredPiece(WHITE, KNIGHT)};
+    EXPECT_TRUE(validator.isValidMove(promoteKnight));
+
+    board.loadFEN(
+        "rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 3");
+
+    Move enPassant{3, 4, 2, 5};
+    EXPECT_TRUE(validator.isValidMove(enPassant));
+}
+
+TEST(MovementValidatorTest, PawnBadMovement) {
+    ChessBoard board;
+    board.loadFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+
+    MovementValidator validator(&board);
+
+    Move randomBadMove{6, 4, 0, 0};
+    EXPECT_FALSE(validator.isValidMove(randomBadMove));
+
+    board.loadFEN(
+        "r1bqkbnr/ppp1p1pp/2n5/3pPp2/8/2N5/PPPP1PPP/R1BQKBNR w KQkq - 2 4");
+
+    Move enPassantDelayed{3, 4, 2, 5};
+    EXPECT_FALSE(validator.isValidMove(enPassantDelayed));
+
+    board.loadFEN(
+        "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2");
+
+    Move pawnCaptureForward{4, 4, 3, 4};
+    EXPECT_FALSE(validator.isValidMove(pawnCaptureForward));
+}
+
+TEST(MovementValidatorTest, BishopGoodMovement) {
+    ChessBoard board;
+    board.loadFEN(
+        "rnbqkb1r/pppp1ppp/5n2/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR w KQkq - 2 3");
+
+    MovementValidator validator(&board);
+
+    Move upRight{4, 2, 1, 5};
+    EXPECT_TRUE(validator.isValidMove(upRight));
+
+    Move upLeft{4, 2, 3, 1};
+    EXPECT_TRUE(validator.isValidMove(upLeft));
+
+    Move downRight{4, 2, 7, 5};
+    EXPECT_TRUE(validator.isValidMove(downRight));
+
+    Move downLeft{4, 2, 5, 1};
+    EXPECT_TRUE(validator.isValidMove(downLeft));
+}
+
+TEST(MovementValidatorTest, BishopBadMovement) {
+    ChessBoard board;
+    board.loadFEN(
+        "r1bqkb1r/ppp2ppp/2np1n2/4p3/P1B1P3/1P6/2PP1PPP/RNBQK1NR w KQkq - 0 5");
+
+    MovementValidator validator(&board);
+
+    Move randomBadMove{4, 2, 0, 0};
+    EXPECT_FALSE(validator.isValidMove(randomBadMove));
+
+    Move travelThroughEnemyPiece{4, 2, 0, 6};
+    EXPECT_FALSE(validator.isValidMove(travelThroughEnemyPiece));
+
+    Move travelThroughFriendPiece{4, 2, 6, 0};
+    EXPECT_FALSE(validator.isValidMove(travelThroughFriendPiece));
+
+    Move captureFriendPiece{4, 2, 5, 1};
+    EXPECT_FALSE(validator.isValidMove(captureFriendPiece));
+}
+
+TEST(MovementValidatorTest, RookGoodMovement) {
+    ChessBoard board;
+    board.loadFEN(
+        "r1bqkb1r/1ppp1ppp/2n1pn2/p2R4/P7/8/1PPPPPPP/1NBQKBNR w Kkq - 0 5");
+
+    MovementValidator validator(&board);
+
+    Move up{3, 3, 1, 3};
+    EXPECT_TRUE(validator.isValidMove(up));
+
+    Move down{3, 3, 5, 3};
+    EXPECT_TRUE(validator.isValidMove(down));
+
+    Move right{3, 3, 3, 7};
+    EXPECT_TRUE(validator.isValidMove(right));
+
+    Move left{3, 3, 3, 0};
+    EXPECT_TRUE(validator.isValidMove(left));
+}
+
+TEST(MovementValidatorTest, RookBadMovement) {
+    ChessBoard board;
+    board.loadFEN(
+        "r1bqk2r/1ppp1ppp/2n1pn2/p1bR4/P2P4/8/1PP1PPPP/1NBQKBNR w Kkq - 1 6");
+
+    MovementValidator validator(&board);
+
+    Move randomBadMove{3, 3, 0, 0};
+    EXPECT_FALSE(validator.isValidMove(randomBadMove));
+
+    Move travelThroughEnemyPiece{3, 3, 0, 3};
+    EXPECT_FALSE(validator.isValidMove(travelThroughEnemyPiece));
+
+    Move travelThroughFriendPiece{3, 3, 6, 3};
+    EXPECT_FALSE(validator.isValidMove(travelThroughFriendPiece));
+
+    Move captureFriendPiece{3, 3, 4, 3};
+    EXPECT_FALSE(validator.isValidMove(captureFriendPiece));
+}
+
+TEST(MovementValidatorTest, QueenGoodMovement) {
+    ChessBoard board;
+    board.loadFEN(
+        "rnbqkb1r/pppp1ppp/5n2/4p3/2Q1P3/8/PPPP1PPP/RNBQK1NR w KQkq - 2 3");
+
+    MovementValidator validator(&board);
+
+    Move upRight{4, 2, 1, 5};
+    EXPECT_TRUE(validator.isValidMove(upRight));
+
+    Move upLeft{4, 2, 3, 1};
+    EXPECT_TRUE(validator.isValidMove(upLeft));
+
+    Move downRight{4, 2, 7, 5};
+    EXPECT_TRUE(validator.isValidMove(downRight));
+
+    Move downLeft{4, 2, 5, 1};
+    EXPECT_TRUE(validator.isValidMove(downLeft));
+
+    board.loadFEN(
+        "r1bqkb1r/1ppp1ppp/2n1pn2/p2Q4/P7/8/1PPPPPPP/1NBQKBNR w Kkq - 0 5");
+
+    Move up{3, 3, 1, 3};
+    EXPECT_TRUE(validator.isValidMove(up));
+
+    Move down{3, 3, 5, 3};
+    EXPECT_TRUE(validator.isValidMove(down));
+
+    Move right{3, 3, 3, 7};
+    EXPECT_TRUE(validator.isValidMove(right));
+
+    Move left{3, 3, 3, 0};
+    EXPECT_TRUE(validator.isValidMove(left));
+}
+
+TEST(MovementValidatorTest, QueenBadMovement) {
+    ChessBoard board;
+    board.loadFEN(
+        "r1bqk2r/1ppp1ppp/2n1pn2/p1bQ4/P2P4/8/1PP1PPPP/1NBQKBNR w Kkq - 1 6");
+
+    MovementValidator validator(&board);
+
+    Move randomBadMove{3, 3, 0, 0};
+    EXPECT_FALSE(validator.isValidMove(randomBadMove));
+
+    Move travelThroughEnemyPieceRook{3, 3, 0, 3};
+    EXPECT_FALSE(validator.isValidMove(travelThroughEnemyPieceRook));
+
+    Move travelThroughFriendPieceRook{3, 3, 6, 3};
+    EXPECT_FALSE(validator.isValidMove(travelThroughFriendPieceRook));
+
+    Move captureFriendPiece{3, 3, 4, 3};
+    EXPECT_FALSE(validator.isValidMove(captureFriendPiece));
+
+    board.loadFEN(
+        "r1bqkb1r/ppp2ppp/2np1n2/4p3/P1Q1P3/1P6/2PP1PPP/RNBBK1NR w KQkq - 0 5");
+
+    Move travelThroughEnemyPieceBishop{4, 2, 0, 6};
+    EXPECT_FALSE(validator.isValidMove(travelThroughEnemyPieceBishop));
+
+    Move travelThroughFriendPieceBishop{4, 2, 6, 0};
+    EXPECT_FALSE(validator.isValidMove(travelThroughFriendPieceBishop));
+}
+
+TEST(MovementValidatorTest, KnightGoodMovement) {
+    ChessBoard board;
+    board.loadFEN("rnbqkbnr/pppppppp/8/8/4N3/8/PPP1P1PP/RNBQKB1R w KQkq - 0 1");
+
+    MovementValidator validator(&board);
+
+    Move upTwoRightOne{4, 4, 2, 5};
+    EXPECT_TRUE(validator.isValidMove(upTwoRightOne));
+
+    Move upOneRightTwo{4, 4, 3, 6};
+    EXPECT_TRUE(validator.isValidMove(upOneRightTwo));
+
+    Move downOneRightTwo{4, 4, 5, 6};
+    EXPECT_TRUE(validator.isValidMove(downOneRightTwo));
+
+    Move downTwoRightOne{4, 4, 6, 5};
+    EXPECT_TRUE(validator.isValidMove(downTwoRightOne));
+
+    Move downTwoLeftOne{4, 4, 6, 3};
+    EXPECT_TRUE(validator.isValidMove(downTwoLeftOne));
+
+    Move downOneLeftTwo{4, 4, 5, 2};
+    EXPECT_TRUE(validator.isValidMove(downOneLeftTwo));
+
+    Move upOneLeftTwo{4, 4, 3, 2};
+    EXPECT_TRUE(validator.isValidMove(upOneLeftTwo));
+
+    Move upTwoLeftOne{4, 4, 2, 3};
+    EXPECT_TRUE(validator.isValidMove(upTwoLeftOne));
+}
+
+TEST(MovementValidatorTest, KnightBadMovement) {
+    ChessBoard board;
+    board.loadFEN(
+        "rnbqkbnr/pppppppp/8/8/4N3/8/PPPPPPsPP/RNBQKB1R w KQkq - 0 1");
+
+    MovementValidator validator(&board);
+
+    Move randomBadMove{4, 4, 0, 0};
+    EXPECT_FALSE(validator.isValidMove(randomBadMove));
+
+    Move captureFriendPiece{4, 4, 6, 5};
+    EXPECT_FALSE(validator.isValidMove(captureFriendPiece));
+}
+
+TEST(MovementValidatorTest, CastlingGoodMove) {
+    ChessBoard board;
+    board.loadFEN("rnbqk2r/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1");
+
+    MovementValidator validator(&board);
+
+    Move shortCastle{0, 4, 0, 6};
+    EXPECT_TRUE(validator.isValidMove(shortCastle));
+
+    board.loadFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/R3KBNR w KQkq - 0 1");
+
+    Move longCastle{7, 4, 7, 2};
+    EXPECT_TRUE(validator.isValidMove(longCastle));
+}
+
+TEST(MovementValidatorTest, CastlingBadMove) {
+    ChessBoard board;
+    board.loadFEN(
+        "rnb1kbnr/pppppppp/8/8/2q1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 1");
+
+    MovementValidator validator(&board);
+
+    Move shortCastleThroughCheck{7, 4, 7, 6};
+    EXPECT_FALSE(validator.isValidMove(shortCastleThroughCheck));
+
+    board.loadFEN("r3kbnr/pppp1ppp/8/6B1/8/8/PPPPPPPP/RNBQK1NR b KQkq - 0 1");
+
+    Move longCastleThroughCheck{0, 4, 0, 2};
+    EXPECT_FALSE(validator.isValidMove(longCastleThroughCheck));
+
+    board.loadFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1");
+
+    Move shortCastleThroughPieces{0, 4, 0, 6};
+    EXPECT_FALSE(validator.isValidMove(shortCastleThroughPieces));
+
+    board.loadFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+
+    Move longCastleThroughPieces{7, 4, 7, 2};
+    EXPECT_FALSE(validator.isValidMove(longCastleThroughPieces));
+
+    board.loadFEN("rnbqk2r/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQq - 0 1");
+
+    Move shortCastleRookHasMoved{0, 4, 0, 6};
+    EXPECT_FALSE(validator.isValidMove(shortCastleRookHasMoved));
+
+    board.loadFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/R3KBNR w kq - 0 1");
+
+    Move longCastleKingHasMoved{7, 4, 7, 2};
+    EXPECT_FALSE(validator.isValidMove(longCastleKingHasMoved));
+}
+
+TEST(MovementValidatorTest, IntoCheckBadMove) {
+    ChessBoard board;
+    std::string fen =
+        "rnbqkbnr/pppp1Bpp/8/4p3/4P3/8/PPPP1PPP/RNBQK1NR b KQkq - 1 1";
+    board.loadFEN(fen);
+
+    MovementValidator validator(&board);
+
+    Move d6IntoCheck{1, 3, 2, 3};
+    EXPECT_FALSE(validator.isValidMove(d6IntoCheck));
+    EXPECT_EQ(board.getFEN(), fen);
+
+    fen = "rnbqk1nr/pppp1ppp/8/4p3/1b2P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3";
+    board.loadFEN(fen);
+
+    Move d4IntoCheck{6, 3, 4, 3};
+    EXPECT_FALSE(validator.isValidMove(d4IntoCheck));
+    EXPECT_EQ(board.getFEN(), fen);
+
+    fen = "rkb2b1r/pppppppp/4qn2/4B3/8/8/PPPP1PPP/RNBQKBNR w KQkq - 1 2";
+    board.loadFEN(fen);
+
+    Move bishopCheckIntoCheck{3, 4, 1, 2};
+    EXPECT_FALSE(validator.isValidMove(bishopCheckIntoCheck));
+    EXPECT_EQ(board.getFEN(), fen);
+}

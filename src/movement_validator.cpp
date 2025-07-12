@@ -1,0 +1,271 @@
+#include "movement_validator.h"
+#include "chess_board.h"
+
+MovementValidator::MovementValidator(ChessBoard *board) : chessBoard(board) {}
+
+bool MovementValidator::isValidMove(const Move &move) const {
+    int fromRow = move.fromRow, fromCol = move.fromCol;
+    int toRow = move.toRow, toCol = move.toCol;
+    ColoredPiece movingPiece =
+        this->chessBoard->getPiece(Square{fromRow, fromCol});
+    ColoredPiece capturedPiece =
+        this->chessBoard->getPiece(Square{toRow, toCol});
+    if (fromRow < 0 || fromRow >= 8 || fromCol < 0 || fromCol >= 8 ||
+        toRow < 0 || toRow >= 8 || toCol < 0 || toCol >= 8) {
+        return false;
+    }
+
+    if (movingPiece == NO_Piece)
+        return false;
+    if (getColor(movingPiece) == getColor(capturedPiece))
+        return false;
+    if (getColor(movingPiece) == WHITE && !chessBoard->getIsWhitesTurn())
+        return false;
+    if (getColor(movingPiece) == BLACK && chessBoard->getIsWhitesTurn())
+        return false;
+
+    if (!isValidPieceMovement(movingPiece.piece, move))
+        return false;
+
+    if (moveLeadsIntoCheck(move))
+        return false;
+
+    return true;
+}
+
+bool MovementValidator::moveLeadsIntoCheck(Move move) const {
+
+    MoveContext context = chessBoard->getMoveContext(move);
+
+    ColoredPiece capturedPiece = chessBoard->movePiece(move);
+
+    Color color = context.previousIsWhitesTurn ? WHITE : BLACK;
+    bool isChecked = chessBoard->scanner.isInCheck(color);
+    context.capturedPiece = capturedPiece;
+
+    chessBoard->unmovePiece(context);
+
+    return isChecked;
+}
+
+bool MovementValidator::isValidPieceMovement(Piece piece, Move move) const {
+    if (move.fromCol == move.toCol && move.fromRow == move.toRow)
+        return false;
+    switch (piece) {
+    case PAWN:
+        return isValidPawnMovement(move);
+    case KNIGHT:
+        return isValidKnightMovement(move);
+    case BISHOP:
+        return isValidBishopMovement(move);
+    case ROOK:
+        return isValidRookMovement(move);
+    case QUEEN:
+        return isValidQueenMovement(move);
+    case KING:
+        return isValidKingMovement(move);
+    default:
+        return false;
+    }
+}
+
+bool MovementValidator::isValidPawnMovement(Move move) const {
+    int colorIndex;
+    bool isWhite;
+    ColoredPiece cp =
+        this->chessBoard->getPiece(Square{move.fromRow, move.fromCol});
+
+    if (cp.color == WHITE) {
+        colorIndex = 1;
+        isWhite = true;
+    } else {
+        colorIndex = -1;
+        isWhite = false;
+    }
+
+    int fromCol = move.fromCol, fromRow = move.fromRow;
+    int toCol = move.toCol, toRow = move.toRow;
+
+    if (fromCol == toCol && toRow == fromRow - colorIndex &&
+        this->chessBoard->getPiece(Square{toRow, toCol}) == NO_Piece)
+        return true;
+
+    if (fromRow == (isWhite ? 6 : 1) && fromCol == toCol &&
+        toRow == fromRow - (2 * colorIndex) &&
+        this->chessBoard->getPiece(Square{toRow, toCol}) == NO_Piece &&
+        this->chessBoard->getPiece(Square{toRow + colorIndex, toCol}) ==
+            NO_Piece) {
+        return true;
+    }
+    if (toCol == fromCol - 1 && toRow == fromRow - colorIndex &&
+        this->chessBoard->getPiece(Square{toRow, toCol}) != NO_Piece)
+        return true;
+    if (toCol == fromCol + 1 && toRow == fromRow - colorIndex &&
+        this->chessBoard->getPiece(Square{toRow, toCol}) != NO_Piece)
+        return true;
+
+    if (Square{toRow, toCol} == this->chessBoard->getEnpassantSquare() &&
+        toCol == fromCol - 1 && toRow == fromRow - colorIndex &&
+        this->chessBoard->getPiece(Square{toRow + colorIndex, toCol}) !=
+            NO_Piece)
+        return true;
+    if (Square{toRow, toCol} == this->chessBoard->getEnpassantSquare() &&
+        toCol == fromCol + 1 && toRow == fromRow - colorIndex &&
+        this->chessBoard->getPiece(Square{toRow + colorIndex, toCol}) !=
+            NO_Piece)
+        return true;
+
+    return false;
+}
+
+bool MovementValidator::isValidKnightMovement(Move move) const {
+    return std::abs(move.toCol - move.fromCol) *
+               std::abs(move.toRow - move.fromRow) ==
+           2;
+}
+
+bool MovementValidator::isValidBishopMovement(Move move) const {
+    int fromRow = move.fromRow, fromCol = move.fromCol;
+    int toRow = move.toRow, toCol = move.toCol;
+
+    if (std::abs(fromCol - toCol) != std::abs(fromRow - toRow)) {
+        return false;
+    }
+
+    int dRow = (toRow > fromRow) ? 1 : -1;
+    int dCol = (toCol > fromCol) ? 1 : -1;
+    int steps = std::abs(toRow - fromRow);
+
+    for (int i = 1; i < steps; ++i) {
+        int checkRow = fromRow + i * dRow;
+        int checkCol = fromCol + i * dCol;
+        if (!chessBoard->isEmpty(Square{checkRow, checkCol})) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool MovementValidator::isValidRookMovement(Move move) const {
+    int fromRow = move.fromRow, fromCol = move.fromCol;
+    int toRow = move.toRow, toCol = move.toCol;
+
+    if (fromRow != toRow && fromCol != toCol) {
+        return false;
+    }
+
+    int dRow = (toRow > fromRow) ? 1 : (toRow < fromRow) ? -1 : 0;
+    int dCol = (toCol > fromCol) ? 1 : (toCol < fromCol) ? -1 : 0;
+    int steps = std::abs(toRow - fromRow + toCol - fromCol);
+
+    for (int i = 1; i < steps; ++i) {
+        int checkRow = fromRow + i * dRow;
+        int checkCol = fromCol + i * dCol;
+        if (!chessBoard->isEmpty(Square{checkRow, checkCol})) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool MovementValidator::isValidQueenMovement(Move move) const {
+    if (isValidRookMovement(move)) {
+        return true;
+    }
+    if (isValidBishopMovement(move)) {
+        return true;
+    }
+    return false;
+}
+
+bool MovementValidator::isValidKingMovement(Move move) const {
+    int fromCol = move.fromCol, fromRow = move.fromRow;
+    int toCol = move.toCol, toRow = move.toRow;
+
+    Color color =
+        getColor(this->chessBoard->getPiece(Square{fromRow, fromCol}));
+    bool isCastling =
+        (std::abs(fromCol - toCol) == 2 && fromRow == toRow && fromCol == 4);
+    if (isCastling) {
+        if (this->chessBoard->scanner.isSquareInCheck(Square{fromRow, 4},
+                                                      color)) {
+            return false;
+        }
+        bool isKingside = (toCol == 6);
+        bool isQueenside = (toCol == 2);
+        if (isKingside &&
+            (this->chessBoard->getCastleState(color) & KING_SIDE)) {
+            for (int col = 5; col <= 6; col++) {
+                if (this->chessBoard->scanner.isSquareInCheck(
+                        Square{fromRow, col}, color)) {
+                    return false;
+                }
+                if (!this->chessBoard->isEmpty(Square{toRow, col})) {
+                    return false;
+                }
+            }
+        } else if (isQueenside &&
+                   (this->chessBoard->getCastleState(color) & QUEEN_SIDE)) {
+            for (int col = 2; col < 4; col++) {
+                if (this->chessBoard->scanner.isSquareInCheck(
+                        Square{fromRow, col}, color)) {
+                    return false;
+                }
+                if (!this->chessBoard->isEmpty(Square{toRow, col})) {
+                    return false;
+                }
+            }
+        } else {
+            return false;
+        }
+        return true;
+    }
+    bool isDiagonalMove = std::abs((fromCol - toCol) * (fromRow - toRow)) == 1;
+    bool isStraightMove =
+        (fromCol == toCol && std::abs(fromRow - toRow) == 1) ||
+        (fromRow == toRow && std::abs(fromCol - toCol) == 1);
+    return isDiagonalMove || isStraightMove;
+}
+
+/**
+ * @param color the color for which to get legal moves.
+ * @returns a vector of all legal moves for the given color.
+ */
+std::vector<Move> MovementValidator::getLegalMoves(Color color) {
+    std::vector<Move> legalMoves;
+    for (int row = 0; row < 8; ++row) {
+        for (int col = 0; col < 8; ++col) {
+            ColoredPiece piece = this->chessBoard->getPiece(Square{row, col});
+            if (getColor(piece) != color)
+                continue;
+
+            for (int targetRow = 0; targetRow < 8; ++targetRow) {
+                for (int targetCol = 0; targetCol < 8; ++targetCol) {
+                    Move move{row, col, targetRow, targetCol};
+                    if (piece.piece == PAWN) {
+                        // Handle pawn promotion
+                        for (const Piece &promotionPiece :
+                             {QUEEN, ROOK, BISHOP, KNIGHT}) {
+                            if (targetRow == (color == WHITE ? 0 : 7)) {
+                                move.promotionPiece =
+                                    ColoredPiece(color, promotionPiece);
+                            } else {
+                                move.promotionPiece = NO_Piece;
+                            }
+                            if (chessBoard->movementValidator.isValidMove(
+                                    move)) {
+                                legalMoves.push_back(move);
+                            }
+                        }
+                    } else if (chessBoard->movementValidator.isValidMove(
+                                   move)) {
+                        legalMoves.push_back(move);
+                    }
+                }
+            }
+        }
+    }
+    return legalMoves;
+}

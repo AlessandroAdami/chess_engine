@@ -1,0 +1,38 @@
+#include "chess_board.h"
+#include "move_parser.h"
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
+
+int main() {
+    ChessBoard board;
+    board.printBoard();
+
+    while (true) {
+        std::string moveStr;
+        std::cout << "Enter:    - 'xnym' move\n"
+                  << "          - 'u' to undo\n"
+                  << "          - 'r' to redo\n"
+                  << "          - 'q' to quit\n"
+                  << "Your move: ";
+        std::getline(std::cin, moveStr);
+        if (moveStr == "q")
+            break;
+
+        try {
+            if (moveStr.length() == 1 && moveStr[0] == 'u') {
+                board.undoMove();
+            } else if (moveStr.length() == 1 && moveStr[0] == 'r') {
+                board.redoMove();
+            } else {
+                board.makeMoveFromString(moveStr);
+            }
+            board.printBoard();
+
+        } catch (const std::exception &e) {
+            std::cerr << "Invalid move string: " << e.what() << "\n";
+        }
+    }
+    return 0;
+}
