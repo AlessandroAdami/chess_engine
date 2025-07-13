@@ -1,15 +1,16 @@
 #include "chess_engine.h"
-#include <queue>
 #include <limits>
+#include <queue>
 
 const int INF = std::numeric_limits<int>::max();
-const int MATE_SCORE = 999999;
+const int MATE_SCORE = INF;
 
 ChessEngine::ChessEngine(ChessBoard *board) { this->chessBoard = board; }
 
 Move ChessEngine::getBestMove() {
     switch (algorithm) {
-        default: return minimax();
+    default:
+        return minimax();
     }
 }
 
@@ -22,7 +23,8 @@ Move ChessEngine::minimax() const {
     Move bestMove;
     int bestValue = -INF;
     Color color = chessBoard->getIsWhitesTurn() ? WHITE : BLACK;
-    std::vector<Move> legalMoves = chessBoard->movementValidator.getLegalMoves(color);
+    std::vector<Move> legalMoves =
+        chessBoard->movementValidator.getLegalMoves(color);
     for (const Move &move : legalMoves) {
         MoveContext context = chessBoard->getMoveContext(move);
         chessBoard->movePiece(move);
@@ -30,7 +32,7 @@ Move ChessEngine::minimax() const {
         chessBoard->unmovePiece(context);
         if (moveValue > bestValue) {
             bestValue = moveValue;
-            bestMove = move;    
+            bestMove = move;
         }
     }
     return bestMove;
@@ -47,7 +49,8 @@ int ChessEngine::negaMax(int depth) const {
     }
     int max = -INF;
     Color color = chessBoard->getIsWhitesTurn() ? WHITE : BLACK;
-    std::vector<Move> legalMoves = chessBoard->movementValidator.getLegalMoves(color);
+    std::vector<Move> legalMoves =
+        chessBoard->movementValidator.getLegalMoves(color);
 
     for (const Move &move : legalMoves) {
         MoveContext context = chessBoard->getMoveContext(move);
@@ -65,9 +68,7 @@ Move ChessEngine::AStarSearch(int depth, bool isWhitesTurn) {
     return Move{0, 0, 0, 0};
 }
 
-int ChessEngine::evaluateBoard() const {
-    return evaluateBoard(chessBoard);
-}
+int ChessEngine::evaluateBoard() const { return evaluateBoard(chessBoard); }
 
 /**
  * A simple board evaluation (positive for white, negative for black).

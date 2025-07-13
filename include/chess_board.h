@@ -7,7 +7,7 @@
 #include "types.h"
 #include <string>
 
-//TODO: return move context instead of coloredpiece for makeMove
+// TODO: return move context instead of coloredpiece for makeMove
 
 class ChessBoard {
   public:
@@ -34,7 +34,7 @@ class ChessBoard {
     int getCastleState(Color color) const {
         return castleState[color == WHITE ? 0 : 1];
     }
-    bool isEmpty(const Square &square) const;
+    bool isSquareEmpty(const Square &square) const;
     ColoredPiece getCapturedPiece(const Move &move) const;
     bool isCheckmate() const;
     bool isStalemate() const;

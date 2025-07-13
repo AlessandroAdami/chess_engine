@@ -2,11 +2,7 @@
 
 #include "chess_board.h"
 
- enum Algorithm {
-        MINIMAX,
-        ALPHA_BETA,
-        A_STAR
-    };
+enum Algorithm { MINIMAX, ALPHA_BETA, A_STAR };
 
 class ChessEngine {
   public:
@@ -17,7 +13,7 @@ class ChessEngine {
     ChessBoard *chessBoard;
     int evaluateBoard() const;
     int evaluateBoard(ChessBoard *board) const;
-    int evaluateBoardForColor(ChessBoard *board,Color color) const;
+    int evaluateBoardForColor(ChessBoard *board, Color color) const;
     int getPieceValue(const ColoredPiece &cp) const;
     Move minimax() const;
     int negaMax(int depth) const;
@@ -27,6 +23,4 @@ class ChessEngine {
     Algorithm algorithm = MINIMAX;
 
     friend class ChessEngineTest_EvaluateBoard_Test;
-
-   
 };

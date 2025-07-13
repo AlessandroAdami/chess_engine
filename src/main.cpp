@@ -11,9 +11,9 @@ int main() {
 
     while (true) {
         std::string moveStr;
-        std::cout << "Enter:    - 'xnym' move\n"
-                  << "          - 'u' to undo\n"
-                  << "          - 'r' to redo\n"
+        std::cout << "Enter:    - move (e.g. 'e4', 'nxf6', 'o-o', 'd1=q')\n"
+                  << "          - 'u' to undo move\n"
+                  << "          - 'r' to redo move\n"
                   << "          - 'q' to quit\n"
                   << "Your move: ";
         std::getline(std::cin, moveStr);

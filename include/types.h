@@ -1,5 +1,7 @@
 #pragma once
 
+// TODO: add getSquare(str e.g "e4") util, modify Move to have two squares
+
 enum Piece {
     EMPTY = 0,
     PAWN = 1,
@@ -60,7 +62,5 @@ struct Move {
                promotionPiece == other.promotionPiece;
     }
 
-    bool operator!=(const Move &other) const {
-    return !(*this == other);
-}
+    bool operator!=(const Move &other) const { return !(*this == other); }
 };

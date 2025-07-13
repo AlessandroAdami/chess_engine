@@ -239,3 +239,103 @@ TEST(MoveMakerTest, UndoMove) {
     EXPECT_EQ(board.getFEN(),
               "rnbqkbnr/ppp1p1pp/B7/3pPp2/8/8/PPPP1PPP/RNBQK1NR b KQkq - 1 3");
 }
+
+TEST(MoveMakerTest, GetCapturedPiece) {
+    ChessBoard board;
+    std::string fen =
+        "rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3";
+    board.loadFEN(fen);
+
+    MoveMaker moveMaker(&board);
+
+    Move exd6{3, 4, 2, 3};
+    ColoredPiece capturedPiece = moveMaker.getCapturedPiece(exd6);
+
+    EXPECT_EQ(capturedPiece, ColoredPiece(BLACK, PAWN));
+
+    fen = "rnb1kbnr/pppppppp/8/8/2q1P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1";
+    board.loadFEN(fen);
+    Move bxc4{7, 5, 4, 2};
+    capturedPiece = moveMaker.getCapturedPiece(bxc4);
+
+    EXPECT_EQ(capturedPiece, ColoredPiece(BLACK, QUEEN));
+
+    fen = "rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 3";
+    board.loadFEN(fen);
+
+    Move exf6EnPassant{3, 4, 2, 5};
+    capturedPiece = moveMaker.getCapturedPiece(exf6EnPassant);
+
+    EXPECT_EQ(capturedPiece, ColoredPiece(BLACK, PAWN));
+
+    fen = "rnbqkbnr/ppp1p1pp/8/3p1pN1/8/8/PPPPPPPP/RNBQKB1R w KQkq - 0 3";
+    board.loadFEN(fen);
+
+    Move nh3{3, 6, 5, 7};
+    capturedPiece = moveMaker.getCapturedPiece(nh3);
+
+    EXPECT_EQ(capturedPiece, NO_Piece);
+
+    fen = "rnbq2nr/ppppkppp/8/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQ - 4 4";
+    board.loadFEN(fen);
+
+    Move shortCastle{7, 4, 7, 6};
+    capturedPiece = moveMaker.getCapturedPiece(shortCastle);
+
+    EXPECT_EQ(capturedPiece, NO_Piece);
+}
+
+TEST(MoveMakerTest, GetMoveContext) {
+    ChessBoard board;
+    std::string fen =
+        "rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3";
+    board.loadFEN(fen);
+
+    MoveMaker moveMaker(&board);
+
+    Move exd6{3, 4, 2, 3};
+    MoveContext context = moveMaker.getMoveContext(exd6);
+
+    MoveContext expectedContext = {
+        exd6,
+        ColoredPiece(BLACK, PAWN),
+        Square{2, 3},
+        {KING_SIDE | QUEEN_SIDE, KING_SIDE | QUEEN_SIDE},
+        0,
+        3,
+        true,
+        false,
+        true,
+        false};
+
+    EXPECT_EQ(context, expectedContext);
+
+    fen = "rnbqk1nr/pppp1ppp/8/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b Qk - 3 3";
+    board.loadFEN(fen);
+    Move ke7{0, 4, 1, 4};
+
+    context = moveMaker.getMoveContext(ke7);
+    expectedContext = {ke7,   NO_Piece, Square{-1, -1}, {QUEEN_SIDE, KING_SIDE},
+                       3,     3,        false,          false,
+                       false, false};
+
+    EXPECT_EQ(context, expectedContext);
+
+    fen = "rnbqkb1r/ppp1pppp/5n2/8/2p1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 4";
+    board.loadFEN(fen);
+    Move castle{7, 4, 7, 6};
+
+    context = moveMaker.getMoveContext(castle);
+    expectedContext = {castle,
+                       NO_Piece,
+                       Square{-1, -1},
+                       {KING_SIDE | QUEEN_SIDE, KING_SIDE | QUEEN_SIDE},
+                       0,
+                       4,
+                       true,
+                       false,
+                       false,
+                       true};
+
+    EXPECT_EQ(context, expectedContext);
+}

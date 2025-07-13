@@ -201,7 +201,7 @@ ColoredPiece ChessBoard::getPiece(Square square) const {
 /**
  * @returns true if the given square is empty (i.e., contains no piece).
  */
-bool ChessBoard::isEmpty(const Square &square) const {
+bool ChessBoard::isSquareEmpty(const Square &square) const {
     return getPiece(square) == NO_Piece;
 }
 

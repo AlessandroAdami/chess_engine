@@ -8,8 +8,7 @@ bool MovementValidator::isValidMove(const Move &move) const {
     int toRow = move.toRow, toCol = move.toCol;
     ColoredPiece movingPiece =
         this->chessBoard->getPiece(Square{fromRow, fromCol});
-    ColoredPiece capturedPiece =
-        this->chessBoard->getPiece(Square{toRow, toCol});
+    ColoredPiece capturedPiece = this->chessBoard->getCapturedPiece(move);
     if (fromRow < 0 || fromRow >= 8 || fromCol < 0 || fromCol >= 8 ||
         toRow < 0 || toRow >= 8 || toCol < 0 || toCol >= 8) {
         return false;
@@ -139,7 +138,7 @@ bool MovementValidator::isValidBishopMovement(Move move) const {
     for (int i = 1; i < steps; ++i) {
         int checkRow = fromRow + i * dRow;
         int checkCol = fromCol + i * dCol;
-        if (!chessBoard->isEmpty(Square{checkRow, checkCol})) {
+        if (!chessBoard->isSquareEmpty(Square{checkRow, checkCol})) {
             return false;
         }
     }
@@ -162,7 +161,7 @@ bool MovementValidator::isValidRookMovement(Move move) const {
     for (int i = 1; i < steps; ++i) {
         int checkRow = fromRow + i * dRow;
         int checkCol = fromCol + i * dCol;
-        if (!chessBoard->isEmpty(Square{checkRow, checkCol})) {
+        if (!chessBoard->isSquareEmpty(Square{checkRow, checkCol})) {
             return false;
         }
     }
@@ -202,7 +201,7 @@ bool MovementValidator::isValidKingMovement(Move move) const {
                         Square{fromRow, col}, color)) {
                     return false;
                 }
-                if (!this->chessBoard->isEmpty(Square{toRow, col})) {
+                if (!this->chessBoard->isSquareEmpty(Square{toRow, col})) {
                     return false;
                 }
             }
@@ -213,7 +212,7 @@ bool MovementValidator::isValidKingMovement(Move move) const {
                         Square{fromRow, col}, color)) {
                     return false;
                 }
-                if (!this->chessBoard->isEmpty(Square{toRow, col})) {
+                if (!this->chessBoard->isSquareEmpty(Square{toRow, col})) {
                     return false;
                 }
             }

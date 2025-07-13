@@ -3,6 +3,8 @@
 #include "types.h"
 #include <vector>
 
+// TODO: put getMoveContext and getCapturedPiece in ChessBoard
+
 class ChessBoard;
 struct MoveContext {
     Move move;
