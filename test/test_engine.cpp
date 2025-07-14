@@ -1,5 +1,5 @@
-#include "../include/position.h"
 #include "../include/engine.h"
+#include "../include/position.h"
 #include "../include/types.h"
 #include <gtest/gtest.h>
 

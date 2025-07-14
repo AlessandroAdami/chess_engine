@@ -36,11 +36,10 @@ bool MovementValidator::moveLeadsIntoCheck(Move move) const {
 
     MoveContext context = chessBoard->getMoveContext(move);
 
-    ColoredPiece capturedPiece = chessBoard->movePiece(move);
+    chessBoard->movePiece(move);
 
     Color color = context.previousIsWhitesTurn ? WHITE : BLACK;
     bool isChecked = chessBoard->scanner.isInCheck(color);
-    context.capturedPiece = capturedPiece;
 
     chessBoard->unmovePiece(context);
 

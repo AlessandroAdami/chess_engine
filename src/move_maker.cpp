@@ -17,7 +17,7 @@ MoveMaker::MoveMaker(Position *chessBoard)
  * @return the piece that was captured, or EMPTY if no piece was captured
  * Modifies the board in ChessBoard and updates the turn.
  */
-ColoredPiece MoveMaker::makeMove(const Move &move) {
+MoveContext MoveMaker::makeMove(const Move &move) {
     if (moveCursor < (int)moveHistory.size()) {
         moveHistory.erase(moveHistory.begin() + moveCursor, moveHistory.end());
     }
@@ -26,14 +26,15 @@ ColoredPiece MoveMaker::makeMove(const Move &move) {
     moveCursor++;
 
     ColoredPiece movingPiece = chessBoard->getPiece(move.from);
-    ColoredPiece capturedPiece = movePiece(move);
+    movePiece(move);
+    ColoredPiece capturedPiece = context.capturedPiece;
 
     increaseHalfmoveClock(movingPiece, capturedPiece);
     this->chessBoard->fullmoveNumber += this->chessBoard->isWhitesTurn ? 0 : 1;
 
     this->chessBoard->isWhitesTurn = !this->chessBoard->isWhitesTurn;
 
-    return capturedPiece;
+    return context;
 }
 
 /**
@@ -58,7 +59,8 @@ void MoveMaker::increaseHalfmoveClock(const ColoredPiece movingCP,
     }
 }
 
-ColoredPiece MoveMaker::movePiece(const Move &move) {
+MoveContext MoveMaker::movePiece(const Move &move) {
+    MoveContext context = getMoveContext(move);
     ColoredPiece movingPiece = chessBoard->getPiece(move.from);
 
     ColoredPiece capturedPiece;
@@ -79,7 +81,7 @@ ColoredPiece MoveMaker::movePiece(const Move &move) {
 
     chessBoard->setPiece(move.to, movingPiece);
     chessBoard->setPiece(move.from, NO_Piece);
-    return capturedPiece;
+    return context;
 }
 
 ColoredPiece MoveMaker::movePawn(const Move &move) {

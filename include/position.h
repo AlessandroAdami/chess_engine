@@ -7,8 +7,6 @@
 #include "types.h"
 #include <string>
 
-// TODO: return move context instead of coloredpiece for makeMove
-
 class Position {
   public:
     Position();
@@ -17,12 +15,12 @@ class Position {
     void loadFEN(const std::string &fen);
     std::string getFEN() const;
     void printBoard() const;
-    ColoredPiece makeMove(const Move &move);
-    ColoredPiece makeMoveFromString(const std::string &moveStr) {
+    MoveContext makeMove(const Move &move);
+    MoveContext makeMoveFromString(const std::string &moveStr) {
         Move move = moveParser.moveStringToMove(moveStr);
         return makeMove(move);
     }
-    ColoredPiece movePiece(const Move &move);
+    MoveContext movePiece(const Move &move);
     void unmovePiece(const MoveContext &context);
     void undoMove();
     void redoMove();

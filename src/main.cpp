@@ -1,5 +1,5 @@
-#include "position.h"
 #include "move_parser.h"
+#include "position.h"
 #include <iostream>
 #include <sstream>
 #include <string>
