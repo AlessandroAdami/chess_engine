@@ -1,9 +1,9 @@
-#include "../include/chess_board.h"
+#include "../include/position.h"
 #include "../include/move_maker.h"
 #include <gtest/gtest.h>
 
 TEST(MoveMakerTest, PawnMakeMove) {
-    ChessBoard board;
+    Position board;
     std::string fen =
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     board.loadFEN(fen);
@@ -54,7 +54,7 @@ TEST(MoveMakerTest, PawnMakeMove) {
 }
 
 TEST(MoveMakerTest, KnightMakeMove) {
-    ChessBoard board;
+    Position board;
     std::string fen =
         "r1bqkbnr/pppppppp/2n5/8/3N4/8/PPPPPPPP/RNBQKB1R b KQkq - 3 2";
     board.loadFEN(fen);
@@ -78,7 +78,7 @@ TEST(MoveMakerTest, KnightMakeMove) {
 }
 
 TEST(MoveMakerTest, BishopMakeMove) {
-    ChessBoard board;
+    Position board;
     std::string fen =
         "rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2";
     board.loadFEN(fen);
@@ -102,7 +102,7 @@ TEST(MoveMakerTest, BishopMakeMove) {
 }
 
 TEST(MoveMakerTest, RookMakeMove) {
-    ChessBoard board;
+    Position board;
     std::string fen =
         "1nbqkbnr/1ppppppp/r7/p7/7P/4R3/PPPPPPP1/RNBQKBN1 b Qk - 3 3";
     board.loadFEN(fen);
@@ -126,7 +126,7 @@ TEST(MoveMakerTest, RookMakeMove) {
 }
 
 TEST(MoveMakerTest, QueenMakeMove) {
-    ChessBoard board;
+    Position board;
     std::string fen =
         "rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKQNR w KQkq - 0 2";
     board.loadFEN(fen);
@@ -168,7 +168,7 @@ TEST(MoveMakerTest, QueenMakeMove) {
 }
 
 TEST(MoveMakerTest, KingMakeMove) {
-    ChessBoard board;
+    Position board;
     std::string fen =
         "rnbqk1nr/pppp1ppp/8/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3";
     board.loadFEN(fen);
@@ -202,7 +202,7 @@ TEST(MoveMakerTest, KingMakeMove) {
 }
 
 TEST(MoveMakerTest, UndoMove) {
-    ChessBoard board;
+    Position board;
     std::string fen =
         "rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3";
     board.loadFEN(fen);
@@ -241,7 +241,7 @@ TEST(MoveMakerTest, UndoMove) {
 }
 
 TEST(MoveMakerTest, GetCapturedPiece) {
-    ChessBoard board;
+    Position board;
     std::string fen =
         "rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3";
     board.loadFEN(fen);
@@ -286,7 +286,7 @@ TEST(MoveMakerTest, GetCapturedPiece) {
 }
 
 TEST(MoveMakerTest, GetMoveContext) {
-    ChessBoard board;
+    Position board;
     std::string fen =
         "rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3";
     board.loadFEN(fen);

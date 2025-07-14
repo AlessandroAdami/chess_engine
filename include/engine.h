@@ -1,19 +1,19 @@
 #pragma once
 
-#include "chess_board.h"
+#include "position.h"
 
 enum Algorithm { MINIMAX, ALPHA_BETA, A_STAR };
 
 class ChessEngine {
   public:
-    ChessEngine(ChessBoard *board);
+    ChessEngine(Position *board);
     Move getBestMove();
 
   private:
-    ChessBoard *chessBoard;
+    Position *chessBoard;
     int evaluateBoard() const;
-    int evaluateBoard(ChessBoard *board) const;
-    int evaluateBoardForColor(ChessBoard *board, Color color) const;
+    int evaluateBoard(Position *board) const;
+    int evaluateBoardForColor(Position *board, Color color) const;
     int getPieceValue(const ColoredPiece &cp) const;
     Move minimax() const;
     int negaMax(int depth) const;

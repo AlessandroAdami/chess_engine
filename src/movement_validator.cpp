@@ -1,7 +1,7 @@
 #include "movement_validator.h"
-#include "chess_board.h"
+#include "position.h"
 
-MovementValidator::MovementValidator(ChessBoard *board) : chessBoard(board) {}
+MovementValidator::MovementValidator(Position *board) : chessBoard(board) {}
 
 bool MovementValidator::isValidMove(const Move &move) const {
     int fromRow = move.from.row, fromCol = move.from.col;

@@ -1,10 +1,10 @@
 #include "../include/check_scanner.h"
-#include "../include/chess_board.h"
+#include "../include/position.h"
 #include "../include/types.h"
 #include <gtest/gtest.h>
 
 TEST(CheckScannerTest, IsInCheckTest) {
-    ChessBoard board;
+    Position board;
     board.loadFEN(
         "rnb1kbnr/pp2pppp/3p4/2p5/3PP3/2q2N2/PPP2PPP/R1BQKB1R w KQkq - 0 5");
 
@@ -21,7 +21,7 @@ TEST(CheckScannerTest, IsInCheckTest) {
 }
 
 TEST(CheckScannerTest, IsInCheckmate) {
-    ChessBoard board;
+    Position board;
     board.loadFEN(
         "r1bqkb1r/pp1ppBpp/2n2n2/2p4Q/4P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4");
 
@@ -38,7 +38,7 @@ TEST(CheckScannerTest, IsInCheckmate) {
 }
 
 TEST(CheckScannerTest, IsInStalemate) {
-    ChessBoard board;
+    Position board;
     board.loadFEN("1q6/5ppb/4p2k/4b2p/3p3P/3P2pK/6P1/8 w - - 2 4");
 
     CheckScanner scanner(&board);
@@ -51,7 +51,7 @@ TEST(CheckScannerTest, IsInStalemate) {
 }
 
 TEST(CheckScannerTest, IsSquareInCheck) {
-    ChessBoard board;
+    Position board;
     board.loadFEN(
         "r1bqkb1r/pp1p1ppp/2n1pn2/2p5/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 w kq - 4 5");
 

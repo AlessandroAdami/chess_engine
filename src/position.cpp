@@ -1,4 +1,4 @@
-#include "chess_board.h"
+#include "position.h"
 #include "types.h"
 #include <iostream>
 #include <sstream>
@@ -8,7 +8,7 @@
 const std::string startFEN =
     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-ChessBoard::ChessBoard()
+Position::Position()
     : scanner(this), movementValidator(this), moveMaker(this),
       moveParser(this) {
     for (int row = 0; row < 8; ++row)
@@ -23,7 +23,7 @@ ChessBoard::ChessBoard()
  * <board state> <active color> <castling rights> <en passant square> <halfmove>
  * <fullmove>
  */
-void ChessBoard::loadFEN(const std::string &fen) {
+void Position::loadFEN(const std::string &fen) {
     for (int r = 0; r < 8; r++) {
         for (int c = 0; c < 8; c++) {
             board[r][c] = NO_Piece;
@@ -83,7 +83,7 @@ void ChessBoard::loadFEN(const std::string &fen) {
     this->moveMaker.clearMoveHistory();
 }
 
-std::string ChessBoard::getFEN() const {
+std::string Position::getFEN() const {
     std::ostringstream oss;
     for (int row = 0; row < 8; ++row) {
         int emptyCount = 0;
@@ -131,7 +131,7 @@ std::string ChessBoard::getFEN() const {
     return oss.str();
 }
 
-void ChessBoard::printBoard() const {
+void Position::printBoard() const {
     std::cout << "\n   a b c d e f g h\n";
     std::cout << "   ~~~~~~~~~~~~~~~\n";
     for (int row = 0; row < 8; ++row) {
@@ -150,7 +150,7 @@ void ChessBoard::printBoard() const {
  * @returns the piece that was moved, or an empty ColoredPiece if the move was
  * illegal.
  */
-ColoredPiece ChessBoard::makeMove(const Move &move) {
+ColoredPiece Position::makeMove(const Move &move) {
     if (!movementValidator.isValidMove(move)) {
         std::cerr << "Illegal move.\n";
         return NO_Piece;
@@ -167,52 +167,52 @@ ColoredPiece ChessBoard::makeMove(const Move &move) {
 /**
  * Undoes the most recent move and updates the game state accordingly.
  */
-void ChessBoard::undoMove() { this->moveMaker.undoMove(); }
+void Position::undoMove() { this->moveMaker.undoMove(); }
 
 /**
  * Redoes the most recent undone move and updates the game state accordingly.
  * If there are no moves to redo, this function does nothing.
  */
-void ChessBoard::redoMove() { this->moveMaker.redoMove(); }
+void Position::redoMove() { this->moveMaker.redoMove(); }
 
 /**
  * Moves a piece without having an effect on the game state
  * (e.g. does not change the turn, does not add to move history).
  * This is used for previewing moves.
  */
-ColoredPiece ChessBoard::movePiece(const Move &move) {
+ColoredPiece Position::movePiece(const Move &move) {
     return this->moveMaker.movePiece(move);
 }
 
 /**
  * Like movePiece, but undoes the move and restores the previous position state.
  */
-void ChessBoard::unmovePiece(const MoveContext &context) {
+void Position::unmovePiece(const MoveContext &context) {
     this->moveMaker.unmovePiece(context);
 }
 
 /**
  * @returns the piece at the given square.
  */
-ColoredPiece ChessBoard::getPiece(Square square) const {
+ColoredPiece Position::getPiece(Square square) const {
     return board[square.row][square.col];
 }
 
-void ChessBoard::setPiece(Square square, ColoredPiece cp) {
+void Position::setPiece(Square square, ColoredPiece cp) {
     board[square.row][square.col] = cp;
 }
 
 /**
  * @returns true if the given square is empty (i.e., contains no piece).
  */
-bool ChessBoard::isSquareEmpty(const Square &square) const {
+bool Position::isSquareEmpty(const Square &square) const {
     return getPiece(square) == NO_Piece;
 }
 
 /**
  * @returns the move contex of the given move
  */
-MoveContext ChessBoard::getMoveContext(const Move &move) {
+MoveContext Position::getMoveContext(const Move &move) {
     MoveContext context;
     context.move = move;
     context.capturedPiece = getCapturedPiece(move);
@@ -229,7 +229,7 @@ MoveContext ChessBoard::getMoveContext(const Move &move) {
     return context;
 }
 
-ColoredPiece ChessBoard::getCapturedPiece(const Move &move) const {
+ColoredPiece Position::getCapturedPiece(const Move &move) const {
     ColoredPiece capturedPiece = getPiece(move.to);
     if (isEnPassant(move)) {
         int colorIndex = (getPiece(move.from).color == WHITE) ? 1 : -1;
@@ -240,14 +240,14 @@ ColoredPiece ChessBoard::getCapturedPiece(const Move &move) const {
     return capturedPiece;
 }
 
-bool ChessBoard::isEnPassant(const Move &move) const {
+bool Position::isEnPassant(const Move &move) const {
     ColoredPiece movingPiece = getPiece(move.from);
     if (movingPiece.piece != PAWN)
         return false;
     return move.to == this->enPassantSquare;
 }
 
-bool ChessBoard::isCastling(const Move &move) const {
+bool Position::isCastling(const Move &move) const {
     ColoredPiece movingPiece = getPiece(move.from);
     if (movingPiece.piece != KING)
         return false;
@@ -256,9 +256,9 @@ bool ChessBoard::isCastling(const Move &move) const {
     return std::abs(fromSquare.col - toSquare.col) == 2;
 }
 
-bool ChessBoard::isCheckmate() const {
+bool Position::isCheckmate() const {
     return this->scanner.isInCheckmate(isWhitesTurn ? WHITE : BLACK);
 }
-bool ChessBoard::isStalemate() const {
+bool Position::isStalemate() const {
     return this->scanner.isInStalemate(isWhitesTurn ? WHITE : BLACK);
 }

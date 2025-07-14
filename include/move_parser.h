@@ -4,15 +4,15 @@
 #include <string>
 #include <vector>
 
-class ChessBoard;
+class Position;
 
 class MoveParser {
   public:
-    MoveParser(ChessBoard *chessBoard);
+    MoveParser(Position *chessBoard);
     Move moveStringToMove(const std::string &moveStr);
 
   private:
-    ChessBoard *chessBoard;
+    Position *chessBoard;
     std::vector<std::pair<Move, std::string>>
     getMoveSANPairs(std::vector<Move> legalMoves) const;
 };

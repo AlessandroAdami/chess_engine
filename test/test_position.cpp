@@ -1,9 +1,9 @@
-#include "../include/chess_board.h"
+#include "../include/position.h"
 #include "../include/types.h"
 #include <gtest/gtest.h>
 
 TEST(ChessBoardTest, LoadFenFromStartingPosition) {
-    ChessBoard board;
+    Position board;
     board.loadFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
     for (Color color : {WHITE, BLACK}) {
@@ -34,7 +34,7 @@ TEST(ChessBoardTest, LoadFenFromStartingPosition) {
 }
 
 TEST(ChessBoardTest, LoadFenFromRandomPosition) {
-    ChessBoard board;
+    Position board;
     board.loadFEN(
         "r4rk1/1pp2pp1/2np1q1p/p1b1p3/2P3b1/2NPPNP1/PP3PBP/R2Q1RK1 w - - 0 11");
 
@@ -53,7 +53,7 @@ TEST(ChessBoardTest, LoadFenFromRandomPosition) {
 }
 
 TEST(ChessBoardTest, MakeMoveIllegal) {
-    ChessBoard board;
+    Position board;
     std::string fen =
         "r1bqkbnr/pp1ppppp/2n5/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3";
     board.loadFEN(fen);
@@ -73,7 +73,7 @@ TEST(ChessBoardTest, MakeMoveIllegal) {
 }
 
 TEST(ChessBoardTest, MakeMoveLegal) {
-    ChessBoard board;
+    Position board;
     std::string fen =
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     board.loadFEN(fen);
@@ -114,7 +114,7 @@ TEST(ChessBoardTest, MakeMoveLegal) {
 }
 
 TEST(ChessBoardTest, UndoRedoMove) {
-    ChessBoard board;
+    Position board;
     std::string fen =
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
@@ -138,7 +138,7 @@ TEST(ChessBoardTest, UndoRedoMove) {
 }
 
 TEST(ChessBoardTest, GetMoveContext) {
-    ChessBoard board;
+    Position board;
     std::string fen =
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 

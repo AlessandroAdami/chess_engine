@@ -1,11 +1,11 @@
-#include "chess_engine.h"
+#include "engine.h"
 #include <limits>
 #include <queue>
 
 const int INF = std::numeric_limits<int>::max();
 const int MATE_SCORE = INF;
 
-ChessEngine::ChessEngine(ChessBoard *board) { this->chessBoard = board; }
+ChessEngine::ChessEngine(Position *board) { this->chessBoard = board; }
 
 Move ChessEngine::getBestMove() {
     switch (algorithm) {
@@ -73,7 +73,7 @@ int ChessEngine::evaluateBoard() const { return evaluateBoard(chessBoard); }
 /**
  * A simple board evaluation (positive for white, negative for black).
  */
-int ChessEngine::evaluateBoard(ChessBoard *board) const {
+int ChessEngine::evaluateBoard(Position *board) const {
     if (board->isCheckmate()) {
         return board->getIsWhitesTurn() ? -MATE_SCORE : MATE_SCORE;
     } else if (board->isStalemate()) {
@@ -98,7 +98,7 @@ int ChessEngine::evaluateBoard(ChessBoard *board) const {
  * Evaluates the board for a specific color.
  * A positive score means 'color' is advantaged, negative means disadvantaged.
  */
-int ChessEngine::evaluateBoardForColor(ChessBoard *board, Color color) const {
+int ChessEngine::evaluateBoardForColor(Position *board, Color color) const {
     int score = evaluateBoard(board);
     int colorMultiplier = (color == WHITE) ? 1 : -1;
     return score * colorMultiplier;

@@ -1,12 +1,12 @@
 #include "check_scanner.h"
-#include "chess_board.h"
+#include "position.h"
 
 /**
  * Looks for checks in the board, assumes you are asking about the color whose
  * move it is
  */
 
-CheckScanner::CheckScanner(ChessBoard *board) : chessBoard(board) {}
+CheckScanner::CheckScanner(Position *board) : chessBoard(board) {}
 
 bool CheckScanner::isInCheck(Color color) const {
     Square kingSquare = getKingSquare(color);

@@ -3,7 +3,7 @@
 #include "types.h"
 #include <vector>
 
-class ChessBoard;
+class Position;
 struct MoveContext {
     Move move;
     ColoredPiece capturedPiece;
@@ -32,7 +32,7 @@ struct MoveContext {
 
 class MoveMaker {
   public:
-    MoveMaker(ChessBoard *chessBoard);
+    MoveMaker(Position *chessBoard);
     ColoredPiece makeMove(const Move &move);
     ColoredPiece movePiece(const Move &move);
     void unmovePiece(const MoveContext &context);
@@ -46,7 +46,7 @@ class MoveMaker {
     ColoredPiece getCapturedPiece(const Move &move) const;
 
   private:
-    ChessBoard *chessBoard;
+    Position *chessBoard;
     ColoredPiece (*board)[8];
     std::vector<MoveContext> moveHistory;
     int moveCursor = 0;

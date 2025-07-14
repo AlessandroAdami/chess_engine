@@ -1,5 +1,5 @@
 #include "move_maker.h"
-#include "chess_board.h"
+#include "position.h"
 #include <iostream>
 
 /**
@@ -8,7 +8,7 @@
  * The legality of the moves is checked by the MovementValidator class.
  */
 
-MoveMaker::MoveMaker(ChessBoard *chessBoard)
+MoveMaker::MoveMaker(Position *chessBoard)
     : chessBoard(chessBoard), board(chessBoard->board){};
 
 /**

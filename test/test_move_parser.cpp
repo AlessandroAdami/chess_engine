@@ -1,10 +1,10 @@
-#include "../include/chess_board.h"
+#include "../include/position.h"
 #include "../include/move_parser.h"
 #include "../include/types.h"
 #include <gtest/gtest.h>
 
 TEST(MoveParser, StringToMove) {
-    ChessBoard board;
+    Position board;
     MoveParser parser(&board);
     std::string fen =
         "rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2";

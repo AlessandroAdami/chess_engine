@@ -9,9 +9,9 @@
 
 // TODO: return move context instead of coloredpiece for makeMove
 
-class ChessBoard {
+class Position {
   public:
-    ChessBoard();
+    Position();
     CheckScanner scanner;
     MovementValidator movementValidator;
     void loadFEN(const std::string &fen);

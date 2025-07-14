@@ -1,11 +1,11 @@
 #include "move_parser.h"
-#include "chess_board.h"
+#include "position.h"
 #include <algorithm>
 #include <cctype>
 #include <stdexcept>
 #include <vector>
 
-MoveParser::MoveParser(ChessBoard *chessBoard) : chessBoard(chessBoard) {}
+MoveParser::MoveParser(Position *chessBoard) : chessBoard(chessBoard) {}
 
 /**
  * Converts a move from algebraic notation (e.g. "e4", "Nf3", "O-O", "exf8=n")

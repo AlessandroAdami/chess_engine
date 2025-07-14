@@ -2,17 +2,17 @@
 
 #include "types.h"
 #include <vector>
-class ChessBoard;
+class Position;
 
 class MovementValidator {
   public:
-    MovementValidator(ChessBoard *chessBoard);
+    MovementValidator(Position *chessBoard);
     bool isValidMove(const Move &move) const;
     bool isValidPieceMovement(Piece piece, Move move) const;
     std::vector<Move> getLegalMoves(Color color);
 
   private:
-    ChessBoard *chessBoard;
+    Position *chessBoard;
     bool isValidPawnMovement(Move move) const;
     bool isValidKnightMovement(Move move) const;
     bool isValidBishopMovement(Move move) const;

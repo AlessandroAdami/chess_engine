@@ -1,4 +1,4 @@
-#include "chess_board.h"
+#include "position.h"
 #include "move_parser.h"
 #include <iostream>
 #include <sstream>
@@ -6,7 +6,7 @@
 #include <vector>
 
 int main() {
-    ChessBoard board;
+    Position board;
     board.printBoard();
 
     while (true) {

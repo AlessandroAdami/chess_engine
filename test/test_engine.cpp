@@ -1,10 +1,10 @@
-#include "../include/chess_board.h"
-#include "../include/chess_engine.h"
+#include "../include/position.h"
+#include "../include/engine.h"
 #include "../include/types.h"
 #include <gtest/gtest.h>
 
 TEST(ChessEngineTest, EvaluateBoard) {
-    ChessBoard board;
+    Position board;
     ChessEngine engine(&board);
 
     board.loadFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
@@ -28,7 +28,7 @@ TEST(ChessEngineTest, EvaluateBoard) {
 }
 
 TEST(ChessEngineTest, GetBestMove) {
-    ChessBoard board;
+    Position board;
     ChessEngine engine(&board);
 
     board.loadFEN(

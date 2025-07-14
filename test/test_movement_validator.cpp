@@ -1,9 +1,9 @@
-#include "../include/chess_board.h"
+#include "../include/position.h"
 #include "../include/movement_validator.h"
 #include <gtest/gtest.h>
 
 TEST(MovementValidatorTest, PawnGoodMovement) {
-    ChessBoard board;
+    Position board;
     board.loadFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
     MovementValidator validator(&board);
@@ -46,7 +46,7 @@ TEST(MovementValidatorTest, PawnGoodMovement) {
 }
 
 TEST(MovementValidatorTest, PawnBadMovement) {
-    ChessBoard board;
+    Position board;
     board.loadFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
     MovementValidator validator(&board);
@@ -68,7 +68,7 @@ TEST(MovementValidatorTest, PawnBadMovement) {
 }
 
 TEST(MovementValidatorTest, BishopGoodMovement) {
-    ChessBoard board;
+    Position board;
     board.loadFEN(
         "rnbqkb1r/pppp1ppp/5n2/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR w KQkq - 2 3");
 
@@ -88,7 +88,7 @@ TEST(MovementValidatorTest, BishopGoodMovement) {
 }
 
 TEST(MovementValidatorTest, BishopBadMovement) {
-    ChessBoard board;
+    Position board;
     board.loadFEN(
         "r1bqkb1r/ppp2ppp/2np1n2/4p3/P1B1P3/1P6/2PP1PPP/RNBQK1NR w KQkq - 0 5");
 
@@ -108,7 +108,7 @@ TEST(MovementValidatorTest, BishopBadMovement) {
 }
 
 TEST(MovementValidatorTest, RookGoodMovement) {
-    ChessBoard board;
+    Position board;
     board.loadFEN(
         "r1bqkb1r/1ppp1ppp/2n1pn2/p2R4/P7/8/1PPPPPPP/1NBQKBNR w Kkq - 0 5");
 
@@ -128,7 +128,7 @@ TEST(MovementValidatorTest, RookGoodMovement) {
 }
 
 TEST(MovementValidatorTest, RookBadMovement) {
-    ChessBoard board;
+    Position board;
     board.loadFEN(
         "r1bqk2r/1ppp1ppp/2n1pn2/p1bR4/P2P4/8/1PP1PPPP/1NBQKBNR w Kkq - 1 6");
 
@@ -148,7 +148,7 @@ TEST(MovementValidatorTest, RookBadMovement) {
 }
 
 TEST(MovementValidatorTest, QueenGoodMovement) {
-    ChessBoard board;
+    Position board;
     board.loadFEN(
         "rnbqkb1r/pppp1ppp/5n2/4p3/2Q1P3/8/PPPP1PPP/RNBQK1NR w KQkq - 2 3");
 
@@ -183,7 +183,7 @@ TEST(MovementValidatorTest, QueenGoodMovement) {
 }
 
 TEST(MovementValidatorTest, QueenBadMovement) {
-    ChessBoard board;
+    Position board;
     board.loadFEN(
         "r1bqk2r/1ppp1ppp/2n1pn2/p1bQ4/P2P4/8/1PP1PPPP/1NBQKBNR w Kkq - 1 6");
 
@@ -212,7 +212,7 @@ TEST(MovementValidatorTest, QueenBadMovement) {
 }
 
 TEST(MovementValidatorTest, KnightGoodMovement) {
-    ChessBoard board;
+    Position board;
     board.loadFEN("rnbqkbnr/pppppppp/8/8/4N3/8/PPP1P1PP/RNBQKB1R w KQkq - 0 1");
 
     MovementValidator validator(&board);
@@ -243,7 +243,7 @@ TEST(MovementValidatorTest, KnightGoodMovement) {
 }
 
 TEST(MovementValidatorTest, KnightBadMovement) {
-    ChessBoard board;
+    Position board;
     board.loadFEN(
         "rnbqkbnr/pppppppp/8/8/4N3/8/PPPPPPsPP/RNBQKB1R w KQkq - 0 1");
 
@@ -257,7 +257,7 @@ TEST(MovementValidatorTest, KnightBadMovement) {
 }
 
 TEST(MovementValidatorTest, CastlingGoodMove) {
-    ChessBoard board;
+    Position board;
     board.loadFEN("rnbqk2r/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1");
 
     MovementValidator validator(&board);
@@ -272,7 +272,7 @@ TEST(MovementValidatorTest, CastlingGoodMove) {
 }
 
 TEST(MovementValidatorTest, CastlingBadMove) {
-    ChessBoard board;
+    Position board;
     board.loadFEN(
         "rnb1kbnr/pppppppp/8/8/2q1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 1");
 
@@ -308,7 +308,7 @@ TEST(MovementValidatorTest, CastlingBadMove) {
 }
 
 TEST(MovementValidatorTest, IntoCheckBadMove) {
-    ChessBoard board;
+    Position board;
     std::string fen =
         "rnbqkbnr/pppp1Bpp/8/4p3/4P3/8/PPPP1PPP/RNBQK1NR b KQkq - 1 1";
     board.loadFEN(fen);
