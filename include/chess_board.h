@@ -29,6 +29,7 @@ class ChessBoard {
     MoveContext getMoveContext(const Move &move);
 
     ColoredPiece getPiece(Square square) const;
+    void setPiece(Square square, ColoredPiece cp);
     Square getEnpassantSquare() const { return enPassantSquare; }
     bool getIsWhitesTurn() const { return isWhitesTurn; }
     int getCastleState(Color color) const {
@@ -36,6 +37,8 @@ class ChessBoard {
     }
     bool isSquareEmpty(const Square &square) const;
     ColoredPiece getCapturedPiece(const Move &move) const;
+    bool isEnPassant(const Move &move) const;
+    bool isCastling(const Move &move) const;
     bool isCheckmate() const;
     bool isStalemate() const;
     bool getIsGameOver() const { return isGameOver; }

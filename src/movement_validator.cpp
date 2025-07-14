@@ -4,8 +4,8 @@
 MovementValidator::MovementValidator(ChessBoard *board) : chessBoard(board) {}
 
 bool MovementValidator::isValidMove(const Move &move) const {
-    int fromRow = move.fromRow, fromCol = move.fromCol;
-    int toRow = move.toRow, toCol = move.toCol;
+    int fromRow = move.from.row, fromCol = move.from.col;
+    int toRow = move.to.row, toCol = move.to.col;
     ColoredPiece movingPiece =
         this->chessBoard->getPiece(Square{fromRow, fromCol});
     ColoredPiece capturedPiece = this->chessBoard->getCapturedPiece(move);
@@ -48,7 +48,7 @@ bool MovementValidator::moveLeadsIntoCheck(Move move) const {
 }
 
 bool MovementValidator::isValidPieceMovement(Piece piece, Move move) const {
-    if (move.fromCol == move.toCol && move.fromRow == move.toRow)
+    if (move.from.col == move.to.col && move.from.row == move.to.row)
         return false;
     switch (piece) {
     case PAWN:
@@ -71,8 +71,7 @@ bool MovementValidator::isValidPieceMovement(Piece piece, Move move) const {
 bool MovementValidator::isValidPawnMovement(Move move) const {
     int colorIndex;
     bool isWhite;
-    ColoredPiece cp =
-        this->chessBoard->getPiece(Square{move.fromRow, move.fromCol});
+    ColoredPiece cp = this->chessBoard->getPiece(move.from);
 
     if (cp.color == WHITE) {
         colorIndex = 1;
@@ -82,8 +81,8 @@ bool MovementValidator::isValidPawnMovement(Move move) const {
         isWhite = false;
     }
 
-    int fromCol = move.fromCol, fromRow = move.fromRow;
-    int toCol = move.toCol, toRow = move.toRow;
+    int fromCol = move.from.col, fromRow = move.from.row;
+    int toCol = move.to.col, toRow = move.to.row;
 
     if (fromCol == toCol && toRow == fromRow - colorIndex &&
         this->chessBoard->getPiece(Square{toRow, toCol}) == NO_Piece)
@@ -118,14 +117,14 @@ bool MovementValidator::isValidPawnMovement(Move move) const {
 }
 
 bool MovementValidator::isValidKnightMovement(Move move) const {
-    return std::abs(move.toCol - move.fromCol) *
-               std::abs(move.toRow - move.fromRow) ==
+    return std::abs(move.to.col - move.from.col) *
+               std::abs(move.to.row - move.from.row) ==
            2;
 }
 
 bool MovementValidator::isValidBishopMovement(Move move) const {
-    int fromRow = move.fromRow, fromCol = move.fromCol;
-    int toRow = move.toRow, toCol = move.toCol;
+    int fromRow = move.from.row, fromCol = move.from.col;
+    int toRow = move.to.row, toCol = move.to.col;
 
     if (std::abs(fromCol - toCol) != std::abs(fromRow - toRow)) {
         return false;
@@ -147,8 +146,8 @@ bool MovementValidator::isValidBishopMovement(Move move) const {
 }
 
 bool MovementValidator::isValidRookMovement(Move move) const {
-    int fromRow = move.fromRow, fromCol = move.fromCol;
-    int toRow = move.toRow, toCol = move.toCol;
+    int fromRow = move.from.row, fromCol = move.from.col;
+    int toRow = move.to.row, toCol = move.to.col;
 
     if (fromRow != toRow && fromCol != toCol) {
         return false;
@@ -180,8 +179,8 @@ bool MovementValidator::isValidQueenMovement(Move move) const {
 }
 
 bool MovementValidator::isValidKingMovement(Move move) const {
-    int fromCol = move.fromCol, fromRow = move.fromRow;
-    int toCol = move.toCol, toRow = move.toRow;
+    int fromRow = move.from.row, fromCol = move.from.col;
+    int toRow = move.to.row, toCol = move.to.col;
 
     Color color =
         getColor(this->chessBoard->getPiece(Square{fromRow, fromCol}));

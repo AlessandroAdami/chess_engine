@@ -198,6 +198,10 @@ ColoredPiece ChessBoard::getPiece(Square square) const {
     return board[square.row][square.col];
 }
 
+void ChessBoard::setPiece(Square square, ColoredPiece cp) {
+    board[square.row][square.col] = cp;
+}
+
 /**
  * @returns true if the given square is empty (i.e., contains no piece).
  */
@@ -209,11 +213,47 @@ bool ChessBoard::isSquareEmpty(const Square &square) const {
  * @returns the move contex of the given move
  */
 MoveContext ChessBoard::getMoveContext(const Move &move) {
-    return this->moveMaker.getMoveContext(move);
+    MoveContext context;
+    context.move = move;
+    context.capturedPiece = getCapturedPiece(move);
+    context.previousEnPassant = this->enPassantSquare;
+    context.previousCastleState[0] = this->castleState[0];
+    context.previousCastleState[1] = this->castleState[1];
+    context.previousHalfmoveClock = this->halfmoveClock;
+    context.previousFullmoveNumber = this->fullmoveNumber;
+    context.previousIsWhitesTurn = this->isWhitesTurn;
+    context.previousIsGameOver = this->isGameOver;
+    context.wasEnPassantCapture = isEnPassant(move);
+    context.wasCastling = isCastling(move);
+
+    return context;
 }
 
 ColoredPiece ChessBoard::getCapturedPiece(const Move &move) const {
-    return this->moveMaker.getCapturedPiece(move);
+    ColoredPiece capturedPiece = getPiece(move.to);
+    if (isEnPassant(move)) {
+        int colorIndex = (getPiece(move.from).color == WHITE) ? 1 : -1;
+        Square toSquare = move.to;
+        capturedPiece =
+            getPiece(Square{toSquare.row + colorIndex, toSquare.col});
+    }
+    return capturedPiece;
+}
+
+bool ChessBoard::isEnPassant(const Move &move) const {
+    ColoredPiece movingPiece = getPiece(move.from);
+    if (movingPiece.piece != PAWN)
+        return false;
+    return move.to == this->enPassantSquare;
+}
+
+bool ChessBoard::isCastling(const Move &move) const {
+    ColoredPiece movingPiece = getPiece(move.from);
+    if (movingPiece.piece != KING)
+        return false;
+    Square fromSquare = move.from;
+    Square toSquare = move.to;
+    return std::abs(fromSquare.col - toSquare.col) == 2;
 }
 
 bool ChessBoard::isCheckmate() const {
