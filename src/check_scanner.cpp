@@ -52,7 +52,7 @@ bool CheckScanner::areThereLegalMoves(Color color) const {
 
             for (int targetRow = 0; targetRow < 8; ++targetRow) {
                 for (int targetCol = 0; targetCol < 8; ++targetCol) {
-                    Move move{row, col, targetRow, targetCol};
+                    Move move{Square{row, col}, Square{targetRow, targetCol}};
                     if (chessBoard->movementValidator.isValidMove(move)) {
                         return true;
                     }
@@ -70,7 +70,7 @@ bool CheckScanner::isSquareInCheck(Square square, Color color) const {
             if (getColor(cp) == color || cp == NO_Piece)
                 continue;
 
-            Move move{row, col, square.row, square.col};
+            Move move{Square{row, col}, square};
             if (chessBoard->movementValidator.isValidPieceMovement(cp.piece,
                                                                    move)) {
                 return true;

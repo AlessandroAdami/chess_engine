@@ -3,8 +3,6 @@
 #include "types.h"
 #include <vector>
 
-// TODO: put getMoveContext and getCapturedPiece in ChessBoard
-
 class ChessBoard;
 struct MoveContext {
     Move move;
@@ -38,7 +36,7 @@ class MoveMaker {
     ColoredPiece makeMove(const Move &move);
     ColoredPiece movePiece(const Move &move);
     void unmovePiece(const MoveContext &context);
-    MoveContext getMoveContext(const Move &move);
+    MoveContext getMoveContext(const Move &move) const;
     void undoMove();
     void redoMove();
     void clearMoveHistory() {
@@ -56,8 +54,6 @@ class MoveMaker {
     ColoredPiece moveKing(const Move &move);
     ColoredPiece moveRook(const Move &move);
     ColoredPiece promotePawn(const Move &move);
-    bool isEnPassant(const Move &move) const;
-    bool isCastling(const Move &move) const;
     void increaseHalfmoveClock(const ColoredPiece movingPiece,
                                const ColoredPiece capturedPiece) const;
 };

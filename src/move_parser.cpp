@@ -42,18 +42,18 @@ MoveParser::getMoveSANPairs(std::vector<Move> legalMoves) const {
     for (const Move &move : legalMoves) {
         std::string moveRepresentation;
 
-        ColoredPiece cp =
-            chessBoard->getPiece(Square{move.fromRow, move.fromCol});
+        ColoredPiece cp = chessBoard->getPiece(move.from);
         Piece type = cp.piece;
 
-        char fromCol = 'a' + move.fromCol;
-        char toCol = 'a' + move.toCol;
-        char toRow = '1' + (7 - move.toRow);
+        char fromCol = 'a' + move.from.col;
+        char toCol = 'a' + move.to.col;
+        char toRow = '1' + (7 - move.to.row);
 
         bool isCapture = this->chessBoard->getCapturedPiece(move) != NO_Piece;
 
-        if (type == KING && std::abs(move.toCol - move.fromCol) == 2) {
-            moveRepresentation = (move.toCol > move.fromCol) ? "o-o" : "o-o-o";
+        if (type == KING && std::abs(move.to.col - move.from.col) == 2) {
+            moveRepresentation =
+                (move.to.col > move.from.col) ? "o-o" : "o-o-o";
         } else if (type == PAWN) {
             if (isCapture) {
                 moveRepresentation += fromCol;
@@ -75,18 +75,16 @@ MoveParser::getMoveSANPairs(std::vector<Move> legalMoves) const {
             bool needCol = false;
             bool needRow = false;
             for (const Move &otherMove : legalMoves) {
-                bool sameDestination = otherMove.toRow == move.toRow &&
-                                       otherMove.toCol == move.toCol;
-                bool differentSource = otherMove.fromRow != move.fromRow ||
-                                       otherMove.fromCol != move.fromCol;
+                bool sameDestination = otherMove.to == move.to;
+                bool differentSource = otherMove.from != move.from;
                 if (sameDestination && differentSource) {
-                    ColoredPiece otherPiece = chessBoard->getPiece(
-                        Square{otherMove.fromRow, otherMove.fromCol});
+                    ColoredPiece otherPiece =
+                        chessBoard->getPiece(otherMove.from);
                     if (otherPiece == cp) {
                         neeedDisambiguation = true;
-                        if (otherMove.fromRow == move.fromRow)
+                        if (otherMove.from.row == move.from.row)
                             needCol = true;
-                        else if (otherMove.fromCol == move.fromCol)
+                        else if (otherMove.from.col == move.from.col)
                             needRow = true;
                     }
                 }
@@ -94,11 +92,11 @@ MoveParser::getMoveSANPairs(std::vector<Move> legalMoves) const {
 
             if (needCol && needRow) {
                 moveRepresentation += fromCol;
-                moveRepresentation += '1' + (7 - move.fromRow);
+                moveRepresentation += '1' + (7 - move.from.row);
             } else if (needCol) {
                 moveRepresentation += fromCol;
             } else if (needRow) {
-                moveRepresentation += '1' + (7 - move.fromRow);
+                moveRepresentation += '1' + (7 - move.from.row);
             } else if (neeedDisambiguation) {
                 moveRepresentation += fromCol;
             }
