@@ -32,7 +32,7 @@ struct MoveContext {
 
 class MoveMaker {
   public:
-    MoveMaker(Position *chessBoard);
+    MoveMaker(Position *position);
     MoveContext makeMove(const Move &move);
     MoveContext movePiece(const Move &move);
     void unmovePiece(const MoveContext &context);
@@ -46,8 +46,7 @@ class MoveMaker {
     ColoredPiece getCapturedPiece(const Move &move) const;
 
   private:
-    Position *chessBoard;
-    ColoredPiece (*board)[8];
+    Position *position;
     std::vector<MoveContext> moveHistory;
     int moveCursor = 0;
     ColoredPiece movePawn(const Move &move);

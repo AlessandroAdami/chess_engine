@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <vector>
 
-MoveParser::MoveParser(Position *chessBoard) : chessBoard(chessBoard) {}
+MoveParser::MoveParser(Position *position) : position(position) {}
 
 /**
  * Converts a move from algebraic notation (e.g. "e4", "Nf3", "O-O", "exf8=n")
@@ -16,10 +16,10 @@ Move MoveParser::moveStringToMove(const std::string &moveStr) {
     std::transform(normalizedInput.begin(), normalizedInput.end(),
                    normalizedInput.begin(), ::tolower);
 
-    bool isWhitesTurn = chessBoard->getIsWhitesTurn();
+    bool isWhitesTurn = position->getIsWhitesTurn();
     Color color = isWhitesTurn ? WHITE : BLACK;
     std::vector<Move> legalMoves =
-        chessBoard->movementValidator.getLegalMoves(color);
+        position->movementValidator.getLegalMoves(color);
 
     std::vector<std::pair<Move, std::string>> moveSANPairs =
         getMoveSANPairs(legalMoves);
@@ -42,14 +42,14 @@ MoveParser::getMoveSANPairs(std::vector<Move> legalMoves) const {
     for (const Move &move : legalMoves) {
         std::string moveRepresentation;
 
-        ColoredPiece cp = chessBoard->getPiece(move.from);
+        ColoredPiece cp = position->getPiece(move.from);
         Piece type = cp.piece;
 
         char fromCol = 'a' + move.from.col;
         char toCol = 'a' + move.to.col;
         char toRow = '1' + (7 - move.to.row);
 
-        bool isCapture = this->chessBoard->getCapturedPiece(move) != NO_Piece;
+        bool isCapture = this->position->getCapturedPiece(move) != NO_Piece;
 
         if (type == KING && std::abs(move.to.col - move.from.col) == 2) {
             moveRepresentation =
@@ -70,7 +70,6 @@ MoveParser::getMoveSANPairs(std::vector<Move> legalMoves) const {
         } else {
             moveRepresentation += std::tolower(pieceToChar(cp));
 
-            // === DISAMBIGUATION START ===
             bool neeedDisambiguation = false;
             bool needCol = false;
             bool needRow = false;
@@ -79,7 +78,7 @@ MoveParser::getMoveSANPairs(std::vector<Move> legalMoves) const {
                 bool differentSource = otherMove.from != move.from;
                 if (sameDestination && differentSource) {
                     ColoredPiece otherPiece =
-                        chessBoard->getPiece(otherMove.from);
+                        position->getPiece(otherMove.from);
                     if (otherPiece == cp) {
                         neeedDisambiguation = true;
                         if (otherMove.from.row == move.from.row)
@@ -100,7 +99,6 @@ MoveParser::getMoveSANPairs(std::vector<Move> legalMoves) const {
             } else if (neeedDisambiguation) {
                 moveRepresentation += fromCol;
             }
-            // === DISAMBIGUATION END ===
 
             if (isCapture)
                 moveRepresentation += 'x';

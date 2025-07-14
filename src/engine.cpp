@@ -1,11 +1,12 @@
 #include "engine.h"
 #include <limits>
-#include <queue>
 
 const int INF = std::numeric_limits<int>::max();
 const int MATE_SCORE = INF;
 
-ChessEngine::ChessEngine(Position *board) { this->chessBoard = board; }
+ChessEngine::ChessEngine(Position* position) {
+    this->position = position;
+}
 
 Move ChessEngine::getBestMove() {
     switch (algorithm) {
@@ -15,68 +16,90 @@ Move ChessEngine::getBestMove() {
 }
 
 /**
- * Uses the minimax algorithm to find the best move.
- * This is a simple implementation without alpha-beta pruning.
+ * Minimax with alpha-beta pruning.
  */
 Move ChessEngine::minimax() const {
     int depth = searchMoveDepth * 2;
-    Move bestMove;
+    Color color = position->getIsWhitesTurn() ? WHITE : BLACK;
+    std::vector<Move> legalMoves = position->movementValidator.getLegalMoves(color);
+
+    if (legalMoves.empty()) {
+        return Move{0, 0, 0, 0};  // No legal moves available
+    }
+
+    Move bestMove = legalMoves.front();
     int bestValue = -INF;
-    Color color = chessBoard->getIsWhitesTurn() ? WHITE : BLACK;
-    std::vector<Move> legalMoves =
-        chessBoard->movementValidator.getLegalMoves(color);
-    for (const Move &move : legalMoves) {
-        MoveContext context = chessBoard->getMoveContext(move);
-        chessBoard->movePiece(move);
-        int moveValue = -negaMax(depth - 1);
-        chessBoard->unmovePiece(context);
-        if (moveValue > bestValue) {
-            bestValue = moveValue;
+    int alpha = -INF;
+    int beta = INF;
+
+    for (const Move& move : legalMoves) {
+        MoveContext context = position->getMoveContext(move);
+        position->movePiece(move);
+        int score = -negaMaxAlphaBeta(depth - 1, -beta, -alpha);
+        position->unmovePiece(context);
+
+        if (score > bestValue) {
+            bestValue = score;
             bestMove = move;
         }
+
+        if (score > alpha) {
+            alpha = score;
+        }
     }
+
     return bestMove;
 }
 
 /**
- * NegaMax algorithm implementation.
- * This is a recursive function that evaluates the board state.
- * It returns a score for the current position.
+ * NegaMax with alpha-beta pruning (single-threaded).
  */
-int ChessEngine::negaMax(int depth) const {
-    if (depth == 0 || chessBoard->getIsGameOver()) {
-        return evaluateBoard(chessBoard);
+int ChessEngine::negaMaxAlphaBeta(int depth, int alpha, int beta) const {
+    if (depth == 0 || position->getIsGameOver()) {
+        return evaluatePosition(position);
     }
-    int max = -INF;
-    Color color = chessBoard->getIsWhitesTurn() ? WHITE : BLACK;
-    std::vector<Move> legalMoves =
-        chessBoard->movementValidator.getLegalMoves(color);
 
-    for (const Move &move : legalMoves) {
-        MoveContext context = chessBoard->getMoveContext(move);
-        chessBoard->movePiece(move);
-        int score = -negaMax(depth - 1);
-        chessBoard->unmovePiece(context);
-        if (score > max) {
-            max = score;
+    int maxScore = -INF;
+    Color color = position->getIsWhitesTurn() ? WHITE : BLACK;
+    std::vector<Move> legalMoves = position->movementValidator.getLegalMoves(color);
+
+    for (const Move& move : legalMoves) {
+        MoveContext context = position->getMoveContext(move);
+        position->movePiece(move);
+        int score = -negaMaxAlphaBeta(depth - 1, -beta, -alpha);
+        position->unmovePiece(context);
+
+        if (score > maxScore) {
+            maxScore = score;
+        }
+
+        if (score > alpha) {
+            alpha = score;
+        }
+
+        if (alpha >= beta) {
+            break;  // Beta cutoff
         }
     }
-    return max;
+
+    return maxScore;
 }
 
 Move ChessEngine::AStarSearch(int depth, bool isWhitesTurn) {
     return Move{0, 0, 0, 0};
 }
 
-int ChessEngine::evaluateBoard() const { return evaluateBoard(chessBoard); }
+int ChessEngine::evaluatePosition() const {
+    return evaluatePosition(position);
+}
 
 /**
- * A simple board evaluation (positive for white, negative for black).
+ * Simple material-based evaluation (positive for white, negative for black).
  */
-int ChessEngine::evaluateBoard(Position *board) const {
-    if (board->isCheckmate()) {
-        return board->getIsWhitesTurn() ? -MATE_SCORE : MATE_SCORE;
-    } else if (board->isStalemate()) {
+int ChessEngine::evaluatePosition(Position* position) const {
+    if (position->isCheckmate()) {
+        return position->getIsWhitesTurn() ? -MATE_SCORE : MATE_SCORE;
+    } else if (position->isStalemate()) {
         return 0;
     }
 
@@ -84,7 +107,7 @@ int ChessEngine::evaluateBoard(Position *board) const {
 
     for (int row = 0; row < 8; ++row) {
         for (int col = 0; col < 8; ++col) {
-            ColoredPiece cp = board->getPiece(Square{row, col});
+            ColoredPiece cp = position->getPiece(Square{row, col});
             if (cp != NO_Piece) {
                 score += getPieceValue(cp);
             }
@@ -95,18 +118,20 @@ int ChessEngine::evaluateBoard(Position *board) const {
 }
 
 /**
- * Evaluates the board for a specific color.
- * A positive score means 'color' is advantaged, negative means disadvantaged.
+ * Evaluation relative to a specific color.
  */
-int ChessEngine::evaluateBoardForColor(Position *board, Color color) const {
-    int score = evaluateBoard(board);
-    int colorMultiplier = (color == WHITE) ? 1 : -1;
-    return score * colorMultiplier;
+int ChessEngine::evaluatePositionForColor(Position* position, Color color) const {
+    int score = evaluatePosition(position);
+    return (color == WHITE) ? score : -score;
 }
 
-int ChessEngine::getPieceValue(const ColoredPiece &cp) const {
-    int value;
+/**
+ * Material values for each piece type.
+ */
+int ChessEngine::getPieceValue(const ColoredPiece& cp) const {
+    int value = 0;
     int colorMultiplier = (cp.color == WHITE) ? 1 : -1;
+
     switch (cp.piece) {
     case PAWN:
         value = 100;

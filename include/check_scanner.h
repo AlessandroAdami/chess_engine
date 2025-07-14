@@ -12,7 +12,7 @@ class CheckScanner {
     bool isSquareInCheck(Square square, Color color) const;
 
   private:
-    Position *chessBoard;
+    Position *position;
     bool areThereLegalMoves(Color color) const;
     Square getKingSquare(Color color) const;
 };

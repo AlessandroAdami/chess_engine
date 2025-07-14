@@ -8,8 +8,8 @@
  * The legality of the moves is checked by the MovementValidator class.
  */
 
-MoveMaker::MoveMaker(Position *chessBoard)
-    : chessBoard(chessBoard), board(chessBoard->board){};
+MoveMaker::MoveMaker(Position *position)
+    : position(position){};
 
 /**
  * @param move the move to be made
@@ -25,14 +25,14 @@ MoveContext MoveMaker::makeMove(const Move &move) {
     moveHistory.push_back(context);
     moveCursor++;
 
-    ColoredPiece movingPiece = chessBoard->getPiece(move.from);
+    ColoredPiece movingPiece = position->getPiece(move.from);
     movePiece(move);
     ColoredPiece capturedPiece = context.capturedPiece;
 
     increaseHalfmoveClock(movingPiece, capturedPiece);
-    this->chessBoard->fullmoveNumber += this->chessBoard->isWhitesTurn ? 0 : 1;
+    this->position->fullmoveNumber += this->position->isWhitesTurn ? 0 : 1;
 
-    this->chessBoard->isWhitesTurn = !this->chessBoard->isWhitesTurn;
+    this->position->isWhitesTurn = !this->position->isWhitesTurn;
 
     return context;
 }
@@ -41,32 +41,32 @@ MoveContext MoveMaker::makeMove(const Move &move) {
  * Gets the move context for the given move.
  */
 MoveContext MoveMaker::getMoveContext(const Move &move) const {
-    return this->chessBoard->getMoveContext(move);
+    return this->position->getMoveContext(move);
 }
 
 ColoredPiece MoveMaker::getCapturedPiece(const Move &move) const {
-    return chessBoard->getCapturedPiece(move);
+    return position->getCapturedPiece(move);
 }
 
 void MoveMaker::increaseHalfmoveClock(const ColoredPiece movingCP,
                                       const ColoredPiece capturedCP) const {
     if (movingCP.piece == PAWN) {
-        this->chessBoard->halfmoveClock = 0;
+        this->position->halfmoveClock = 0;
     } else if (capturedCP != NO_Piece) {
-        this->chessBoard->halfmoveClock = 0;
+        this->position->halfmoveClock = 0;
     } else {
-        this->chessBoard->halfmoveClock++;
+        this->position->halfmoveClock++;
     }
 }
 
 MoveContext MoveMaker::movePiece(const Move &move) {
     MoveContext context = getMoveContext(move);
-    ColoredPiece movingPiece = chessBoard->getPiece(move.from);
+    ColoredPiece movingPiece = position->getPiece(move.from);
 
     ColoredPiece capturedPiece;
 
     if (movingPiece.piece != PAWN) {
-        chessBoard->enPassantSquare = Square{-1, -1};
+        position->enPassantSquare = Square{-1, -1};
     }
 
     if (movingPiece.piece == PAWN) {
@@ -76,11 +76,11 @@ MoveContext MoveMaker::movePiece(const Move &move) {
     } else if (movingPiece.piece == ROOK) {
         capturedPiece = moveRook(move);
     } else {
-        capturedPiece = chessBoard->getPiece(move.to);
+        capturedPiece = position->getPiece(move.to);
     }
 
-    chessBoard->setPiece(move.to, movingPiece);
-    chessBoard->setPiece(move.from, NO_Piece);
+    position->setPiece(move.to, movingPiece);
+    position->setPiece(move.from, NO_Piece);
     return context;
 }
 
@@ -92,48 +92,48 @@ ColoredPiece MoveMaker::movePawn(const Move &move) {
     Square fromSquare = move.from;
     Square toSquare = move.to;
 
-    int colorIndex = (chessBoard->getPiece(fromSquare).color == WHITE) ? 1 : -1;
-    ColoredPiece capturedPiece = chessBoard->getPiece(toSquare);
-    ColoredPiece movingPiece = chessBoard->getPiece(fromSquare);
+    int colorIndex = (position->getPiece(fromSquare).color == WHITE) ? 1 : -1;
+    ColoredPiece capturedPiece = position->getPiece(toSquare);
+    ColoredPiece movingPiece = position->getPiece(fromSquare);
 
-    if (toSquare == this->chessBoard->enPassantSquare) {
-        capturedPiece = chessBoard->getPiece(
+    if (toSquare == this->position->enPassantSquare) {
+        capturedPiece = position->getPiece(
             Square{toSquare.row + colorIndex, toSquare.col});
-        chessBoard->setPiece(Square{toSquare.row + colorIndex, toSquare.col},
+        position->setPiece(Square{toSquare.row + colorIndex, toSquare.col},
                              NO_Piece);
     }
 
     if (std::abs(fromSquare.row - toSquare.row) == 2) {
-        this->chessBoard->enPassantSquare =
+        this->position->enPassantSquare =
             Square{toSquare.row + colorIndex, toSquare.col};
         capturedPiece = NO_Piece;
     } else {
-        this->chessBoard->enPassantSquare = Square{-1, -1};
+        this->position->enPassantSquare = Square{-1, -1};
     }
 
-    colorIndex = (chessBoard->getPiece(fromSquare).color == WHITE) ? 0 : 7;
+    colorIndex = (position->getPiece(fromSquare).color == WHITE) ? 0 : 7;
     if (toSquare.row == colorIndex) {
-        chessBoard->setPiece(toSquare, move.promotionPiece);
+        position->setPiece(toSquare, move.promotionPiece);
     }
 
-    chessBoard->setPiece(fromSquare, NO_Piece);
-    chessBoard->setPiece(toSquare, movingPiece);
+    position->setPiece(fromSquare, NO_Piece);
+    position->setPiece(toSquare, movingPiece);
 
     return capturedPiece;
 }
 
 ColoredPiece MoveMaker::promotePawn(const Move &move) {
     ColoredPiece promotionPiece = move.promotionPiece;
-    ColoredPiece capturedPiece = chessBoard->getPiece(move.to);
-    promotionPiece.color = chessBoard->getPiece(move.from).color;
-    chessBoard->setPiece(move.to, promotionPiece);
-    chessBoard->setPiece(move.from, NO_Piece);
+    ColoredPiece capturedPiece = position->getPiece(move.to);
+    promotionPiece.color = position->getPiece(move.from).color;
+    position->setPiece(move.to, promotionPiece);
+    position->setPiece(move.from, NO_Piece);
 
     return capturedPiece;
 }
 
 ColoredPiece MoveMaker::moveKing(const Move &move) {
-    ColoredPiece king = chessBoard->getPiece(move.from);
+    ColoredPiece king = position->getPiece(move.from);
 
     Square fromSquare = move.from;
     Square toSquare = move.to;
@@ -141,38 +141,38 @@ ColoredPiece MoveMaker::moveKing(const Move &move) {
     if (std::abs(fromSquare.col - toSquare.col) == 2) {
         ColoredPiece rook;
         if (fromSquare.col < toSquare.col) {
-            rook = chessBoard->getPiece(Square{fromSquare.row, 7});
-            chessBoard->setPiece(Square{fromSquare.row, 7}, NO_Piece);
-            chessBoard->setPiece(Square{fromSquare.row, 5}, rook);
+            rook = position->getPiece(Square{fromSquare.row, 7});
+            position->setPiece(Square{fromSquare.row, 7}, NO_Piece);
+            position->setPiece(Square{fromSquare.row, 5}, rook);
         } else {
-            rook = chessBoard->getPiece(Square{fromSquare.row, 0});
-            chessBoard->setPiece(Square{fromSquare.row, 0}, NO_Piece);
-            chessBoard->setPiece(Square{fromSquare.row, 3}, rook);
+            rook = position->getPiece(Square{fromSquare.row, 0});
+            position->setPiece(Square{fromSquare.row, 0}, NO_Piece);
+            position->setPiece(Square{fromSquare.row, 3}, rook);
         }
     }
 
-    chessBoard->getPiece(toSquare);
-    ColoredPiece capturedPiece = chessBoard->getPiece(toSquare);
-    ColoredPiece movingPiece = chessBoard->getPiece(fromSquare);
-    chessBoard->setPiece(toSquare, movingPiece);
-    chessBoard->setPiece(fromSquare, NO_Piece);
-    chessBoard->castleState[king.color == WHITE ? 0 : 1] = NO_CASTLING;
+    position->getPiece(toSquare);
+    ColoredPiece capturedPiece = position->getPiece(toSquare);
+    ColoredPiece movingPiece = position->getPiece(fromSquare);
+    position->setPiece(toSquare, movingPiece);
+    position->setPiece(fromSquare, NO_Piece);
+    position->castleState[king.color == WHITE ? 0 : 1] = NO_CASTLING;
     return capturedPiece;
 }
 
 ColoredPiece MoveMaker::moveRook(const Move &move) {
-    chessBoard->getPiece(move.from);
-    ColoredPiece rook = chessBoard->getPiece(move.from);
+    position->getPiece(move.from);
+    ColoredPiece rook = position->getPiece(move.from);
 
     int fromCol = move.from.col;
 
     if (fromCol == 7) {
-        chessBoard->castleState[rook.color == WHITE ? 0 : 1] &= ~KING_SIDE;
+        position->castleState[rook.color == WHITE ? 0 : 1] &= ~KING_SIDE;
     } else if (fromCol == 0) {
-        chessBoard->castleState[rook.color == WHITE ? 0 : 1] &= ~QUEEN_SIDE;
+        position->castleState[rook.color == WHITE ? 0 : 1] &= ~QUEEN_SIDE;
     }
 
-    return chessBoard->getPiece(move.to);
+    return position->getPiece(move.to);
 }
 
 void MoveMaker::undoMove() {
@@ -188,39 +188,39 @@ void MoveMaker::undoMove() {
 void MoveMaker::unmovePiece(const MoveContext &context) {
     const Move &move = context.move;
 
-    ColoredPiece movedPiece = chessBoard->getPiece(move.to);
-    chessBoard->setPiece(move.from, movedPiece);
-    chessBoard->setPiece(move.to, context.capturedPiece);
+    ColoredPiece movedPiece = position->getPiece(move.to);
+    position->setPiece(move.from, movedPiece);
+    position->setPiece(move.to, context.capturedPiece);
 
     Square from = move.from;
     Square to = move.to;
 
     if (context.wasEnPassantCapture) {
         int colorIndex = context.previousIsWhitesTurn ? 1 : -1;
-        chessBoard->setPiece(Square{to.row + colorIndex, to.col},
+        position->setPiece(Square{to.row + colorIndex, to.col},
                              context.capturedPiece);
-        chessBoard->setPiece(to, NO_Piece);
+        position->setPiece(to, NO_Piece);
     }
 
     if (context.wasCastling) {
         if (to.col == 6) {
-            ColoredPiece rook = chessBoard->getPiece(Square{to.row, 5});
-            chessBoard->setPiece(Square{to.row, 7}, rook);
-            chessBoard->setPiece(Square{to.row, 5}, NO_Piece);
+            ColoredPiece rook = position->getPiece(Square{to.row, 5});
+            position->setPiece(Square{to.row, 7}, rook);
+            position->setPiece(Square{to.row, 5}, NO_Piece);
         } else if (to.col == 2) {
-            ColoredPiece rook = chessBoard->getPiece(Square{to.row, 3});
-            chessBoard->setPiece(Square{to.row, 0}, rook);
-            chessBoard->setPiece(Square{to.row, 3}, NO_Piece);
+            ColoredPiece rook = position->getPiece(Square{to.row, 3});
+            position->setPiece(Square{to.row, 0}, rook);
+            position->setPiece(Square{to.row, 3}, NO_Piece);
         }
     }
 
-    chessBoard->enPassantSquare = context.previousEnPassant;
-    chessBoard->castleState[0] = context.previousCastleState[0];
-    chessBoard->castleState[1] = context.previousCastleState[1];
-    chessBoard->isWhitesTurn = context.previousIsWhitesTurn;
-    chessBoard->isGameOver = context.previousIsGameOver;
-    chessBoard->halfmoveClock = context.previousHalfmoveClock;
-    chessBoard->fullmoveNumber = context.previousFullmoveNumber;
+    position->enPassantSquare = context.previousEnPassant;
+    position->castleState[0] = context.previousCastleState[0];
+    position->castleState[1] = context.previousCastleState[1];
+    position->isWhitesTurn = context.previousIsWhitesTurn;
+    position->isGameOver = context.previousIsGameOver;
+    position->halfmoveClock = context.previousHalfmoveClock;
+    position->fullmoveNumber = context.previousFullmoveNumber;
 }
 
 void MoveMaker::redoMove() {
@@ -231,5 +231,5 @@ void MoveMaker::redoMove() {
     moveCursor++;
 
     movePiece(context.move);
-    this->chessBoard->isWhitesTurn = !this->chessBoard->isWhitesTurn;
+    this->position->isWhitesTurn = !this->position->isWhitesTurn;
 }

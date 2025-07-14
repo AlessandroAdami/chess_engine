@@ -6,21 +6,21 @@ enum Algorithm { MINIMAX, ALPHA_BETA, A_STAR };
 
 class ChessEngine {
   public:
-    ChessEngine(Position *board);
+    ChessEngine(Position *position);
     Move getBestMove();
 
   private:
-    Position *chessBoard;
-    int evaluateBoard() const;
-    int evaluateBoard(Position *board) const;
-    int evaluateBoardForColor(Position *board, Color color) const;
+    Position *position;
+    int evaluatePosition() const;
+    int evaluatePosition(Position *position) const;
+    int evaluatePositionForColor(Position *position, Color color) const;
     int getPieceValue(const ColoredPiece &cp) const;
     Move minimax() const;
-    int negaMax(int depth) const;
+    int negaMaxAlphaBeta(int depth, int alpha, int beta) const;
     Move AStarSearch(int depth, bool isWhitesTurn);
     int searchMoveDepth = 1;
     Move bestMove;
     Algorithm algorithm = MINIMAX;
 
-    friend class ChessEngineTest_EvaluateBoard_Test;
+    friend class ChessEngineTest_EvaluatePosition_Test;
 };

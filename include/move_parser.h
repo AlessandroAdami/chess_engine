@@ -8,11 +8,11 @@ class Position;
 
 class MoveParser {
   public:
-    MoveParser(Position *chessBoard);
+    MoveParser(Position *position);
     Move moveStringToMove(const std::string &moveStr);
 
   private:
-    Position *chessBoard;
+    Position *position;
     std::vector<std::pair<Move, std::string>>
     getMoveSANPairs(std::vector<Move> legalMoves) const;
 };
