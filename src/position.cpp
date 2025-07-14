@@ -150,18 +150,18 @@ void Position::printBoard() const {
  * @returns the piece that was moved, or an empty ColoredPiece if the move was
  * illegal.
  */
-ColoredPiece Position::makeMove(const Move &move) {
+MoveContext Position::makeMove(const Move &move) {
     if (!movementValidator.isValidMove(move)) {
         std::cerr << "Illegal move.\n";
-        return NO_Piece;
+        return MoveContext();
     }
-    ColoredPiece capturedPiece = this->moveMaker.makeMove(move);
+    MoveContext context = this->moveMaker.makeMove(move);
 
     if (isCheckmate() || isStalemate()) {
         isGameOver = true;
     }
 
-    return capturedPiece;
+    return context;
 }
 
 /**
@@ -180,7 +180,7 @@ void Position::redoMove() { this->moveMaker.redoMove(); }
  * (e.g. does not change the turn, does not add to move history).
  * This is used for previewing moves.
  */
-ColoredPiece Position::movePiece(const Move &move) {
+MoveContext Position::movePiece(const Move &move) {
     return this->moveMaker.movePiece(move);
 }
 

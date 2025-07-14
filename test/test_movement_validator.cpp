@@ -1,5 +1,5 @@
-#include "../include/position.h"
 #include "../include/movement_validator.h"
+#include "../include/position.h"
 #include <gtest/gtest.h>
 
 TEST(MovementValidatorTest, PawnGoodMovement) {

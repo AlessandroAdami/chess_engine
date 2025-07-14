@@ -1,5 +1,5 @@
-#include "../include/position.h"
 #include "../include/move_maker.h"
+#include "../include/position.h"
 #include <gtest/gtest.h>
 
 TEST(MoveMakerTest, PawnMakeMove) {

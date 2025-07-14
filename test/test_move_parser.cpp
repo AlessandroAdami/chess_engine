@@ -1,5 +1,5 @@
-#include "../include/position.h"
 #include "../include/move_parser.h"
+#include "../include/position.h"
 #include "../include/types.h"
 #include <gtest/gtest.h>
 

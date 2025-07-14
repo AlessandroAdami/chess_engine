@@ -33,8 +33,8 @@ struct MoveContext {
 class MoveMaker {
   public:
     MoveMaker(Position *chessBoard);
-    ColoredPiece makeMove(const Move &move);
-    ColoredPiece movePiece(const Move &move);
+    MoveContext makeMove(const Move &move);
+    MoveContext movePiece(const Move &move);
     void unmovePiece(const MoveContext &context);
     MoveContext getMoveContext(const Move &move) const;
     void undoMove();
