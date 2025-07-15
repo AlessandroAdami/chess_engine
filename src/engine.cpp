@@ -1,12 +1,6 @@
 #include "engine.h"
-#include <limits>
 
-const int INF = std::numeric_limits<int>::max();
-const int MATE_SCORE = INF;
-
-ChessEngine::ChessEngine(Position* position) {
-    this->position = position;
-}
+ChessEngine::ChessEngine(Position *position) { this->position = position; }
 
 Move ChessEngine::getBestMove() {
     switch (algorithm) {
@@ -19,12 +13,13 @@ Move ChessEngine::getBestMove() {
  * Minimax with alpha-beta pruning.
  */
 Move ChessEngine::minimax() const {
-    int depth = searchMoveDepth * 2;
+    int depth = searchMoveDepth;
     Color color = position->getIsWhitesTurn() ? WHITE : BLACK;
-    std::vector<Move> legalMoves = position->movementValidator.getLegalMoves(color);
+    std::vector<Move> legalMoves =
+        position->movementValidator.getLegalMoves(color);
 
     if (legalMoves.empty()) {
-        return Move{0, 0, 0, 0};  // No legal moves available
+        return Move{0, 0, 0, 0};
     }
 
     Move bestMove = legalMoves.front();
@@ -32,11 +27,12 @@ Move ChessEngine::minimax() const {
     int alpha = -INF;
     int beta = INF;
 
-    for (const Move& move : legalMoves) {
-        MoveContext context = position->getMoveContext(move);
-        position->movePiece(move);
+    for (const Move &move : legalMoves) {
+        MoveContext context = position->movePiece(move);
+        position->changeTurn();
         int score = -negaMaxAlphaBeta(depth - 1, -beta, -alpha);
         position->unmovePiece(context);
+        position->changeTurn();
 
         if (score > bestValue) {
             bestValue = score;
@@ -56,61 +52,54 @@ Move ChessEngine::minimax() const {
  */
 int ChessEngine::negaMaxAlphaBeta(int depth, int alpha, int beta) const {
     if (depth == 0 || position->getIsGameOver()) {
-        return evaluatePosition(position);
+        Color color = position->getTurn();
+        return evaluatePositionForColor(position, color);
     }
 
     int maxScore = -INF;
     Color color = position->getIsWhitesTurn() ? WHITE : BLACK;
-    std::vector<Move> legalMoves = position->movementValidator.getLegalMoves(color);
+    std::vector<Move> legalMoves =
+        position->movementValidator.getLegalMoves(color);
 
-    for (const Move& move : legalMoves) {
-        MoveContext context = position->getMoveContext(move);
-        position->movePiece(move);
+    for (const Move &move : legalMoves) {
+        MoveContext context = position->movePiece(move);
+        position->changeTurn();
         int score = -negaMaxAlphaBeta(depth - 1, -beta, -alpha);
         position->unmovePiece(context);
+        position->changeTurn();
 
         if (score > maxScore) {
             maxScore = score;
-        }
-
-        if (score > alpha) {
-            alpha = score;
+            if (score > alpha)
+                alpha = score;
         }
 
         if (alpha >= beta) {
-            break;  // Beta cutoff
+            return maxScore;
         }
     }
 
     return maxScore;
 }
 
-Move ChessEngine::AStarSearch(int depth, bool isWhitesTurn) {
-    return Move{0, 0, 0, 0};
-}
-
-int ChessEngine::evaluatePosition() const {
-    return evaluatePosition(position);
-}
+int ChessEngine::evaluatePosition() const { return evaluatePosition(position); }
 
 /**
  * Simple material-based evaluation (positive for white, negative for black).
  */
-int ChessEngine::evaluatePosition(Position* position) const {
+int ChessEngine::evaluatePosition(Position *position) const {
+    int score = 0;
     if (position->isCheckmate()) {
-        return position->getIsWhitesTurn() ? -MATE_SCORE : MATE_SCORE;
+        score = position->getIsWhitesTurn() ? BLACK_WIN_SCORE : WHITE_WIN_SCORE;
+        return score;
     } else if (position->isStalemate()) {
         return 0;
     }
 
-    int score = 0;
-
     for (int row = 0; row < 8; ++row) {
         for (int col = 0; col < 8; ++col) {
             ColoredPiece cp = position->getPiece(Square{row, col});
-            if (cp != NO_Piece) {
-                score += getPieceValue(cp);
-            }
+            score += getPieceValue(cp);
         }
     }
 
@@ -120,7 +109,8 @@ int ChessEngine::evaluatePosition(Position* position) const {
 /**
  * Evaluation relative to a specific color.
  */
-int ChessEngine::evaluatePositionForColor(Position* position, Color color) const {
+int ChessEngine::evaluatePositionForColor(Position *position,
+                                          Color color) const {
     int score = evaluatePosition(position);
     return (color == WHITE) ? score : -score;
 }
@@ -128,7 +118,7 @@ int ChessEngine::evaluatePositionForColor(Position* position, Color color) const
 /**
  * Material values for each piece type.
  */
-int ChessEngine::getPieceValue(const ColoredPiece& cp) const {
+int ChessEngine::getPieceValue(const ColoredPiece &cp) const {
     int value = 0;
     int colorMultiplier = (cp.color == WHITE) ? 1 : -1;
 

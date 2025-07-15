@@ -103,13 +103,11 @@ bool MovementValidator::isValidPawnMovement(Move move) const {
 
     if (Square{toRow, toCol} == this->position->getEnpassantSquare() &&
         toCol == fromCol - 1 && toRow == fromRow - colorIndex &&
-        this->position->getPiece(Square{toRow + colorIndex, toCol}) !=
-            NO_Piece)
+        this->position->getPiece(Square{toRow + colorIndex, toCol}) != NO_Piece)
         return true;
     if (Square{toRow, toCol} == this->position->getEnpassantSquare() &&
         toCol == fromCol + 1 && toRow == fromRow - colorIndex &&
-        this->position->getPiece(Square{toRow + colorIndex, toCol}) !=
-            NO_Piece)
+        this->position->getPiece(Square{toRow + colorIndex, toCol}) != NO_Piece)
         return true;
 
     return false;
@@ -181,19 +179,17 @@ bool MovementValidator::isValidKingMovement(Move move) const {
     int fromRow = move.from.row, fromCol = move.from.col;
     int toRow = move.to.row, toCol = move.to.col;
 
-    Color color =
-        getColor(this->position->getPiece(Square{fromRow, fromCol}));
+    Color color = getColor(this->position->getPiece(Square{fromRow, fromCol}));
     bool isCastling =
         (std::abs(fromCol - toCol) == 2 && fromRow == toRow && fromCol == 4);
     if (isCastling) {
         if (this->position->scanner.isSquareInCheck(Square{fromRow, 4},
-                                                      color)) {
+                                                    color)) {
             return false;
         }
         bool isKingside = (toCol == 6);
         bool isQueenside = (toCol == 2);
-        if (isKingside &&
-            (this->position->getCastleState(color) & KING_SIDE)) {
+        if (isKingside && (this->position->getCastleState(color) & KING_SIDE)) {
             for (int col = 5; col <= 6; col++) {
                 if (this->position->scanner.isSquareInCheck(
                         Square{fromRow, col}, color)) {
@@ -251,13 +247,11 @@ std::vector<Move> MovementValidator::getLegalMoves(Color color) {
                             } else {
                                 move.promotionPiece = NO_Piece;
                             }
-                            if (position->movementValidator.isValidMove(
-                                    move)) {
+                            if (position->movementValidator.isValidMove(move)) {
                                 legalMoves.push_back(move);
                             }
                         }
-                    } else if (position->movementValidator.isValidMove(
-                                   move)) {
+                    } else if (position->movementValidator.isValidMove(move)) {
                         legalMoves.push_back(move);
                     }
                 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "position.h"
+#include <limits>
 
 enum Algorithm { MINIMAX, ALPHA_BETA, A_STAR };
 
@@ -17,10 +18,12 @@ class ChessEngine {
     int getPieceValue(const ColoredPiece &cp) const;
     Move minimax() const;
     int negaMaxAlphaBeta(int depth, int alpha, int beta) const;
-    Move AStarSearch(int depth, bool isWhitesTurn);
-    int searchMoveDepth = 1;
+    int searchMoveDepth = 10;
     Move bestMove;
     Algorithm algorithm = MINIMAX;
+    const int INF = std::numeric_limits<int>::max();
+    const int WHITE_WIN_SCORE = std::numeric_limits<int>::max();
+    const int BLACK_WIN_SCORE = std::numeric_limits<int>::min();
 
     friend class ChessEngineTest_EvaluatePosition_Test;
 };

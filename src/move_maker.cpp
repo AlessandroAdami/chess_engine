@@ -8,8 +8,7 @@
  * The legality of the moves is checked by the MovementValidator class.
  */
 
-MoveMaker::MoveMaker(Position *position)
-    : position(position){};
+MoveMaker::MoveMaker(Position *position) : position(position){};
 
 /**
  * @param move the move to be made
@@ -26,8 +25,8 @@ MoveContext MoveMaker::makeMove(const Move &move) {
     moveCursor++;
 
     ColoredPiece movingPiece = position->getPiece(move.from);
-    movePiece(move);
     ColoredPiece capturedPiece = context.capturedPiece;
+    movePiece(move);
 
     increaseHalfmoveClock(movingPiece, capturedPiece);
     this->position->fullmoveNumber += this->position->isWhitesTurn ? 0 : 1;
@@ -97,10 +96,10 @@ ColoredPiece MoveMaker::movePawn(const Move &move) {
     ColoredPiece movingPiece = position->getPiece(fromSquare);
 
     if (toSquare == this->position->enPassantSquare) {
-        capturedPiece = position->getPiece(
-            Square{toSquare.row + colorIndex, toSquare.col});
+        capturedPiece =
+            position->getPiece(Square{toSquare.row + colorIndex, toSquare.col});
         position->setPiece(Square{toSquare.row + colorIndex, toSquare.col},
-                             NO_Piece);
+                           NO_Piece);
     }
 
     if (std::abs(fromSquare.row - toSquare.row) == 2) {
@@ -198,7 +197,7 @@ void MoveMaker::unmovePiece(const MoveContext &context) {
     if (context.wasEnPassantCapture) {
         int colorIndex = context.previousIsWhitesTurn ? 1 : -1;
         position->setPiece(Square{to.row + colorIndex, to.col},
-                             context.capturedPiece);
+                           context.capturedPiece);
         position->setPiece(to, NO_Piece);
     }
 

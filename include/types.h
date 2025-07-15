@@ -1,5 +1,7 @@
 #pragma once
 
+// TODO: add printMove function for test util
+
 enum Piece {
     EMPTY = 0,
     PAWN = 1,
@@ -51,7 +53,6 @@ struct Square {
     bool operator!=(const Square &other) const { return !(*this == other); }
 };
 
-// change move to have two squares
 struct Move {
     Square from;
     Square to;
@@ -64,3 +65,5 @@ struct Move {
 
     bool operator!=(const Move &other) const { return !(*this == other); }
 };
+
+void printMove(const Move move);

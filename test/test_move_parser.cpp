@@ -27,8 +27,9 @@ TEST(MoveParser, StringToMove) {
     expectedMove = Move{7, 4, 7, 6};
     EXPECT_EQ(actualMove, expectedMove);
 
-    position.loadFEN("r3kb1r/pppq1ppp/2n1pn2/3p2B1/2B1P1b1/2NP1N2/PPPQ1PPP/R3K2R "
-                  "b KQkq - 3 7");
+    position.loadFEN(
+        "r3kb1r/pppq1ppp/2n1pn2/3p2B1/2B1P1b1/2NP1N2/PPPQ1PPP/R3K2R "
+        "b KQkq - 3 7");
     moveStr = "o-o-o";
     actualMove = parser.moveStringToMove(moveStr);
     expectedMove = Move{0, 4, 0, 2};
@@ -53,8 +54,9 @@ TEST(MoveParser, StringToMove) {
     expectedMove = Move{5, 5, 6, 3};
     EXPECT_EQ(actualMove, expectedMove);
 
-    position.loadFEN("r1bqkb1r/pppp1ppp/2n2n2/4p3/4P3/1N1P1N2/PPP2PPP/RNBQKB1R w "
-                  "KQkq - 1 4");
+    position.loadFEN(
+        "r1bqkb1r/pppp1ppp/2n2n2/4p3/4P3/1N1P1N2/PPP2PPP/RNBQKB1R w "
+        "KQkq - 1 4");
     moveStr = "nb3d2";
     actualMove = parser.moveStringToMove(moveStr);
     expectedMove = Move{5, 1, 6, 3};
@@ -72,7 +74,8 @@ TEST(MoveParser, StringToMove) {
     expectedMove = Move{5, 2, 3, 4};
     EXPECT_EQ(actualMove, expectedMove);
 
-    position.loadFEN("rnbqkbnr/ppppPppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    position.loadFEN(
+        "rnbqkbnr/ppppPppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     moveStr = "exf8=n";
     actualMove = parser.moveStringToMove(moveStr);
     expectedMove = Move{1, 4, 0, 5, ColoredPiece(WHITE, KNIGHT)};

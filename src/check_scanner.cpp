@@ -19,8 +19,7 @@ Square CheckScanner::getKingSquare(Color color) const {
     ColoredPiece bK = ColoredPiece(BLACK, KING);
     for (int row = 0; row < 8; ++row) {
         for (int col = 0; col < 8; ++col) {
-            if (position->getPiece(Square{row, col}) == wK &&
-                color == WHITE) {
+            if (position->getPiece(Square{row, col}) == wK && color == WHITE) {
                 return Square{row, col};
             } else if (position->getPiece(Square{row, col}) == bK &&
                        color == BLACK) {
@@ -72,7 +71,7 @@ bool CheckScanner::isSquareInCheck(Square square, Color color) const {
 
             Move move{Square{row, col}, square};
             if (position->movementValidator.isValidPieceMovement(cp.piece,
-                                                                   move)) {
+                                                                 move)) {
                 return true;
             }
         }

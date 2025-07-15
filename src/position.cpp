@@ -262,3 +262,12 @@ bool Position::isCheckmate() const {
 bool Position::isStalemate() const {
     return this->scanner.isInStalemate(isWhitesTurn ? WHITE : BLACK);
 }
+
+bool Position::getIsGameOver() const {
+    return this->scanner.isInCheckmate(WHITE) ||
+           this->scanner.isInCheckmate(BLACK) ||
+           this->scanner.isInStalemate(WHITE) ||
+           this->scanner.isInStalemate(BLACK);
+}
+
+void Position::changeTurn() { this->isWhitesTurn = !this->isWhitesTurn; }

@@ -4,17 +4,23 @@
 
 TEST(ChessBoardTest, LoadFenFromStartingPosition) {
     Position position;
-    position.loadFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    position.loadFEN(
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
     for (Color color : {WHITE, BLACK}) {
         int row = (color == WHITE) ? 7 : 0;
         EXPECT_EQ(position.getPiece(Square{row, 0}), ColoredPiece(color, ROOK));
-        EXPECT_EQ(position.getPiece(Square{row, 1}), ColoredPiece(color, KNIGHT));
-        EXPECT_EQ(position.getPiece(Square{row, 2}), ColoredPiece(color, BISHOP));
-        EXPECT_EQ(position.getPiece(Square{row, 3}), ColoredPiece(color, QUEEN));
+        EXPECT_EQ(position.getPiece(Square{row, 1}),
+                  ColoredPiece(color, KNIGHT));
+        EXPECT_EQ(position.getPiece(Square{row, 2}),
+                  ColoredPiece(color, BISHOP));
+        EXPECT_EQ(position.getPiece(Square{row, 3}),
+                  ColoredPiece(color, QUEEN));
         EXPECT_EQ(position.getPiece(Square{row, 4}), ColoredPiece(color, KING));
-        EXPECT_EQ(position.getPiece(Square{row, 5}), ColoredPiece(color, BISHOP));
-        EXPECT_EQ(position.getPiece(Square{row, 6}), ColoredPiece(color, KNIGHT));
+        EXPECT_EQ(position.getPiece(Square{row, 5}),
+                  ColoredPiece(color, BISHOP));
+        EXPECT_EQ(position.getPiece(Square{row, 6}),
+                  ColoredPiece(color, KNIGHT));
         EXPECT_EQ(position.getPiece(Square{row, 7}), ColoredPiece(color, ROOK));
     }
 

@@ -4,7 +4,8 @@
 
 TEST(MovementValidatorTest, PawnGoodMovement) {
     Position position;
-    position.loadFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    position.loadFEN(
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
     MovementValidator validator(&position);
 
@@ -47,7 +48,8 @@ TEST(MovementValidatorTest, PawnGoodMovement) {
 
 TEST(MovementValidatorTest, PawnBadMovement) {
     Position position;
-    position.loadFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    position.loadFEN(
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
     MovementValidator validator(&position);
 
@@ -213,7 +215,8 @@ TEST(MovementValidatorTest, QueenBadMovement) {
 
 TEST(MovementValidatorTest, KnightGoodMovement) {
     Position position;
-    position.loadFEN("rnbqkbnr/pppppppp/8/8/4N3/8/PPP1P1PP/RNBQKB1R w KQkq - 0 1");
+    position.loadFEN(
+        "rnbqkbnr/pppppppp/8/8/4N3/8/PPP1P1PP/RNBQKB1R w KQkq - 0 1");
 
     MovementValidator validator(&position);
 
@@ -281,17 +284,20 @@ TEST(MovementValidatorTest, CastlingBadMove) {
     Move shortCastleThroughCheck{7, 4, 7, 6};
     EXPECT_FALSE(validator.isValidMove(shortCastleThroughCheck));
 
-    position.loadFEN("r3kbnr/pppp1ppp/8/6B1/8/8/PPPPPPPP/RNBQK1NR b KQkq - 0 1");
+    position.loadFEN(
+        "r3kbnr/pppp1ppp/8/6B1/8/8/PPPPPPPP/RNBQK1NR b KQkq - 0 1");
 
     Move longCastleThroughCheck{0, 4, 0, 2};
     EXPECT_FALSE(validator.isValidMove(longCastleThroughCheck));
 
-    position.loadFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1");
+    position.loadFEN(
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1");
 
     Move shortCastleThroughPieces{0, 4, 0, 6};
     EXPECT_FALSE(validator.isValidMove(shortCastleThroughPieces));
 
-    position.loadFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    position.loadFEN(
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
     Move longCastleThroughPieces{7, 4, 7, 2};
     EXPECT_FALSE(validator.isValidMove(longCastleThroughPieces));
