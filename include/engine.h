@@ -22,8 +22,7 @@ class ChessEngine {
     Move bestMove;
     Algorithm algorithm = MINIMAX;
     const int INF = std::numeric_limits<int>::max();
-    const int WHITE_WIN_SCORE = std::numeric_limits<int>::max();
-    const int BLACK_WIN_SCORE = std::numeric_limits<int>::min();
+    const int MATE_SCORE = INF;
 
     friend class ChessEngineTest_EvaluatePosition_Test;
 };

@@ -54,10 +54,16 @@ ColoredPiece charToColoredPiece(char c) {
     }
 }
 
-void printMove(const Move move) {
+std::string getMoveString(Move move) {
     char fromCol = 'a' + move.from.col;
     char fromRow = '1' + (7 - move.from.row);
     char toCol = 'a' + move.to.col;
     char toRow = '1' + (7 - move.to.row);
-    std::cout << fromCol << fromRow << toCol << toRow;
+    std::string moveStr;
+    moveStr += fromCol;
+    moveStr += fromRow;
+    moveStr += toCol;
+    moveStr += toRow;
+
+    return moveStr;
 }

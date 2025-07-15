@@ -1,6 +1,5 @@
 #pragma once
-
-// TODO: add printMove function for test util
+#include <string>
 
 enum Piece {
     EMPTY = 0,
@@ -66,4 +65,4 @@ struct Move {
     bool operator!=(const Move &other) const { return !(*this == other); }
 };
 
-void printMove(const Move move);
+std::string getMoveString(Move move);

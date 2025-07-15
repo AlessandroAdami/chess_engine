@@ -1,4 +1,6 @@
 #include "engine.h"
+#include "types.h"
+#include <iostream>
 
 ChessEngine::ChessEngine(Position *position) { this->position = position; }
 
@@ -13,6 +15,7 @@ Move ChessEngine::getBestMove() {
  * Minimax with alpha-beta pruning.
  */
 Move ChessEngine::minimax() const {
+    std::cout << "------------------------\n";
     int depth = searchMoveDepth;
     Color color = position->getIsWhitesTurn() ? WHITE : BLACK;
     std::vector<Move> legalMoves =
@@ -33,6 +36,8 @@ Move ChessEngine::minimax() const {
         int score = -negaMaxAlphaBeta(depth - 1, -beta, -alpha);
         position->unmovePiece(context);
         position->changeTurn();
+
+        std::cout << getMoveString(move) << " → score: " << score << std::endl;
 
         if (score > bestValue) {
             bestValue = score;
@@ -90,7 +95,7 @@ int ChessEngine::evaluatePosition() const { return evaluatePosition(position); }
 int ChessEngine::evaluatePosition(Position *position) const {
     int score = 0;
     if (position->isCheckmate()) {
-        score = position->getIsWhitesTurn() ? BLACK_WIN_SCORE : WHITE_WIN_SCORE;
+        score = position->getIsWhitesTurn() ? -MATE_SCORE : MATE_SCORE;
         return score;
     } else if (position->isStalemate()) {
         return 0;
