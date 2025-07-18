@@ -215,7 +215,7 @@ TEST(MoveMakerTest, UndoMove) {
     EXPECT_EQ(position.getFEN(),
               "rnbqkbnr/ppp1p1pp/3P4/5p2/8/8/PPPP1PPP/RNBQKBNR b KQkq - 0 3");
 
-    moveMaker.undoMove();
+    moveMaker.unmakeMove();
 
     EXPECT_EQ(position.getFEN(),
               "rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3");
@@ -225,7 +225,7 @@ TEST(MoveMakerTest, UndoMove) {
     EXPECT_EQ(position.getFEN(),
               "rnbqkbnr/ppp1p1pp/B7/3pPp2/8/8/PPPP1PPP/RNBQK1NR b KQkq - 1 3");
 
-    moveMaker.undoMove();
+    moveMaker.unmakeMove();
     EXPECT_EQ(position.getFEN(),
               "rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3");
 
@@ -235,7 +235,7 @@ TEST(MoveMakerTest, UndoMove) {
     EXPECT_EQ(position.getFEN(),
               "r1bqkbnr/ppp1p1pp/n7/3pPp2/8/8/PPPP1PPP/RNBQK1NR w KQkq - 0 4");
 
-    moveMaker.undoMove();
+    moveMaker.unmakeMove();
     EXPECT_EQ(position.getFEN(),
               "rnbqkbnr/ppp1p1pp/B7/3pPp2/8/8/PPPP1PPP/RNBQK1NR b KQkq - 1 3");
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <vector>
 
 enum Piece {
     EMPTY = 0,
@@ -66,3 +67,4 @@ struct Move {
 };
 
 std::string getMoveString(Move move);
+bool vectorContainsMove(std::vector<Move> moves, Move move);

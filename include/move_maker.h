@@ -37,8 +37,8 @@ class MoveMaker {
     MoveContext movePiece(const Move &move);
     void unmovePiece(const MoveContext &context);
     MoveContext getMoveContext(const Move &move) const;
-    void undoMove();
-    void redoMove();
+    void unmakeMove();
+    void remakeMove();
     void clearMoveHistory() {
         moveHistory.clear();
         moveCursor = 0;

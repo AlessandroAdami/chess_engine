@@ -5,99 +5,76 @@
 ChessEngine::ChessEngine(Position *position) { this->position = position; }
 
 Move ChessEngine::getBestMove() {
+    Move bestMove;
     switch (algorithm) {
     default:
-        return minimax();
-    }
-}
-
-/**
- * Minimax with alpha-beta pruning.
- */
-Move ChessEngine::minimax() const {
-    std::cout << "------------------------\n";
-    int depth = searchMoveDepth;
-    Color color = position->getIsWhitesTurn() ? WHITE : BLACK;
-    std::vector<Move> legalMoves =
-        position->movementValidator.getLegalMoves(color);
-
-    if (legalMoves.empty()) {
-        return Move{0, 0, 0, 0};
-    }
-
-    Move bestMove = legalMoves.front();
-    int bestValue = -INF;
-    int alpha = -INF;
-    int beta = INF;
-
-    for (const Move &move : legalMoves) {
-        MoveContext context = position->movePiece(move);
-        position->changeTurn();
-        int score = -negaMaxAlphaBeta(depth - 1, -beta, -alpha);
-        position->unmovePiece(context);
-        position->changeTurn();
-
-        std::cout << getMoveString(move) << " → score: " << score << std::endl;
-
-        if (score > bestValue) {
-            bestValue = score;
-            bestMove = move;
-        }
-
-        if (score > alpha) {
-            alpha = score;
-        }
+        bestMove = minimax();
     }
 
     return bestMove;
 }
 
 /**
- * NegaMax with alpha-beta pruning (single-threaded).
+ * Minimax with alpha-beta pruning.
  */
-int ChessEngine::negaMaxAlphaBeta(int depth, int alpha, int beta) const {
-    if (depth == 0 || position->getIsGameOver()) {
-        Color color = position->getTurn();
-        return evaluatePositionForColor(position, color);
-    }
-
-    int maxScore = -INF;
-    Color color = position->getIsWhitesTurn() ? WHITE : BLACK;
-    std::vector<Move> legalMoves =
-        position->movementValidator.getLegalMoves(color);
-
-    for (const Move &move : legalMoves) {
-        MoveContext context = position->movePiece(move);
-        position->changeTurn();
-        int score = -negaMaxAlphaBeta(depth - 1, -beta, -alpha);
-        position->unmovePiece(context);
-        position->changeTurn();
-
-        if (score > maxScore) {
-            maxScore = score;
-            if (score > alpha)
-                alpha = score;
-        }
-
-        if (alpha >= beta) {
-            return maxScore;
-        }
-    }
-
-    return maxScore;
+Move ChessEngine::minimax() {
+    Move bestMove = Move{0, 0, 0, 0};
+    int depth = MAX_DEPTH;
+    Color color = position->getTurn();
+    std::pair<int, Move> result = minimax(position, depth, true, color);
+    bestMove = result.second;
+    return bestMove;
 }
 
-int ChessEngine::evaluatePosition() const { return evaluatePosition(position); }
+std::pair<int,Move> ChessEngine::minimax(Position *position, int depth, bool isMaximizing,
+                         Color color) {
+    Move bestMove = Move{0,0,0,0};
+    if (depth == 0 || position->getIsGameOver()) {
+        int eval = evaluateLeaf(position, color, depth);
+        return std::make_pair(eval,bestMove);
+    }
+
+    Color movingColor = position->getTurn();
+    std::vector<Move> moves = position->movementValidator.getLegalMoves(movingColor);
+
+    if (isMaximizing) {
+        int maxEval = -INF;
+        for (const Move &move : moves) {
+            position->makeMove(move);
+            std::pair<int,Move> result = minimax(position, depth - 1, false, color);
+            int eval = result.first;
+            position->unmakeMove();
+            if (eval > maxEval) {
+                maxEval = eval;
+                bestMove = move;
+            }
+        }
+        return std::make_pair(maxEval,bestMove);
+    } else {
+        int minEval = INF;
+        for (const Move &move : moves) {
+            position->makeMove(move);
+            std::pair<int,Move> result = minimax(position, depth - 1, true, color);
+            int eval = result.first;
+            position->unmakeMove();
+            if (eval < minEval) {
+                minEval = eval;
+                bestMove = move;
+            }
+        }
+        return std::make_pair(minEval,bestMove);
+    }
+}
 
 /**
  * Simple material-based evaluation (positive for white, negative for black).
  */
-int ChessEngine::evaluatePosition(Position *position) const {
+int ChessEngine::evaluate(Position *position) const {
     int score = 0;
-    if (position->isCheckmate()) {
+    if (position->isCheckmated()) {
         score = position->getIsWhitesTurn() ? -MATE_SCORE : MATE_SCORE;
         return score;
-    } else if (position->isStalemate()) {
+    } else if (position->isStalemated()) {
         return 0;
     }
 
@@ -114,9 +91,18 @@ int ChessEngine::evaluatePosition(Position *position) const {
 /**
  * Evaluation relative to a specific color.
  */
-int ChessEngine::evaluatePositionForColor(Position *position,
-                                          Color color) const {
-    int score = evaluatePosition(position);
+int ChessEngine::evaluateLeaf(Position *position, Color color,
+                              int plyFromRoot) const {
+    if (position->isCheckmated()) {
+        int mateScore = MATE_SCORE - plyFromRoot;
+        return (position->getTurn() == color) ? -mateScore : mateScore;
+    }
+
+    if (position->isStalemated()) {
+        return 0;
+    }
+
+    int score = evaluate(position);
     return (color == WHITE) ? score : -score;
 }
 

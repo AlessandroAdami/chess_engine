@@ -157,7 +157,7 @@ MoveContext Position::makeMove(const Move &move) {
     }
     MoveContext context = this->moveMaker.makeMove(move);
 
-    if (isCheckmate() || isStalemate()) {
+    if (isCheckmated() || isStalemated()) {
         isGameOver = true;
     }
 
@@ -167,13 +167,13 @@ MoveContext Position::makeMove(const Move &move) {
 /**
  * Undoes the most recent move and updates the game state accordingly.
  */
-void Position::undoMove() { this->moveMaker.undoMove(); }
+void Position::unmakeMove() { this->moveMaker.unmakeMove(); }
 
 /**
  * Redoes the most recent undone move and updates the game state accordingly.
  * If there are no moves to redo, this function does nothing.
  */
-void Position::redoMove() { this->moveMaker.redoMove(); }
+void Position::remakeMove() { this->moveMaker.remakeMove(); }
 
 /**
  * Moves a piece without having an effect on the game state
@@ -256,18 +256,17 @@ bool Position::isCastling(const Move &move) const {
     return std::abs(fromSquare.col - toSquare.col) == 2;
 }
 
-bool Position::isCheckmate() const {
+bool Position::isCheckmated() const {
     return this->scanner.isInCheckmate(isWhitesTurn ? WHITE : BLACK);
 }
-bool Position::isStalemate() const {
+bool Position::isStalemated() const {
     return this->scanner.isInStalemate(isWhitesTurn ? WHITE : BLACK);
 }
 
 bool Position::getIsGameOver() const {
-    return this->scanner.isInCheckmate(WHITE) ||
-           this->scanner.isInCheckmate(BLACK) ||
-           this->scanner.isInStalemate(WHITE) ||
-           this->scanner.isInStalemate(BLACK);
+    Color color = getTurn();
+
+    return this->scanner.isInCheckmate(color) || this->scanner.isInStalemate(color);
 }
 
 void Position::changeTurn() { this->isWhitesTurn = !this->isWhitesTurn; }

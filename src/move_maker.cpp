@@ -174,7 +174,7 @@ ColoredPiece MoveMaker::moveRook(const Move &move) {
     return position->getPiece(move.to);
 }
 
-void MoveMaker::undoMove() {
+void MoveMaker::unmakeMove() {
     if (moveCursor == 0)
         return;
     moveCursor--;
@@ -222,7 +222,7 @@ void MoveMaker::unmovePiece(const MoveContext &context) {
     position->fullmoveNumber = context.previousFullmoveNumber;
 }
 
-void MoveMaker::redoMove() {
+void MoveMaker::remakeMove() {
     if (moveCursor >= (int)moveHistory.size())
         return;
 

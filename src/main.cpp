@@ -22,9 +22,9 @@ int main() {
 
         try {
             if (moveStr.length() == 1 && moveStr[0] == 'u') {
-                board.undoMove();
+                board.unmakeMove();
             } else if (moveStr.length() == 1 && moveStr[0] == 'r') {
-                board.redoMove();
+                board.remakeMove();
             } else {
                 board.makeMoveFromString(moveStr);
             }

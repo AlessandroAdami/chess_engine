@@ -239,17 +239,19 @@ std::vector<Move> MovementValidator::getLegalMoves(Color color) {
                     Move move{row, col, targetRow, targetCol};
                     if (piece.piece == PAWN) {
                         // Handle pawn promotion
-                        for (const Piece &promotionPiece :
-                             {QUEEN, ROOK, BISHOP, KNIGHT}) {
-                            if (targetRow == (color == WHITE ? 0 : 7)) {
+                        if (targetRow == (color == WHITE ? 0 : 7)) {
+                            for (const Piece &promotionPiece :
+                                 {QUEEN, ROOK, BISHOP, KNIGHT}) {
                                 move.promotionPiece =
                                     ColoredPiece(color, promotionPiece);
-                            } else {
-                                move.promotionPiece = NO_Piece;
+                                if (position->movementValidator.isValidMove(
+                                        move)) {
+                                    legalMoves.push_back(move);
+                                }
                             }
-                            if (position->movementValidator.isValidMove(move)) {
-                                legalMoves.push_back(move);
-                            }
+                        } else if (position->movementValidator.isValidMove(
+                                       move)) {
+                            legalMoves.push_back(move);
                         }
                     } else if (position->movementValidator.isValidMove(move)) {
                         legalMoves.push_back(move);

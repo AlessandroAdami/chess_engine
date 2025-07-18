@@ -22,8 +22,8 @@ class Position {
     }
     MoveContext movePiece(const Move &move);
     void unmovePiece(const MoveContext &context);
-    void undoMove();
-    void redoMove();
+    void unmakeMove();
+    void remakeMove();
     MoveContext getMoveContext(const Move &move);
 
     ColoredPiece getPiece(Square square) const;
@@ -38,8 +38,8 @@ class Position {
     ColoredPiece getCapturedPiece(const Move &move) const;
     bool isEnPassant(const Move &move) const;
     bool isCastling(const Move &move) const;
-    bool isCheckmate() const;
-    bool isStalemate() const;
+    bool isCheckmated() const;
+    bool isStalemated() const;
     bool getIsGameOver() const;
     void changeTurn();
 

@@ -339,3 +339,31 @@ TEST(MovementValidatorTest, IntoCheckBadMove) {
     EXPECT_FALSE(validator.isValidMove(bishopCheckIntoCheck));
     EXPECT_EQ(position.getFEN(), fen);
 }
+
+TEST(MovementValidatorTest, GetLegalMoves) {
+    Position position;
+    std::string fen =
+        "rnbqkbnr/pppp1Bpp/8/4p3/4P3/8/PPPP1PPP/RNBQK1NR b KQkq - 1 1";
+    position.loadFEN(fen);
+
+    MovementValidator validator(&position);
+
+    std::vector<Move> legalMoves = validator.getLegalMoves(BLACK);
+
+    EXPECT_FALSE(vectorContainsMove(legalMoves, Move{0, 0, 0, 0}));
+    EXPECT_FALSE(vectorContainsMove(legalMoves, Move{1, 3, 3, 3}));
+    EXPECT_FALSE(vectorContainsMove(legalMoves, Move{0, 1, 2, 2}));
+
+    EXPECT_TRUE(vectorContainsMove(legalMoves, Move{0, 4, 1, 5}));
+    EXPECT_TRUE(vectorContainsMove(legalMoves, Move{0, 4, 1, 4}));
+
+    fen = "r1bqk2r/pp1pppbp/2n2np1/8/3NP3/2N5/PPP1BPPP/R1BQK2R w KQkq - 3 7";
+    position.loadFEN(fen);
+
+    legalMoves = validator.getLegalMoves(WHITE);
+
+    EXPECT_TRUE(vectorContainsMove(legalMoves, Move{7, 4, 7, 6}));
+    EXPECT_TRUE(vectorContainsMove(legalMoves, Move{4, 3, 2, 2}));
+    EXPECT_TRUE(vectorContainsMove(legalMoves, Move{4, 4, 3, 4}));
+    EXPECT_TRUE(vectorContainsMove(legalMoves, Move{7, 3, 6, 3}));
+}

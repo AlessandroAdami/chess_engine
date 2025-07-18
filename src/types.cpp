@@ -1,5 +1,6 @@
 #include "types.h"
 #include <iostream>
+#include <vector>
 
 Color getColor(const ColoredPiece &cp) { return cp.color; }
 
@@ -66,4 +67,13 @@ std::string getMoveString(Move move) {
     moveStr += toRow;
 
     return moveStr;
+}
+
+bool vectorContainsMove(std::vector<Move> moves, Move move) {
+    for (Move m : moves) {
+        if (m == move) {
+            return true;
+        }
+    }
+    return false;
 }

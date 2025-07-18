@@ -1,9 +1,8 @@
 #pragma once
 
 #include "position.h"
-#include <limits>
 
-enum Algorithm { MINIMAX, ALPHA_BETA, A_STAR };
+enum Algorithm { MINIMAX, A_STAR };
 
 class ChessEngine {
   public:
@@ -12,17 +11,15 @@ class ChessEngine {
 
   private:
     Position *position;
-    int evaluatePosition() const;
-    int evaluatePosition(Position *position) const;
-    int evaluatePositionForColor(Position *position, Color color) const;
+    int evaluate(Position *position) const;
+    int evaluateLeaf(Position *position, Color color, int plyFromRoot) const;
     int getPieceValue(const ColoredPiece &cp) const;
-    Move minimax() const;
-    int negaMaxAlphaBeta(int depth, int alpha, int beta) const;
-    int searchMoveDepth = 10;
-    Move bestMove;
+    Move minimax();
+    std::pair<int,Move> minimax(Position *position, int depth, bool isMaximizing, Color color);
     Algorithm algorithm = MINIMAX;
-    const int INF = std::numeric_limits<int>::max();
-    const int MATE_SCORE = INF;
+    const int INF = 1000000;
+    const int MATE_SCORE = 100000;
+    const int MAX_DEPTH = 4;
 
     friend class ChessEngineTest_EvaluatePosition_Test;
 };
