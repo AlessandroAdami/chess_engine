@@ -84,7 +84,7 @@ TEST(ChessEngineTest, GetBestMoveCheckMateInOne) {
 
     EXPECT_EQ(actualBestMove, expectedBestMove);
 
-    position.loadFEN("8/r7/1k5p/2p4P/1p6/1K1P4/PR2QB2/2q5 b - - 3 3");
+    position.loadFEN("8/r7/1k5p/2p4P/1p6/1K1Pn3/PR2QB2/8 b - - 3 3");
 
     actualBestMove = engine.getBestMove();
 
@@ -130,8 +130,6 @@ TEST(ChessEngineTest, GetBestMoveCheckMateInThree) {
     position.loadFEN("8/Q5pk/8/7p/3B3P/6P1/4rnBK/3r4 b - - 0 1");
 
     Move actualBestMove = engine.getBestMove();
-
-    std::cout << getMoveString(actualBestMove);
 
     Move expectedBestMove = Move{6, 5, 4, 6};
 

@@ -266,7 +266,8 @@ bool Position::isStalemated() const {
 bool Position::getIsGameOver() const {
     Color color = getTurn();
 
-    return this->scanner.isInCheckmate(color) || this->scanner.isInStalemate(color);
+    return this->scanner.isInCheckmate(color) ||
+           this->scanner.isInStalemate(color);
 }
 
 void Position::changeTurn() { this->isWhitesTurn = !this->isWhitesTurn; }

@@ -15,11 +15,16 @@ class ChessEngine {
     int evaluateLeaf(Position *position, Color color, int plyFromRoot) const;
     int getPieceValue(const ColoredPiece &cp) const;
     Move minimax();
-    std::pair<int,Move> minimax(Position *position, int depth, bool isMaximizing, Color color);
+    int negamax(Position *position, int depth, int alpha, int beta,
+                Color color);
+    Color oppositeColor(Color color) {
+        return (color == WHITE) ? BLACK : WHITE;
+    }
+    int scoreMove(const Move &move, const Position *pos) const;
     Algorithm algorithm = MINIMAX;
     const int INF = 1000000;
     const int MATE_SCORE = 100000;
-    const int MAX_DEPTH = 4;
+    const int MAX_DEPTH = 6;
 
     friend class ChessEngineTest_EvaluatePosition_Test;
 };
