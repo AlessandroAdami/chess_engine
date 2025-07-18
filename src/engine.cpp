@@ -1,5 +1,6 @@
 #include "engine.h"
 #include "types.h"
+#include <algorithm>
 #include <iostream>
 
 ChessEngine::ChessEngine(Position *position) { this->position = position; }
@@ -18,52 +19,66 @@ Move ChessEngine::getBestMove() {
  * Minimax with alpha-beta pruning.
  */
 Move ChessEngine::minimax() {
-    Move bestMove = Move{0, 0, 0, 0};
     int depth = MAX_DEPTH;
     Color color = position->getTurn();
-    std::pair<int, Move> result = minimax(position, depth, true, color);
-    bestMove = result.second;
+    int alpha = -INF;
+    int beta = INF;
+
+    Move bestMove = Move{0, 0, 0, 0};
+    int bestScore = -INF;
+
+    std::vector<Move> moves = position->movementValidator.getLegalMoves(color);
+
+    std::sort(moves.begin(), moves.end(), [this](const Move &a, const Move &b) {
+        return scoreMove(a, position) > scoreMove(b, position);
+    });
+
+    for (const Move &move : moves) {
+        position->makeMove(move);
+        int score =
+            -negamax(position, depth - 1, -beta, -alpha, oppositeColor(color));
+        position->unmakeMove();
+
+        if (score > bestScore) {
+            bestScore = score;
+            bestMove = move;
+        }
+        alpha = std::max(alpha, score);
+    }
+
     return bestMove;
 }
 
-std::pair<int,Move> ChessEngine::minimax(Position *position, int depth, bool isMaximizing,
+int ChessEngine::negamax(Position *position, int depth, int alpha, int beta,
                          Color color) {
-    Move bestMove = Move{0,0,0,0};
     if (depth == 0 || position->getIsGameOver()) {
-        int eval = evaluateLeaf(position, color, depth);
-        return std::make_pair(eval,bestMove);
+        return evaluateLeaf(position, color, MAX_DEPTH - depth);
     }
 
-    Color movingColor = position->getTurn();
-    std::vector<Move> moves = position->movementValidator.getLegalMoves(movingColor);
+    int maxEval = -INF;
+    std::vector<Move> moves =
+        position->movementValidator.getLegalMoves(position->getTurn());
 
-    if (isMaximizing) {
-        int maxEval = -INF;
-        for (const Move &move : moves) {
-            position->makeMove(move);
-            std::pair<int,Move> result = minimax(position, depth - 1, false, color);
-            int eval = result.first;
-            position->unmakeMove();
-            if (eval > maxEval) {
-                maxEval = eval;
-                bestMove = move;
-            }
+    std::sort(moves.begin(), moves.end(),
+              [this, position](const Move &a, const Move &b) {
+                  return scoreMove(a, position) > scoreMove(b, position);
+              });
+
+    for (const Move &move : moves) {
+        position->makeMove(move);
+        int eval =
+            -negamax(position, depth - 1, -beta, -alpha, oppositeColor(color));
+        position->unmakeMove();
+
+        maxEval = std::max(maxEval, eval);
+        alpha = std::max(alpha, eval);
+
+        if (alpha >= beta) {
+            break;
         }
-        return std::make_pair(maxEval,bestMove);
-    } else {
-        int minEval = INF;
-        for (const Move &move : moves) {
-            position->makeMove(move);
-            std::pair<int,Move> result = minimax(position, depth - 1, true, color);
-            int eval = result.first;
-            position->unmakeMove();
-            if (eval < minEval) {
-                minEval = eval;
-                bestMove = move;
-            }
-        }
-        return std::make_pair(minEval,bestMove);
     }
+
+    return maxEval;
 }
 
 /**
@@ -137,4 +152,22 @@ int ChessEngine::getPieceValue(const ColoredPiece &cp) const {
     }
 
     return value * colorMultiplier;
+}
+
+int ChessEngine::scoreMove(const Move &move, const Position *pos) const {
+    ColoredPiece attacker = pos->getPiece(Square{move.from.row, move.from.col});
+    ColoredPiece victim = pos->getPiece(Square{move.to.row, move.to.col});
+
+    int attackerVal = getPieceValue(attacker);
+    int victimVal = getPieceValue(victim);
+
+    if (victim != NO_Piece) {
+        return 10000 + (victimVal - attackerVal);
+    }
+
+    if (move.promotionPiece != NO_Piece) {
+        return 9000 + getPieceValue(move.promotionPiece);
+    }
+
+    return 0;
 }
