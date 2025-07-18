@@ -4,9 +4,9 @@
 
 enum Algorithm { MINIMAX, A_STAR };
 
-class ChessEngine {
+class Engine {
   public:
-    ChessEngine(Position *position);
+    Engine(Position *position);
     Move getBestMove();
 
   private:
@@ -17,6 +17,11 @@ class ChessEngine {
     Move minimax();
     int negamax(Position *position, int depth, int alpha, int beta,
                 Color color);
+    int quiescence(Position *position, int alpha, int beta, Color color,
+                   int plyFromRoot);
+    int staticExchangeEval(Position *pos, Square sq, Color sideToMove);
+    std::vector<std::pair<Square, ColoredPiece>>
+    getSortedAttackers(Position *pos, Square target) const;
     Color oppositeColor(Color color) {
         return (color == WHITE) ? BLACK : WHITE;
     }
@@ -24,7 +29,7 @@ class ChessEngine {
     Algorithm algorithm = MINIMAX;
     const int INF = 1000000;
     const int MATE_SCORE = 100000;
-    const int MAX_DEPTH = 6;
+    const int MAX_DEPTH = 4;
 
     friend class ChessEngineTest_EvaluatePosition_Test;
 };

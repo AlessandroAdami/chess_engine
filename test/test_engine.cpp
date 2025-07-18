@@ -5,7 +5,7 @@
 
 TEST(ChessEngineTest, EvaluatePosition) {
     Position position;
-    ChessEngine engine(&position);
+    Engine engine(&position);
 
     position.loadFEN(
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
@@ -65,7 +65,7 @@ TEST(ChessEngineTest, EvaluatePosition) {
 
 TEST(ChessEngineTest, GetBestMoveCheckMateInOne) {
     Position position;
-    ChessEngine engine(&position);
+    Engine engine(&position);
 
     position.loadFEN("3k4/1p1pppn1/2BpQp2/1p1ppp2/8/8/8/2K5 w - - 0 1");
 
@@ -95,7 +95,7 @@ TEST(ChessEngineTest, GetBestMoveCheckMateInOne) {
 
 TEST(ChessEngineTest, GetBestMoveCheckMateInTwo) {
     Position position;
-    ChessEngine engine(&position);
+    Engine engine(&position);
 
     position.loadFEN(
         "r2qkb1r/pp2nppp/3p4/2pNN1B1/2BnP3/3P4/PPP2PPP/R2bK2R w KQkq - 1 1");
@@ -125,7 +125,7 @@ TEST(ChessEngineTest, GetBestMoveCheckMateInTwo) {
 
 TEST(ChessEngineTest, GetBestMoveCheckMateInThree) {
     Position position;
-    ChessEngine engine(&position);
+    Engine engine(&position);
 
     position.loadFEN("8/Q5pk/8/7p/3B3P/6P1/4rnBK/3r4 b - - 0 1");
 
@@ -164,7 +164,7 @@ TEST(ChessEngineTest, GetBestMoveCheckMateInThree) {
 
 TEST(ChessEngineTest, GetBestMoveSimple) {
     Position position;
-    ChessEngine engine(&position);
+    Engine engine(&position);
 
     position.loadFEN(
         "rnb1kbnr/pppppppp/8/8/2q1P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1");

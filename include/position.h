@@ -10,6 +10,7 @@
 class Position {
   public:
     Position();
+    Position(const Position &p);
     CheckScanner scanner;
     MovementValidator movementValidator;
     void loadFEN(const std::string &fen);

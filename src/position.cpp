@@ -17,6 +17,17 @@ Position::Position()
     loadFEN(startFEN);
     this->isGameOver = false;
 }
+
+Position::Position(const Position &p)
+    : scanner(this), movementValidator(this), moveMaker(this),
+      moveParser(this) {
+
+    std::string fen = p.getFEN();
+    this->loadFEN(fen);
+
+    isGameOver = p.isGameOver;
+}
+
 /**
  * Loads the board state from a FEN string.
  * The FEN string should be in the format:
