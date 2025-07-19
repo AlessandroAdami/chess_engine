@@ -24,7 +24,7 @@ Move Engine::minimax() {
     int alpha = -INF;
     int beta = INF;
 
-    Move bestMove = Move{0, 0, 0, 0};
+    Move bestMove = Move(Square(0,0),Square(0,0));
     int bestScore = -INF;
 
     std::vector<Move> moves = position->movementValidator.getLegalMoves(color);
@@ -96,7 +96,7 @@ int Engine::evaluate(Position *position) const {
 
     for (int row = 0; row < 8; ++row) {
         for (int col = 0; col < 8; ++col) {
-            ColoredPiece cp = position->getPiece(Square{row, col});
+            ColoredPiece cp = position->getPiece(Square(row, col));
             score += getPieceValue(cp);
         }
     }
@@ -156,17 +156,17 @@ int Engine::getPieceValue(const ColoredPiece &cp) const {
 }
 
 int Engine::scoreMove(const Move &move, const Position *pos) const {
-    ColoredPiece attacker = pos->getPiece(Square{move.from.row, move.from.col});
-    ColoredPiece victim = pos->getPiece(Square{move.to.row, move.to.col});
+    ColoredPiece attacker = pos->getPiece(Square(move.from.row, move.from.col));
+    ColoredPiece victim = pos->getPiece(Square(move.to.row, move.to.col));
 
     int attackerVal = std::abs(getPieceValue(attacker));
     int victimVal = std::abs(getPieceValue(victim));
 
-    if (victim != NO_Piece) {
+    if (victim != NO_PIECE) {
         return 10000 + (victimVal - attackerVal);
     }
 
-    if (move.promotionPiece != NO_Piece) {
+    if (move.promotionPiece != NO_PIECE) {
         return 9000 + std::abs(getPieceValue(move.promotionPiece));
     }
 
@@ -187,10 +187,10 @@ int Engine::quiescence(Position *position, int alpha, int beta, Color color,
     std::vector<Move> noisyMoves;
     for (const Move &move : moves) {
         ColoredPiece target =
-            position->getPiece(Square{move.to.row, move.to.col});
-        bool isCapture = target != NO_Piece;
+            position->getPiece(Square(move.to.row, move.to.col));
+        bool isCapture = target != NO_PIECE;
         bool isGoodCapture = staticExchangeEval(position, move.to, color) >= 0;
-        if ((isCapture && isGoodCapture) || move.promotionPiece != NO_Piece) {
+        if ((isCapture && isGoodCapture) || move.promotionPiece != NO_PIECE) {
             noisyMoves.push_back(move);
         }
     }
@@ -255,7 +255,7 @@ Engine::getSortedAttackers(Position *pos, Square target) const {
         for (int col = 0; col < 8; ++col) {
             Square from{row, col};
             ColoredPiece cp = pos->getPiece(from);
-            if (cp == NO_Piece)
+            if (cp == NO_PIECE)
                 continue;
             Move move;
             move.from = from, move.to = target;

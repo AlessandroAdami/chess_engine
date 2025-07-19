@@ -57,14 +57,14 @@ TEST(CheckScannerTest, IsSquareInCheck) {
 
     CheckScanner scanner(&position);
 
-    EXPECT_TRUE(scanner.isSquareInCheck(Square{3, 4}, BLACK));
-    EXPECT_TRUE(scanner.isSquareInCheck(Square{3, 1}, BLACK));
-    EXPECT_TRUE(scanner.isSquareInCheck(Square{3, 6}, BLACK));
+    EXPECT_TRUE(scanner.isSquareInCheck(Square(3, 4), BLACK));
+    EXPECT_TRUE(scanner.isSquareInCheck(Square(3, 1), BLACK));
+    EXPECT_TRUE(scanner.isSquareInCheck(Square(3, 6), BLACK));
 
     position.loadFEN(
         "r1bqkb1r/pp1p1ppp/2n1pn2/2p5/2B1P3/5N2/PPPP1PPP/RNBQR1K1 b kq - 5 5");
 
-    EXPECT_TRUE(scanner.isSquareInCheck(Square{4, 4}, WHITE));
-    EXPECT_TRUE(scanner.isSquareInCheck(Square{4, 3}, WHITE));
-    EXPECT_TRUE(scanner.isSquareInCheck(Square{2, 3}, WHITE));
+    EXPECT_TRUE(scanner.isSquareInCheck(Square(4, 4), WHITE));
+    EXPECT_TRUE(scanner.isSquareInCheck(Square(4, 3), WHITE));
+    EXPECT_TRUE(scanner.isSquareInCheck(Square(2, 3), WHITE));
 }

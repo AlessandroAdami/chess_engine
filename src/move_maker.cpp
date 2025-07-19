@@ -52,7 +52,7 @@ void MoveMaker::increaseHalfmoveClock(const ColoredPiece movingCP,
                                       const ColoredPiece capturedCP) const {
     if (movingCP.piece == PAWN) {
         this->position->halfmoveClock = 0;
-    } else if (capturedCP != NO_Piece) {
+    } else if (capturedCP != NO_PIECE) {
         this->position->halfmoveClock = 0;
     } else {
         this->position->halfmoveClock++;
@@ -67,7 +67,7 @@ MoveContext MoveMaker::movePiece(const Move &move) {
     ColoredPiece capturedPiece;
 
     if (movingPiece.piece != PAWN) {
-        position->enPassantSquare = Square{-1, -1};
+        position->enPassantSquare = INVALID_SQUARE;
     }
 
     if (movingPiece.piece == PAWN) {
@@ -82,7 +82,7 @@ MoveContext MoveMaker::movePiece(const Move &move) {
     }
 
     position->setPiece(move.to, movingPiece);
-    position->setPiece(move.from, NO_Piece);
+    position->setPiece(move.from, NO_PIECE);
     return context;
 }
 
@@ -109,7 +109,7 @@ void MoveMaker::updateCastleAfterRookCapture(const Move &move) {
 }
 
 ColoredPiece MoveMaker::movePawn(const Move &move) {
-    if (move.promotionPiece != NO_Piece) {
+    if (move.promotionPiece != NO_PIECE) {
         return promotePawn(move);
     }
 
@@ -122,17 +122,17 @@ ColoredPiece MoveMaker::movePawn(const Move &move) {
 
     if (toSquare == this->position->enPassantSquare) {
         capturedPiece =
-            position->getPiece(Square{toSquare.row + colorIndex, toSquare.col});
-        position->setPiece(Square{toSquare.row + colorIndex, toSquare.col},
-                           NO_Piece);
+            position->getPiece(Square(toSquare.row + colorIndex, toSquare.col));
+        position->setPiece(Square(toSquare.row + colorIndex, toSquare.col),
+                           NO_PIECE);
     }
 
     if (std::abs(fromSquare.row - toSquare.row) == 2) {
         this->position->enPassantSquare =
-            Square{toSquare.row + colorIndex, toSquare.col};
-        capturedPiece = NO_Piece;
+            Square(toSquare.row + colorIndex, toSquare.col);
+        capturedPiece = NO_PIECE;
     } else {
-        this->position->enPassantSquare = Square{-1, -1};
+        this->position->enPassantSquare = INVALID_SQUARE;
     }
 
     colorIndex = (position->getPiece(fromSquare).color == WHITE) ? 0 : 7;
@@ -140,7 +140,7 @@ ColoredPiece MoveMaker::movePawn(const Move &move) {
         position->setPiece(toSquare, move.promotionPiece);
     }
 
-    position->setPiece(fromSquare, NO_Piece);
+    position->setPiece(fromSquare, NO_PIECE);
     position->setPiece(toSquare, movingPiece);
 
     return capturedPiece;
@@ -151,7 +151,7 @@ ColoredPiece MoveMaker::promotePawn(const Move &move) {
     ColoredPiece capturedPiece = position->getPiece(move.to);
     promotionPiece.color = position->getPiece(move.from).color;
     position->setPiece(move.to, promotionPiece);
-    position->setPiece(move.from, NO_Piece);
+    position->setPiece(move.from, NO_PIECE);
 
     return capturedPiece;
 }
@@ -165,13 +165,13 @@ ColoredPiece MoveMaker::moveKing(const Move &move) {
     if (std::abs(fromSquare.col - toSquare.col) == 2) {
         ColoredPiece rook;
         if (fromSquare.col < toSquare.col) {
-            rook = position->getPiece(Square{fromSquare.row, 7});
-            position->setPiece(Square{fromSquare.row, 7}, NO_Piece);
-            position->setPiece(Square{fromSquare.row, 5}, rook);
+            rook = position->getPiece(Square(fromSquare.row, 7));
+            position->setPiece(Square(fromSquare.row, 7), NO_PIECE);
+            position->setPiece(Square(fromSquare.row, 5), rook);
         } else {
-            rook = position->getPiece(Square{fromSquare.row, 0});
-            position->setPiece(Square{fromSquare.row, 0}, NO_Piece);
-            position->setPiece(Square{fromSquare.row, 3}, rook);
+            rook = position->getPiece(Square(fromSquare.row, 0));
+            position->setPiece(Square(fromSquare.row, 0), NO_PIECE);
+            position->setPiece(Square(fromSquare.row, 3), rook);
         }
     }
 
@@ -179,7 +179,7 @@ ColoredPiece MoveMaker::moveKing(const Move &move) {
     ColoredPiece capturedPiece = position->getPiece(toSquare);
     ColoredPiece movingPiece = position->getPiece(fromSquare);
     position->setPiece(toSquare, movingPiece);
-    position->setPiece(fromSquare, NO_Piece);
+    position->setPiece(fromSquare, NO_PIECE);
     position->castleState[king.color == WHITE ? 0 : 1] = NO_CASTLING;
     return capturedPiece;
 }
@@ -222,20 +222,20 @@ void MoveMaker::unmovePiece(const MoveContext &context) {
     if (context.wasEnPassantCapture) {
         bool previousIsWhitesTurn = context.previousTurn == WHITE;
         int colorIndex = previousIsWhitesTurn ? 1 : -1;
-        position->setPiece(Square{to.row + colorIndex, to.col},
+        position->setPiece(Square(to.row + colorIndex, to.col),
                            context.capturedPiece);
-        position->setPiece(to, NO_Piece);
+        position->setPiece(to, NO_PIECE);
     }
 
     if (context.wasCastling) {
         if (to.col == 6) {
-            ColoredPiece rook = position->getPiece(Square{to.row, 5});
-            position->setPiece(Square{to.row, 7}, rook);
-            position->setPiece(Square{to.row, 5}, NO_Piece);
+            ColoredPiece rook = position->getPiece(Square(to.row, 5));
+            position->setPiece(Square(to.row, 7), rook);
+            position->setPiece(Square(to.row, 5), NO_PIECE);
         } else if (to.col == 2) {
-            ColoredPiece rook = position->getPiece(Square{to.row, 3});
-            position->setPiece(Square{to.row, 0}, rook);
-            position->setPiece(Square{to.row, 3}, NO_Piece);
+            ColoredPiece rook = position->getPiece(Square(to.row, 3));
+            position->setPiece(Square(to.row, 0), rook);
+            position->setPiece(Square(to.row, 3), NO_PIECE);
         }
     }
 

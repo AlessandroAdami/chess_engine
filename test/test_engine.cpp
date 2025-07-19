@@ -71,7 +71,7 @@ TEST(ChessEngineTest, GetBestMoveCheckMateInOne) {
 
     Move actualBestMove = engine.getBestMove();
 
-    Move expectedBestMove = Move{2, 4, 1, 3};
+    Move expectedBestMove = Move(Square(2, 4), Square(1, 3));
 
     EXPECT_EQ(actualBestMove, expectedBestMove);
 
@@ -80,7 +80,7 @@ TEST(ChessEngineTest, GetBestMoveCheckMateInOne) {
 
     actualBestMove = engine.getBestMove();
 
-    expectedBestMove = Move{3, 7, 1, 5};
+    expectedBestMove = Move(Square(3, 7), Square(1, 5));
 
     EXPECT_EQ(actualBestMove, expectedBestMove);
 
@@ -88,7 +88,7 @@ TEST(ChessEngineTest, GetBestMoveCheckMateInOne) {
 
     actualBestMove = engine.getBestMove();
 
-    expectedBestMove = Move{1, 0, 5, 0};
+    expectedBestMove = Move(Square(1, 0), Square(5, 0));
 
     EXPECT_EQ(actualBestMove, expectedBestMove);
 }
@@ -102,7 +102,7 @@ TEST(ChessEngineTest, GetBestMoveCheckMateInTwo) {
 
     Move actualBestMove = engine.getBestMove();
 
-    Move expectedBestMove = Move{3, 3, 2, 5};
+    Move expectedBestMove = Move(Square(3, 3), Square(2, 5));
 
     EXPECT_EQ(actualBestMove, expectedBestMove);
 
@@ -110,7 +110,7 @@ TEST(ChessEngineTest, GetBestMoveCheckMateInTwo) {
 
     actualBestMove = engine.getBestMove();
 
-    expectedBestMove = Move{6, 6, 7, 6};
+    expectedBestMove = Move(Square(6, 6), Square(7, 6));
 
     EXPECT_EQ(actualBestMove, expectedBestMove);
 
@@ -118,7 +118,7 @@ TEST(ChessEngineTest, GetBestMoveCheckMateInTwo) {
 
     actualBestMove = engine.getBestMove();
 
-    expectedBestMove = Move{7, 2, 5, 2};
+    expectedBestMove = Move(Square(7, 2), Square(5, 2));
 
     EXPECT_EQ(actualBestMove, expectedBestMove);
 }
@@ -131,7 +131,7 @@ TEST(ChessEngineTest, GetBestMoveCheckMateInThree) {
 
     Move actualBestMove = engine.getBestMove();
 
-    Move expectedBestMove = Move{6, 5, 4, 6};
+    Move expectedBestMove = Move(Square(6, 5), Square(4, 6));
 
     EXPECT_EQ(actualBestMove, expectedBestMove);
 
@@ -140,7 +140,7 @@ TEST(ChessEngineTest, GetBestMoveCheckMateInThree) {
 
     actualBestMove = engine.getBestMove();
 
-    expectedBestMove = Move{5, 2, 0, 7};
+    expectedBestMove = Move(Square(5, 2), Square(0, 7));
 
     EXPECT_EQ(actualBestMove, expectedBestMove);
 
@@ -149,7 +149,7 @@ TEST(ChessEngineTest, GetBestMoveCheckMateInThree) {
 
     actualBestMove = engine.getBestMove();
 
-    expectedBestMove = Move{5, 5, 5, 6};
+    expectedBestMove = Move(Square(5, 5), Square(5, 6));
 
     EXPECT_EQ(actualBestMove, expectedBestMove);
 
@@ -157,7 +157,7 @@ TEST(ChessEngineTest, GetBestMoveCheckMateInThree) {
 
     actualBestMove = engine.getBestMove();
 
-    expectedBestMove = Move{3, 6, 2, 6};
+    expectedBestMove = Move(Square(3, 6), Square(2, 6));
 
     EXPECT_EQ(actualBestMove, expectedBestMove);
 }
@@ -171,7 +171,7 @@ TEST(ChessEngineTest, GetBestMoveSimple) {
 
     Move actualBestMove = engine.getBestMove();
 
-    Move expectedBestMove = Move{7, 5, 4, 2};
+    Move expectedBestMove = Move(Square(7, 5), Square(4, 2));
 
     EXPECT_EQ(actualBestMove, expectedBestMove);
 
@@ -179,7 +179,7 @@ TEST(ChessEngineTest, GetBestMoveSimple) {
 
     actualBestMove = engine.getBestMove();
 
-    expectedBestMove = Move{7, 4, 6, 3};
+    expectedBestMove = Move(Square(7, 4), Square(6, 3));
 
     EXPECT_EQ(actualBestMove, expectedBestMove);
 }

@@ -13,7 +13,7 @@ Position::Position()
       moveParser(this) {
     for (int row = 0; row < 8; ++row)
         for (int col = 0; col < 8; ++col)
-            board[row][col] = NO_Piece;
+            board[row][col] = NO_PIECE;
     loadFEN(startFEN);
     this->isGameOver = false;
 }
@@ -37,7 +37,7 @@ Position::Position(const Position &p)
 void Position::loadFEN(const std::string &fen) {
     for (int r = 0; r < 8; r++) {
         for (int c = 0; c < 8; c++) {
-            board[r][c] = NO_Piece;
+            board[r][c] = NO_PIECE;
         }
     }
     std::istringstream iss(fen);
@@ -82,11 +82,11 @@ void Position::loadFEN(const std::string &fen) {
     }
 
     if (enPassant == "-") {
-        enPassantSquare = Square{-1, -1};
+        enPassantSquare = INVALID_SQUARE;
     } else {
         char file = enPassant[0];
         char rank = enPassant[1];
-        enPassantSquare = Square{8 - (rank - '0'), file - 'a'};
+        enPassantSquare = Square(8 - (rank - '0'), file - 'a');
     }
 
     this->halfmoveClock = halfmoveClock;
@@ -99,7 +99,7 @@ std::string Position::getFEN() const {
     for (int row = 0; row < 8; ++row) {
         int emptyCount = 0;
         for (int col = 0; col < 8; ++col) {
-            if (board[row][col] == NO_Piece) {
+            if (board[row][col] == NO_PIECE) {
                 emptyCount++;
             } else {
                 if (emptyCount > 0) {
@@ -219,7 +219,7 @@ void Position::setPiece(Square square, ColoredPiece cp) {
  * @returns true if the given square is empty (i.e., contains no piece).
  */
 bool Position::isSquareEmpty(const Square &square) const {
-    return getPiece(square) == NO_Piece;
+    return getPiece(square) == NO_PIECE;
 }
 
 /**
@@ -249,7 +249,7 @@ ColoredPiece Position::getCapturedPiece(const Move &move) const {
         int colorIndex = (getPiece(move.from).color == WHITE) ? 1 : -1;
         Square toSquare = move.to;
         capturedPiece =
-            getPiece(Square{toSquare.row + colorIndex, toSquare.col});
+            getPiece(Square(toSquare.row + colorIndex, toSquare.col));
     }
     return capturedPiece;
 }
@@ -291,4 +291,79 @@ void Position::changeTurn() {
 
 void Position::setTurn(Color color) {
     this->turn = color;
+}
+
+void Position::initZobristHash() {
+    hash = 0;
+    for (int row = 0; row < 8; ++row) {
+        for (int col = 0; col < 8; ++col) {
+            ColoredPiece cp = board[row][col];
+            int index = pieceIndex(cp);
+            if (index != -1) {
+                int sq = row * 8 + col;
+                hash ^= zobrist.pieceKeys[index][sq];
+            }
+        }
+    }
+
+    if (turn == WHITE)
+        hash ^= zobrist.sideToMoveKey;
+
+    hash ^= zobrist.castlingRightsKey[getCastlingRightsAsIndex()];
+
+    if (enPassantSquare != INVALID_SQUARE)
+        hash ^= zobrist.enPassantFileKey[enPassantSquare.col];
+}
+
+void Position::updateHashMove(const Move &move) {
+    int fromSq = move.from.row * 8 + move.from.col;
+    int toSq = move.to.row * 8 + move.to.col;
+
+    ColoredPiece moving = board[move.from.row][move.from.col];
+    ColoredPiece captured = board[move.to.row][move.to.col];
+
+    int movingIdx = pieceIndex(moving);
+    int capturedIdx = pieceIndex(captured);
+
+    // Toggle moving piece from and to
+    hash ^= zobrist.pieceKeys[movingIdx][fromSq];
+    hash ^= zobrist.pieceKeys[movingIdx][toSq];
+
+    // Toggle captured piece off
+    if (capturedIdx != -1)
+        hash ^= zobrist.pieceKeys[capturedIdx][toSq];
+
+    // Promotions
+    if (move.promotionPiece != NO_PIECE) {
+        int promoIdx = pieceIndex(move.promotionPiece);
+        hash ^= zobrist.pieceKeys[movingIdx][toSq]; // remove pawn at dest
+        hash ^= zobrist.pieceKeys[promoIdx][toSq];  // add promoted piece
+    }
+
+    // Castling rights and en passant
+    // XOR out old castling rights
+    hash ^= zobrist.castlingRightsKey[getCastlingRightsAsIndex()];
+    // Update them...
+    //updateCastlingRights(move);
+    // XOR in new castling rights
+    hash ^= zobrist.castlingRightsKey[getCastlingRightsAsIndex()];
+
+    if (enPassantSquare != INVALID_SQUARE)
+        hash ^= zobrist.enPassantFileKey[enPassantSquare.col];
+    //updateEnPassantSquare(move);
+    if (enPassantSquare != INVALID_SQUARE)
+        hash ^= zobrist.enPassantFileKey[enPassantSquare.col];
+
+    // Toggle side to move
+    hash ^= zobrist.sideToMoveKey;
+}
+
+
+int Position::getCastlingRightsAsIndex() const {
+    int index = 0;
+    if (castleState[WHITE] & KING_SIDE)  index |= (1 << 0); // White kingside
+    if (castleState[WHITE] & QUEEN_SIDE) index |= (1 << 1); // White queenside
+    if (castleState[BLACK] & KING_SIDE)  index |= (1 << 2); // Black kingside
+    if (castleState[BLACK] & QUEEN_SIDE) index |= (1 << 3); // Black queenside
+    return index; // 0 to 15
 }

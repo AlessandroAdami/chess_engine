@@ -4,10 +4,12 @@
 #include "move_maker.h"
 #include "move_parser.h"
 #include "movement_validator.h"
+#include "zobrist.h"
 #include "types.h"
 #include <string>
 
 // todo add list of pieces squares for efficiency
+// TODO: refactor movement validator
 
 class Position {
   public:
@@ -56,6 +58,12 @@ class Position {
     int castleState[2] = {KING_SIDE | QUEEN_SIDE, KING_SIDE | QUEEN_SIDE};
     MoveMaker moveMaker;
     MoveParser moveParser;
+    Zobrist zobrist;
+    uint64_t hash;
+    void initZobristHash();
+    int getCastlingRightsAsIndex() const;
+    void updateHashMove(const Move &move);
+    void undoHashMove(const Move &move);
 
     friend class MoveMaker;
 };
