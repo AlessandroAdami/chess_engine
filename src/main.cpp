@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-//TODO: fix undo and redom move behavior with engine active
+//TODO: fix pawn promotion behaviour
 
 int main() {
     Position position;
@@ -14,10 +14,11 @@ int main() {
     Engine engine(&position);
     bool activeEngine = false;
     Color engineColor;
+    bool enginePlay = false;
 
     while (true) {
-        if (activeEngine && position.getTurn() == engineColor) {
-            std::cout << "Engine is thinking";
+        if (activeEngine && position.getTurn() == engineColor && enginePlay) {
+            std::cout << "Engine is thinking" << std::endl;
             Move move = engine.getBestMove();
             position.makeMove(move);
             position.printBoard();
@@ -37,14 +38,18 @@ int main() {
         try {
             if (moveStr.length() == 1 && moveStr[0] == 'u') {
                 position.unmakeMove();
+                enginePlay = false;
             } else if (moveStr.length() == 1 && moveStr[0] == 'r') {
                 position.remakeMove();
+                enginePlay = false;
             } else if (moveStr.length() == 1 && moveStr[0] == 'e') {
                 activeEngine = true;
                 engineColor = position.getTurn();
+                enginePlay = true;
                 continue;
             } else {
                 position.makeMoveFromString(moveStr);
+                enginePlay = true;
             }
             position.printBoard();
 
