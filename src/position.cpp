@@ -60,7 +60,7 @@ void Position::loadFEN(const std::string &fen) {
         }
     }
 
-    isWhitesTurn = (activeColor == "w");
+    turn = (activeColor == "w") ? WHITE : BLACK;
 
     castleState[0] = 0;
     castleState[1] = 0;
@@ -117,6 +117,8 @@ std::string Position::getFEN() const {
         }
     }
 
+    bool isWhitesTurn = (turn == WHITE);
+    
     oss << ' ' << (isWhitesTurn ? 'w' : 'b') << ' ';
     if (castleState[0] & KING_SIDE)
         oss << 'K';
@@ -232,7 +234,7 @@ MoveContext Position::getMoveContext(const Move &move) {
     context.previousCastleState[1] = this->castleState[1];
     context.previousHalfmoveClock = this->halfmoveClock;
     context.previousFullmoveNumber = this->fullmoveNumber;
-    context.previousIsWhitesTurn = this->isWhitesTurn;
+    context.previousTurn = this->turn;
     context.previousIsGameOver = this->isGameOver;
     context.wasEnPassantCapture = isEnPassant(move);
     context.wasCastling = isCastling(move);
@@ -268,10 +270,10 @@ bool Position::isCastling(const Move &move) const {
 }
 
 bool Position::isCheckmated() const {
-    return this->scanner.isInCheckmate(isWhitesTurn ? WHITE : BLACK);
+    return this->scanner.isInCheckmate(this->turn);
 }
 bool Position::isStalemated() const {
-    return this->scanner.isInStalemate(isWhitesTurn ? WHITE : BLACK);
+    return this->scanner.isInStalemate(this->turn);
 }
 
 bool Position::getIsGameOver() const {
@@ -281,4 +283,11 @@ bool Position::getIsGameOver() const {
            this->scanner.isInStalemate(color);
 }
 
-void Position::changeTurn() { this->isWhitesTurn = !this->isWhitesTurn; }
+void Position::changeTurn() {
+    Color turnToSet = (this->turn == WHITE) ? BLACK : WHITE;
+    this->turn = turnToSet;
+}
+
+void Position::setTurn(Color color) {
+    this->turn = color;
+}

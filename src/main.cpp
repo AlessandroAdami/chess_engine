@@ -1,12 +1,12 @@
+#include "engine.h"
 #include "move_parser.h"
 #include "position.h"
-#include "engine.h"
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
 
-//TODO: fix pawn promotion behaviour
+// TODO: fix pawn promotion behaviour
 
 int main() {
     Position position;

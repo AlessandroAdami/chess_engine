@@ -30,8 +30,7 @@ class Position {
     ColoredPiece getPiece(Square square) const;
     void setPiece(Square square, ColoredPiece cp);
     Square getEnpassantSquare() const { return enPassantSquare; }
-    bool getIsWhitesTurn() const { return isWhitesTurn; }
-    Color getTurn() const { return isWhitesTurn ? WHITE : BLACK; }
+    Color getTurn() const { return turn; }
     int getCastleState(Color color) const {
         return castleState[color == WHITE ? 0 : 1];
     }
@@ -43,11 +42,12 @@ class Position {
     bool isStalemated() const;
     bool getIsGameOver() const;
     void changeTurn();
+    void setTurn(Color color);
 
   private:
     ColoredPiece board[8][8];
     Square enPassantSquare;
-    bool isWhitesTurn;
+    Color turn;
     bool isGameOver;
     int halfmoveClock;
     int fullmoveNumber;

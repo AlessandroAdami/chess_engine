@@ -303,7 +303,7 @@ TEST(MoveMakerTest, GetMoveContext) {
         {KING_SIDE | QUEEN_SIDE, KING_SIDE | QUEEN_SIDE},
         0,
         3,
-        true,
+        WHITE,
         false,
         true,
         false};
@@ -316,7 +316,7 @@ TEST(MoveMakerTest, GetMoveContext) {
 
     context = moveMaker.getMoveContext(ke7);
     expectedContext = {ke7,   NO_Piece, Square{-1, -1}, {QUEEN_SIDE, KING_SIDE},
-                       3,     3,        false,          false,
+                       3,     3,        BLACK,          false,
                        false, false};
 
     EXPECT_EQ(context, expectedContext);
@@ -332,7 +332,7 @@ TEST(MoveMakerTest, GetMoveContext) {
                        {KING_SIDE | QUEEN_SIDE, KING_SIDE | QUEEN_SIDE},
                        0,
                        4,
-                       true,
+                       WHITE,
                        false,
                        false,
                        true};

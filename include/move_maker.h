@@ -11,7 +11,7 @@ struct MoveContext {
     int previousCastleState[2];
     int previousHalfmoveClock;
     int previousFullmoveNumber;
-    bool previousIsWhitesTurn;
+    Color previousTurn;
     bool previousIsGameOver;
     bool wasEnPassantCapture = false;
     bool wasCastling = false;
@@ -22,8 +22,8 @@ struct MoveContext {
                previousCastleState[0] == other.previousCastleState[0] &&
                previousCastleState[1] == other.previousCastleState[1] &&
                previousHalfmoveClock == other.previousHalfmoveClock &&
-               previousFullmoveNumber == other.previousFullmoveNumber &&
-               previousIsWhitesTurn == other.previousIsWhitesTurn &&
+               previousFullmoveNumber == other.previousFullmoveNumber && 
+               previousTurn == other.previousTurn &&
                previousIsGameOver == other.previousIsGameOver &&
                wasEnPassantCapture == other.wasEnPassantCapture &&
                wasCastling == other.wasCastling;

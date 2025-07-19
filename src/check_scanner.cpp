@@ -45,14 +45,32 @@ bool CheckScanner::isInStalemate(Color color) const {
 bool CheckScanner::areThereLegalMoves(Color color) const {
     for (int row = 0; row < 8; ++row) {
         for (int col = 0; col < 8; ++col) {
-            ColoredPiece piece = position->getPiece(Square{row, col});
-            if (getColor(piece) != color)
+            ColoredPiece cp = position->getPiece(Square{row, col});
+            if (cp.color != color)
                 continue;
 
             for (int targetRow = 0; targetRow < 8; ++targetRow) {
                 for (int targetCol = 0; targetCol < 8; ++targetCol) {
-                    Move move{Square{row, col}, Square{targetRow, targetCol}};
-                    if (position->movementValidator.isValidMove(move)) {
+                    Move move{Square{row, col}, Square{targetRow, targetCol},
+                              NO_Piece};
+                    if (cp.piece == PAWN) {
+                        // Handle pawn promotion
+                        int promotionRow = (cp.color == WHITE) ? 0 : 7;
+                        if (targetRow == promotionRow) {
+                            for (const Piece &promotionPiece :
+                                 {QUEEN, ROOK, BISHOP, KNIGHT}) {
+                                move.promotionPiece =
+                                    ColoredPiece(cp.color, promotionPiece);
+                                if (position->movementValidator.isValidMove(
+                                        move)) {
+                                    return true;
+                                }
+                            }
+                        } else if (position->movementValidator.isValidMove(
+                                       move)) {
+                            return true;
+                        }
+                    } else if (position->movementValidator.isValidMove(move)) {
                         return true;
                     }
                 }
@@ -62,16 +80,33 @@ bool CheckScanner::areThereLegalMoves(Color color) const {
     return false;
 }
 
-bool CheckScanner::isSquareInCheck(Square square, Color color) const {
+bool CheckScanner::isSquareInCheck(Square target, Color color) const {
     for (int row = 0; row < 8; ++row) {
         for (int col = 0; col < 8; ++col) {
             ColoredPiece cp = position->getPiece(Square{row, col});
-            if (getColor(cp) == color || cp == NO_Piece)
+            if (cp.color == color || cp == NO_Piece)
                 continue;
 
-            Move move{Square{row, col}, square};
-            if (position->movementValidator.isValidPieceMovement(cp.piece,
-                                                                 move)) {
+            Move move{Square{row, col}, target};
+            if (cp.piece == PAWN) {
+                // Handle pawn promotion
+                int promotionRow = (cp.color == WHITE) ? 0 : 7;
+                if (target.row == promotionRow) {
+                    for (const Piece &promotionPiece :
+                         {QUEEN, ROOK, BISHOP, KNIGHT}) {
+                        move.promotionPiece =
+                            ColoredPiece(cp.color, promotionPiece);
+                        if (position->movementValidator.isValidPieceMovement(
+                                cp.piece, move)) {
+                            return true;
+                        }
+                    }
+                } else if (position->movementValidator.isValidPieceMovement(
+                               cp.piece, move)) {
+                    return true;
+                }
+            } else if (position->movementValidator.isValidPieceMovement(
+                           cp.piece, move)) {
                 return true;
             }
         }

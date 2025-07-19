@@ -2,8 +2,6 @@
 #include <iostream>
 #include <vector>
 
-Color getColor(const ColoredPiece &cp) { return cp.color; }
-
 char pieceToChar(const ColoredPiece &cp) {
     bool isWhite = cp.color == WHITE;
     switch (cp.piece) {

@@ -32,7 +32,6 @@ struct ColoredPiece {
 
 const ColoredPiece NO_Piece = ColoredPiece(NONE, EMPTY);
 
-Color getColor(const ColoredPiece &piece);
 char pieceToChar(const ColoredPiece &cp);
 ColoredPiece charToColoredPiece(char c);
 

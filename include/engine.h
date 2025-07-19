@@ -29,7 +29,7 @@ class Engine {
     Algorithm algorithm = MINIMAX;
     const int INF = 1000000;
     const int MATE_SCORE = 100000;
-    const int MAX_DEPTH = 4;
+    const int MAX_DEPTH = 2;
 
     friend class ChessEngineTest_EvaluatePosition_Test;
 };

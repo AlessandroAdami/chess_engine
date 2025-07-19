@@ -34,7 +34,7 @@ TEST(ChessBoardTest, LoadFenFromStartingPosition) {
     }
 
     EXPECT_EQ(position.getEnpassantSquare(), (Square{-1, -1}));
-    EXPECT_TRUE(position.getIsWhitesTurn());
+    EXPECT_EQ(position.getTurn(), WHITE);
     EXPECT_EQ(position.getCastleState(WHITE), KING_SIDE | QUEEN_SIDE);
     EXPECT_EQ(position.getCastleState(BLACK), KING_SIDE | QUEEN_SIDE);
 }
@@ -158,7 +158,7 @@ TEST(ChessBoardTest, GetMoveContext) {
         {KING_SIDE | QUEEN_SIDE, KING_SIDE | QUEEN_SIDE},
         0,
         1,
-        true,
+        WHITE,
         false,
         false};
 
@@ -177,7 +177,7 @@ TEST(ChessBoardTest, GetMoveContext) {
                        {KING_SIDE | QUEEN_SIDE, KING_SIDE | QUEEN_SIDE},
                        2,
                        4,
-                       true,
+                       WHITE,
                        false,
                        false,
                        true};
@@ -197,7 +197,7 @@ TEST(ChessBoardTest, GetMoveContext) {
                        {KING_SIDE | QUEEN_SIDE, KING_SIDE | QUEEN_SIDE},
                        0,
                        3,
-                       true,
+                       WHITE,
                        false,
                        true,
                        false};

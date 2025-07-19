@@ -29,9 +29,10 @@ MoveContext MoveMaker::makeMove(const Move &move) {
     movePiece(move);
 
     increaseHalfmoveClock(movingPiece, capturedPiece);
-    this->position->fullmoveNumber += this->position->isWhitesTurn ? 0 : 1;
+    bool isWhitesTurn = (this->position->getTurn() == WHITE);
+    this->position->fullmoveNumber += isWhitesTurn ? 0 : 1;
 
-    this->position->isWhitesTurn = !this->position->isWhitesTurn;
+    this->position->changeTurn();
 
     return context;
 }
@@ -195,7 +196,8 @@ void MoveMaker::unmovePiece(const MoveContext &context) {
     Square to = move.to;
 
     if (context.wasEnPassantCapture) {
-        int colorIndex = context.previousIsWhitesTurn ? 1 : -1;
+        bool previousIsWhitesTurn = context.previousTurn == WHITE;
+        int colorIndex = previousIsWhitesTurn ? 1 : -1;
         position->setPiece(Square{to.row + colorIndex, to.col},
                            context.capturedPiece);
         position->setPiece(to, NO_Piece);
@@ -216,7 +218,7 @@ void MoveMaker::unmovePiece(const MoveContext &context) {
     position->enPassantSquare = context.previousEnPassant;
     position->castleState[0] = context.previousCastleState[0];
     position->castleState[1] = context.previousCastleState[1];
-    position->isWhitesTurn = context.previousIsWhitesTurn;
+    position->turn = context.previousTurn;
     position->isGameOver = context.previousIsGameOver;
     position->halfmoveClock = context.previousHalfmoveClock;
     position->fullmoveNumber = context.previousFullmoveNumber;
@@ -230,5 +232,5 @@ void MoveMaker::remakeMove() {
     moveCursor++;
 
     movePiece(context.move);
-    this->position->isWhitesTurn = !this->position->isWhitesTurn;
+    this->position->changeTurn();
 }

@@ -16,11 +16,9 @@ bool MovementValidator::isValidMove(const Move &move) const {
 
     if (movingPiece == NO_Piece)
         return false;
-    if (getColor(movingPiece) == getColor(capturedPiece))
+    if (movingPiece.color == capturedPiece.color)
         return false;
-    if (getColor(movingPiece) == WHITE && !position->getIsWhitesTurn())
-        return false;
-    if (getColor(movingPiece) == BLACK && position->getIsWhitesTurn())
+    if (movingPiece.color != position->getTurn())
         return false;
 
     if (!isValidPieceMovement(movingPiece.piece, move))
@@ -38,7 +36,7 @@ bool MovementValidator::moveLeadsIntoCheck(Move move) const {
 
     position->movePiece(move);
 
-    Color color = context.previousIsWhitesTurn ? WHITE : BLACK;
+    Color color = context.previousTurn;
     bool isChecked = position->scanner.isInCheck(color);
 
     position->unmovePiece(context);
@@ -82,6 +80,10 @@ bool MovementValidator::isValidPawnMovement(Move move) const {
 
     int fromCol = move.from.col, fromRow = move.from.row;
     int toCol = move.to.col, toRow = move.to.row;
+    int promotionRow = (cp.color == WHITE) ? 0 : 7;
+
+    if (toRow == promotionRow && move.promotionPiece == NO_Piece)
+        return false;
 
     if (fromCol == toCol && toRow == fromRow - colorIndex &&
         this->position->getPiece(Square{toRow, toCol}) == NO_Piece)
@@ -179,7 +181,8 @@ bool MovementValidator::isValidKingMovement(Move move) const {
     int fromRow = move.from.row, fromCol = move.from.col;
     int toRow = move.to.row, toCol = move.to.col;
 
-    Color color = getColor(this->position->getPiece(Square{fromRow, fromCol}));
+    ColoredPiece cp = this->position->getPiece(Square{fromRow, fromCol});
+    Color color = cp.color;
     bool isCastling =
         (std::abs(fromCol - toCol) == 2 && fromRow == toRow && fromCol == 4);
     if (isCastling) {
@@ -231,15 +234,17 @@ std::vector<Move> MovementValidator::getLegalMoves(Color color) {
     for (int row = 0; row < 8; ++row) {
         for (int col = 0; col < 8; ++col) {
             ColoredPiece piece = this->position->getPiece(Square{row, col});
-            if (getColor(piece) != color)
+            if (piece.color != color)
                 continue;
 
             for (int targetRow = 0; targetRow < 8; ++targetRow) {
                 for (int targetCol = 0; targetCol < 8; ++targetCol) {
-                    Move move{row, col, targetRow, targetCol};
+                    Move move{Square{row, col}, Square{targetRow, targetCol},
+                              NO_Piece};
                     if (piece.piece == PAWN) {
                         // Handle pawn promotion
-                        if (targetRow == (color == WHITE ? 0 : 7)) {
+                        int promotionRow = (color == WHITE) ? 0 : 7;
+                        if (targetRow == promotionRow) {
                             for (const Piece &promotionPiece :
                                  {QUEEN, ROOK, BISHOP, KNIGHT}) {
                                 move.promotionPiece =

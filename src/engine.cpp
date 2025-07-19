@@ -50,7 +50,7 @@ Move Engine::minimax() {
 }
 
 int Engine::negamax(Position *position, int depth, int alpha, int beta,
-                         Color color) {
+                    Color color) {
     if (depth == 0 || position->getIsGameOver()) {
         return quiescence(position, -INF, INF, color, MAX_DEPTH - depth);
     }
@@ -87,7 +87,8 @@ int Engine::negamax(Position *position, int depth, int alpha, int beta,
 int Engine::evaluate(Position *position) const {
     int score = 0;
     if (position->isCheckmated()) {
-        score = position->getIsWhitesTurn() ? -MATE_SCORE : MATE_SCORE;
+        bool isWhitesTurn = position->getTurn() == WHITE;
+        score = isWhitesTurn ? -MATE_SCORE : MATE_SCORE;
         return score;
     } else if (position->isStalemated()) {
         return 0;
@@ -107,7 +108,7 @@ int Engine::evaluate(Position *position) const {
  * Evaluation relative to a specific color.
  */
 int Engine::evaluateLeaf(Position *position, Color color,
-                              int plyFromRoot) const {
+                         int plyFromRoot) const {
     if (position->isCheckmated()) {
         int mateScore = MATE_SCORE - plyFromRoot;
         return (position->getTurn() == color) ? -mateScore : mateScore;
@@ -172,8 +173,8 @@ int Engine::scoreMove(const Move &move, const Position *pos) const {
     return 0;
 }
 
-int Engine::quiescence(Position *position, int alpha, int beta,
-                            Color color, int plyFromRoot) {
+int Engine::quiescence(Position *position, int alpha, int beta, Color color,
+                       int plyFromRoot) {
     int stand_pat = evaluateLeaf(position, color, plyFromRoot);
 
     if (stand_pat >= beta)
@@ -214,8 +215,7 @@ int Engine::quiescence(Position *position, int alpha, int beta,
     return alpha;
 }
 
-int Engine::staticExchangeEval(Position *pos, Square target,
-                                    Color sideToMove) {
+int Engine::staticExchangeEval(Position *pos, Square target, Color sideToMove) {
     Position position = *pos;
     std::vector<int> gains;
     int gain = 0;

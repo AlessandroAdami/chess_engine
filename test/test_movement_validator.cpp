@@ -67,6 +67,15 @@ TEST(MovementValidatorTest, PawnBadMovement) {
 
     Move pawnCaptureForward{4, 4, 3, 4};
     EXPECT_FALSE(validator.isValidMove(pawnCaptureForward));
+
+    position.loadFEN(
+        "r3kb1r/pppN1ppp/2n1pB2/8/2B3b1/2N5/PPpQ1PPP/R3K2R b KQkq - 0 10");
+
+    Move sidewaysNoCapture{6, 2, 7, 3};
+    EXPECT_FALSE(validator.isValidMove(sidewaysNoCapture));
+
+    Move lastRankNoPromotion{6, 2, 7, 2};
+    EXPECT_FALSE(validator.isValidMove(lastRankNoPromotion));
 }
 
 TEST(MovementValidatorTest, BishopGoodMovement) {
@@ -366,4 +375,20 @@ TEST(MovementValidatorTest, GetLegalMoves) {
     EXPECT_TRUE(vectorContainsMove(legalMoves, Move{4, 3, 2, 2}));
     EXPECT_TRUE(vectorContainsMove(legalMoves, Move{4, 4, 3, 4}));
     EXPECT_TRUE(vectorContainsMove(legalMoves, Move{7, 3, 6, 3}));
+
+    fen = "r3kb1r/pppN1ppp/2n1pB2/8/2B3b1/2N5/PPpQ1PPP/R3K2R b KQkq - 0 10";
+    position.loadFEN(fen);
+
+    legalMoves = validator.getLegalMoves(BLACK);
+
+    EXPECT_TRUE(vectorContainsMove(
+        legalMoves, Move{6, 2, 7, 2, ColoredPiece(BLACK, QUEEN)}));
+    EXPECT_TRUE(vectorContainsMove(
+        legalMoves, Move{6, 2, 7, 2, ColoredPiece(BLACK, ROOK)}));
+    EXPECT_TRUE(vectorContainsMove(
+        legalMoves, Move{6, 2, 7, 2, ColoredPiece(BLACK, BISHOP)}));
+    EXPECT_TRUE(vectorContainsMove(
+        legalMoves, Move{6, 2, 7, 2, ColoredPiece(BLACK, KNIGHT)}));
+    EXPECT_FALSE(vectorContainsMove(
+        legalMoves, Move{6, 2, 7, 2, ColoredPiece(BLACK, PAWN)}));
 }

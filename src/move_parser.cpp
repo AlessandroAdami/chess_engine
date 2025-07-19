@@ -16,7 +16,7 @@ Move MoveParser::moveStringToMove(const std::string &moveStr) {
     std::transform(normalizedInput.begin(), normalizedInput.end(),
                    normalizedInput.begin(), ::tolower);
 
-    bool isWhitesTurn = position->getIsWhitesTurn();
+    bool isWhitesTurn = (position->getTurn() == WHITE);
     Color color = isWhitesTurn ? WHITE : BLACK;
     std::vector<Move> legalMoves =
         position->movementValidator.getLegalMoves(color);
