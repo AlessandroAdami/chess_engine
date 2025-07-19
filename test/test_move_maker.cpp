@@ -298,6 +298,7 @@ TEST(MoveMakerTest, GetMoveContext) {
 
     MoveContext expectedContext = {
         exd6,
+        ColoredPiece(WHITE,PAWN),
         ColoredPiece(BLACK, PAWN),
         Square{2, 3},
         {KING_SIDE | QUEEN_SIDE, KING_SIDE | QUEEN_SIDE},
@@ -315,7 +316,12 @@ TEST(MoveMakerTest, GetMoveContext) {
     Move ke7{0, 4, 1, 4};
 
     context = moveMaker.getMoveContext(ke7);
-    expectedContext = {ke7,   NO_Piece, Square{-1, -1}, {QUEEN_SIDE, KING_SIDE},
+    expectedContext = {ke7,   
+        ColoredPiece(BLACK,KING),
+         NO_Piece, 
+         Square{-1, -1}, 
+         {QUEEN_SIDE, KING_SIDE},
+
                        3,     3,        BLACK,          false,
                        false, false};
 
@@ -327,6 +333,7 @@ TEST(MoveMakerTest, GetMoveContext) {
 
     context = moveMaker.getMoveContext(castle);
     expectedContext = {castle,
+        ColoredPiece(WHITE,KING),
                        NO_Piece,
                        Square{-1, -1},
                        {KING_SIDE | QUEEN_SIDE, KING_SIDE | QUEEN_SIDE},

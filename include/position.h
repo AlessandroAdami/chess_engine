@@ -7,6 +7,8 @@
 #include "types.h"
 #include <string>
 
+// todo add list of pieces squares for efficiency
+
 class Position {
   public:
     Position();

@@ -228,6 +228,7 @@ bool Position::isSquareEmpty(const Square &square) const {
 MoveContext Position::getMoveContext(const Move &move) {
     MoveContext context;
     context.move = move;
+    context.movedPiece = this->getPiece(move.from);
     context.capturedPiece = getCapturedPiece(move);
     context.previousEnPassant = this->enPassantSquare;
     context.previousCastleState[0] = this->castleState[0];

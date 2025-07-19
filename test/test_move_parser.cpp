@@ -80,4 +80,18 @@ TEST(MoveParser, StringToMove) {
     actualMove = parser.moveStringToMove(moveStr);
     expectedMove = Move{1, 4, 0, 5, ColoredPiece(WHITE, KNIGHT)};
     EXPECT_EQ(actualMove, expectedMove);
+
+    position.loadFEN(
+        "rnbqkbnr/pP3ppp/8/8/4p3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 5");
+    moveStr = "bxa8=q";
+    actualMove = parser.moveStringToMove(moveStr);
+    expectedMove = Move{1, 1, 0, 0, ColoredPiece(WHITE, QUEEN)};
+    EXPECT_EQ(actualMove, expectedMove);
+
+    position.loadFEN(
+        "Qnbqkbnr/p4ppp/8/8/8/2N5/PPPP2pP/R1BQKBNR b KQk - 0 7");
+    moveStr = "gxf1=r";
+    actualMove = parser.moveStringToMove(moveStr);
+    expectedMove = Move{6, 6, 7, 5, ColoredPiece(BLACK, ROOK)};
+    EXPECT_EQ(actualMove, expectedMove);
 }

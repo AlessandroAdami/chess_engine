@@ -6,8 +6,6 @@
 #include <string>
 #include <vector>
 
-// TODO: fix pawn promotion behaviour
-
 int main() {
     Position position;
     position.printBoard();

@@ -2,6 +2,8 @@
 #include "position.h"
 #include <iostream>
 
+// TODO: if rook is captured castlestate should change
+
 /**
  * This class simply makes moves on the chess board.
  * It assumes each move is legal.
@@ -71,6 +73,7 @@ MoveContext MoveMaker::movePiece(const Move &move) {
 
     if (movingPiece.piece == PAWN) {
         capturedPiece = movePawn(move);
+        return context;
     } else if (movingPiece.piece == KING) {
         capturedPiece = moveKing(move);
     } else if (movingPiece.piece == ROOK) {
@@ -188,7 +191,7 @@ void MoveMaker::unmakeMove() {
 void MoveMaker::unmovePiece(const MoveContext &context) {
     const Move &move = context.move;
 
-    ColoredPiece movedPiece = position->getPiece(move.to);
+    ColoredPiece movedPiece = context.movedPiece;
     position->setPiece(move.from, movedPiece);
     position->setPiece(move.to, context.capturedPiece);
 

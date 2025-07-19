@@ -6,6 +6,7 @@
 class Position;
 struct MoveContext {
     Move move;
+    ColoredPiece movedPiece;
     ColoredPiece capturedPiece;
     Square previousEnPassant;
     int previousCastleState[2];
@@ -17,7 +18,8 @@ struct MoveContext {
     bool wasCastling = false;
 
     bool operator==(const MoveContext &other) const {
-        return move == other.move && capturedPiece == other.capturedPiece &&
+        return move == other.move && movedPiece == other.movedPiece &&
+        capturedPiece == other.capturedPiece &&
                previousEnPassant == other.previousEnPassant &&
                previousCastleState[0] == other.previousCastleState[0] &&
                previousCastleState[1] == other.previousCastleState[1] &&

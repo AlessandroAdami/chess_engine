@@ -117,6 +117,16 @@ TEST(ChessBoardTest, MakeMoveLegal) {
     fen = "rnbqkb1r/ppp2Qpp/3p1n2/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4";
 
     EXPECT_EQ(position.getFEN(), fen);
+
+    fen = "rnbqkbnr/pP3ppp/8/8/4p3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 5";
+    position.loadFEN(fen);
+
+    Move bxa8q{1, 1, 0, 0, ColoredPiece(WHITE,QUEEN)};
+    position.makeMove(bxa8q);
+
+    fen = "Qnbqkbnr/p4ppp/8/8/4p3/8/PPPP1PPP/RNBQKBNR b KQk - 0 5";
+
+    EXPECT_EQ(position.getFEN(), fen);
 }
 
 TEST(ChessBoardTest, UndoRedoMove) {
@@ -153,6 +163,7 @@ TEST(ChessBoardTest, GetMoveContext) {
 
     MoveContext expectedContext = {
         e4,
+        ColoredPiece(WHITE,PAWN),
         NO_Piece,
         Square{-1, -1},
         {KING_SIDE | QUEEN_SIDE, KING_SIDE | QUEEN_SIDE},
@@ -172,6 +183,7 @@ TEST(ChessBoardTest, GetMoveContext) {
     actualContext = position.getMoveContext(shortCastle);
 
     expectedContext = {shortCastle,
+            ColoredPiece(WHITE,KING),
                        NO_Piece,
                        Square{-1, -1},
                        {KING_SIDE | QUEEN_SIDE, KING_SIDE | QUEEN_SIDE},
@@ -192,6 +204,7 @@ TEST(ChessBoardTest, GetMoveContext) {
     actualContext = position.getMoveContext(exf6EnPassant);
 
     expectedContext = {exf6EnPassant,
+        ColoredPiece(WHITE,PAWN),
                        ColoredPiece(BLACK, PAWN),
                        Square{2, 5},
                        {KING_SIDE | QUEEN_SIDE, KING_SIDE | QUEEN_SIDE},
