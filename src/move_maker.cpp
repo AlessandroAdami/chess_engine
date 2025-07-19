@@ -2,8 +2,6 @@
 #include "position.h"
 #include <iostream>
 
-// TODO: if rook is captured castlestate should change
-
 /**
  * This class simply makes moves on the chess board.
  * It assumes each move is legal.
@@ -62,6 +60,7 @@ void MoveMaker::increaseHalfmoveClock(const ColoredPiece movingCP,
 }
 
 MoveContext MoveMaker::movePiece(const Move &move) {
+    updateCastleAfterRookCapture(move);
     MoveContext context = getMoveContext(move);
     ColoredPiece movingPiece = position->getPiece(move.from);
 
@@ -85,6 +84,28 @@ MoveContext MoveMaker::movePiece(const Move &move) {
     position->setPiece(move.to, movingPiece);
     position->setPiece(move.from, NO_Piece);
     return context;
+}
+
+void MoveMaker::updateCastleAfterRookCapture(const Move &move) {
+    Square to = move.to;
+    int csIdxWhite = 0;
+    int csIdxBlack = 1;
+    if (to.row == 0) {
+        if (to.col == 0) {
+            position->castleState[csIdxBlack] &= ~QUEEN_SIDE;
+        }
+        if (to.col == 7) {
+            position->castleState[csIdxBlack] &= ~KING_SIDE;
+        }
+    }
+    if (to.row == 7) {
+        if (to.col == 0) {
+            position->castleState[csIdxWhite] &= ~QUEEN_SIDE;
+        }
+        if (to.col == 7) {
+            position->castleState[csIdxWhite] &= ~KING_SIDE;
+        }
+    }
 }
 
 ColoredPiece MoveMaker::movePawn(const Move &move) {

@@ -57,4 +57,5 @@ class MoveMaker {
     ColoredPiece promotePawn(const Move &move);
     void increaseHalfmoveClock(const ColoredPiece movingPiece,
                                const ColoredPiece capturedPiece) const;
+    void updateCastleAfterRookCapture(const Move &move);
 };
