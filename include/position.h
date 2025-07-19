@@ -8,8 +8,10 @@
 #include "types.h"
 #include <string>
 
+// TODO: clean up
 // todo add list of pieces squares for efficiency
 // TODO: refactor movement validator
+// TODO: refactor castling state to avoid magic numbers
 
 class Position {
   public:
@@ -47,6 +49,7 @@ class Position {
     bool getIsGameOver() const;
     void changeTurn();
     void setTurn(Color color);
+    uint64_t zobristHash;
 
   private:
     ColoredPiece board[8][8];
@@ -59,11 +62,9 @@ class Position {
     MoveMaker moveMaker;
     MoveParser moveParser;
     Zobrist zobrist;
-    uint64_t hash;
     void initZobristHash();
     int getCastlingRightsAsIndex() const;
-    void updateHashMove(const Move &move);
-    void undoHashMove(const Move &move);
+    void updateZobristHash(const Move &move);
 
     friend class MoveMaker;
 };

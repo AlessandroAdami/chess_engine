@@ -16,6 +16,7 @@ struct MoveContext {
     bool previousIsGameOver;
     bool wasEnPassantCapture = false;
     bool wasCastling = false;
+    uint64_t previousHash;
 
     bool operator==(const MoveContext &other) const {
         return move == other.move && movedPiece == other.movedPiece &&
@@ -28,7 +29,8 @@ struct MoveContext {
                previousTurn == other.previousTurn &&
                previousIsGameOver == other.previousIsGameOver &&
                wasEnPassantCapture == other.wasEnPassantCapture &&
-               wasCastling == other.wasCastling;
+               wasCastling == other.wasCastling &&
+               previousHash == other.previousHash;
     }
 };
 

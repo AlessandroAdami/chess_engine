@@ -1,6 +1,7 @@
 #pragma once
 
 #include "position.h"
+#include <unordered_map>
 
 enum Algorithm { MINIMAX, A_STAR };
 
@@ -11,6 +12,7 @@ class Engine {
 
   private:
     Position *position;
+    std::unordered_map<uint64_t, int> transpositionTable;
     int evaluate(Position *position) const;
     int evaluateLeaf(Position *position, Color color, int plyFromRoot) const;
     int getPieceValue(const ColoredPiece &cp) const;

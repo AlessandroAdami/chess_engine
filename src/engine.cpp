@@ -51,8 +51,14 @@ Move Engine::minimax() {
 
 int Engine::negamax(Position *position, int depth, int alpha, int beta,
                     Color color) {
+    uint64_t hash = position->zobristHash;
+    if (transpositionTable.find(hash) != transpositionTable.end()) {
+        return transpositionTable[hash];
+    }
     if (depth == 0 || position->getIsGameOver()) {
-        return quiescence(position, -INF, INF, color, MAX_DEPTH - depth);
+        int eval = quiescence(position, -INF, INF, color, MAX_DEPTH - depth);
+        transpositionTable[hash] = eval;
+        return eval;
     }
 
     int maxEval = -INF;
@@ -77,6 +83,8 @@ int Engine::negamax(Position *position, int depth, int alpha, int beta,
             break;
         }
     }
+
+    transpositionTable[hash] = maxEval;
 
     return maxEval;
 }

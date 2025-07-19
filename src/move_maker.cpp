@@ -215,6 +215,7 @@ void MoveMaker::unmovePiece(const MoveContext &context) {
     ColoredPiece movedPiece = context.movedPiece;
     position->setPiece(move.from, movedPiece);
     position->setPiece(move.to, context.capturedPiece);
+    position->zobristHash = context.previousHash;
 
     Square from = move.from;
     Square to = move.to;

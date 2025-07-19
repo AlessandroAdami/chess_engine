@@ -169,6 +169,7 @@ MoveContext Position::makeMove(const Move &move) {
         return MoveContext();
     }
     MoveContext context = this->moveMaker.makeMove(move);
+    updateZobristHash(move);
 
     if (isCheckmated() || isStalemated()) {
         isGameOver = true;
@@ -239,6 +240,7 @@ MoveContext Position::getMoveContext(const Move &move) {
     context.previousIsGameOver = this->isGameOver;
     context.wasEnPassantCapture = isEnPassant(move);
     context.wasCastling = isCastling(move);
+    context.previousHash = this->zobristHash;
 
     return context;
 }
@@ -294,28 +296,28 @@ void Position::setTurn(Color color) {
 }
 
 void Position::initZobristHash() {
-    hash = 0;
+    zobristHash = 0;
     for (int row = 0; row < 8; ++row) {
         for (int col = 0; col < 8; ++col) {
             ColoredPiece cp = board[row][col];
             int index = pieceIndex(cp);
             if (index != -1) {
                 int sq = row * 8 + col;
-                hash ^= zobrist.pieceKeys[index][sq];
+                zobristHash ^= zobrist.pieceKeys[index][sq];
             }
         }
     }
 
     if (turn == WHITE)
-        hash ^= zobrist.sideToMoveKey;
+        zobristHash ^= zobrist.sideToMoveKey;
 
-    hash ^= zobrist.castlingRightsKey[getCastlingRightsAsIndex()];
+    zobristHash ^= zobrist.castlingRightsKey[getCastlingRightsAsIndex()];
 
     if (enPassantSquare != INVALID_SQUARE)
-        hash ^= zobrist.enPassantFileKey[enPassantSquare.col];
+        zobristHash ^= zobrist.enPassantFileKey[enPassantSquare.col];
 }
 
-void Position::updateHashMove(const Move &move) {
+void Position::updateZobristHash(const Move &move) {
     int fromSq = move.from.row * 8 + move.from.col;
     int toSq = move.to.row * 8 + move.to.col;
 
@@ -326,44 +328,41 @@ void Position::updateHashMove(const Move &move) {
     int capturedIdx = pieceIndex(captured);
 
     // Toggle moving piece from and to
-    hash ^= zobrist.pieceKeys[movingIdx][fromSq];
-    hash ^= zobrist.pieceKeys[movingIdx][toSq];
+    zobristHash ^= zobrist.pieceKeys[movingIdx][fromSq];
+    zobristHash ^= zobrist.pieceKeys[movingIdx][toSq];
 
     // Toggle captured piece off
     if (capturedIdx != -1)
-        hash ^= zobrist.pieceKeys[capturedIdx][toSq];
+        zobristHash ^= zobrist.pieceKeys[capturedIdx][toSq];
 
     // Promotions
     if (move.promotionPiece != NO_PIECE) {
         int promoIdx = pieceIndex(move.promotionPiece);
-        hash ^= zobrist.pieceKeys[movingIdx][toSq]; // remove pawn at dest
-        hash ^= zobrist.pieceKeys[promoIdx][toSq];  // add promoted piece
+        zobristHash ^= zobrist.pieceKeys[movingIdx][toSq]; // remove pawn at dest
+        zobristHash ^= zobrist.pieceKeys[promoIdx][toSq];  // add promoted piece
     }
 
     // Castling rights and en passant
     // XOR out old castling rights
-    hash ^= zobrist.castlingRightsKey[getCastlingRightsAsIndex()];
-    // Update them...
-    //updateCastlingRights(move);
+    zobristHash ^= zobrist.castlingRightsKey[getCastlingRightsAsIndex()];
     // XOR in new castling rights
-    hash ^= zobrist.castlingRightsKey[getCastlingRightsAsIndex()];
+    zobristHash ^= zobrist.castlingRightsKey[getCastlingRightsAsIndex()];
 
     if (enPassantSquare != INVALID_SQUARE)
-        hash ^= zobrist.enPassantFileKey[enPassantSquare.col];
-    //updateEnPassantSquare(move);
+        zobristHash ^= zobrist.enPassantFileKey[enPassantSquare.col];
     if (enPassantSquare != INVALID_SQUARE)
-        hash ^= zobrist.enPassantFileKey[enPassantSquare.col];
+        zobristHash ^= zobrist.enPassantFileKey[enPassantSquare.col];
 
     // Toggle side to move
-    hash ^= zobrist.sideToMoveKey;
+    zobristHash ^= zobrist.sideToMoveKey;
 }
 
 
 int Position::getCastlingRightsAsIndex() const {
     int index = 0;
-    if (castleState[WHITE] & KING_SIDE)  index |= (1 << 0); // White kingside
-    if (castleState[WHITE] & QUEEN_SIDE) index |= (1 << 1); // White queenside
-    if (castleState[BLACK] & KING_SIDE)  index |= (1 << 2); // Black kingside
-    if (castleState[BLACK] & QUEEN_SIDE) index |= (1 << 3); // Black queenside
-    return index; // 0 to 15
+    if (castleState[0] & KING_SIDE)  index |= (1 << 0);
+    if (castleState[0] & QUEEN_SIDE) index |= (1 << 1);
+    if (castleState[1] & KING_SIDE)  index |= (1 << 2);
+    if (castleState[1] & QUEEN_SIDE) index |= (1 << 3);
+    return index;
 }

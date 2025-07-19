@@ -2,7 +2,7 @@
 #include "../include/types.h"
 #include <gtest/gtest.h>
 
-TEST(ChessBoardTest, LoadFenFromStartingPosition) {
+TEST(PositionTest, LoadFenFromStartingPosition) {
     Position position;
     position.loadFEN(
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
@@ -39,7 +39,7 @@ TEST(ChessBoardTest, LoadFenFromStartingPosition) {
     EXPECT_EQ(position.getCastleState(BLACK), KING_SIDE | QUEEN_SIDE);
 }
 
-TEST(ChessBoardTest, LoadFenFromRandomPosition) {
+TEST(PositionTest, LoadFenFromRandomPosition) {
     Position position;
     position.loadFEN(
         "r4rk1/1pp2pp1/2np1q1p/p1b1p3/2P3b1/2NPPNP1/PP3PBP/R2Q1RK1 w - - 0 11");
@@ -58,7 +58,7 @@ TEST(ChessBoardTest, LoadFenFromRandomPosition) {
     EXPECT_EQ(position.getPiece(Square(7, 5)), ColoredPiece(WHITE, ROOK));
 }
 
-TEST(ChessBoardTest, MakeMoveIllegal) {
+TEST(PositionTest, MakeMoveIllegal) {
     Position position;
     std::string fen =
         "r1bqkbnr/pp1ppppp/2n5/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3";
@@ -78,7 +78,7 @@ TEST(ChessBoardTest, MakeMoveIllegal) {
     EXPECT_EQ(position.getFEN(), fen);
 }
 
-TEST(ChessBoardTest, MakeMoveLegal) {
+TEST(PositionTest, MakeMoveLegal) {
     Position position;
     std::string fen =
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -129,7 +129,7 @@ TEST(ChessBoardTest, MakeMoveLegal) {
     EXPECT_EQ(position.getFEN(), fen);
 }
 
-TEST(ChessBoardTest, UndoRedoMove) {
+TEST(PositionTest, UndoRedoMove) {
     Position position;
     std::string fen =
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -153,7 +153,7 @@ TEST(ChessBoardTest, UndoRedoMove) {
     EXPECT_EQ(position.getFEN(), fen);
 }
 
-TEST(ChessBoardTest, GetMoveContext) {
+TEST(PositionTest, GetMoveContext) {
     Position position;
     std::string fen =
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -171,7 +171,9 @@ TEST(ChessBoardTest, GetMoveContext) {
         1,
         WHITE,
         false,
-        false};
+        false,
+        false,
+    actualContext.previousHash};
 
     EXPECT_EQ(actualContext, expectedContext);
 
@@ -192,7 +194,8 @@ TEST(ChessBoardTest, GetMoveContext) {
                        WHITE,
                        false,
                        false,
-                       true};
+                       true,
+                    actualContext.previousHash};
 
     EXPECT_EQ(actualContext, expectedContext);
 
@@ -213,7 +216,10 @@ TEST(ChessBoardTest, GetMoveContext) {
                        WHITE,
                        false,
                        true,
-                       false};
+                       false,
+                    actualContext.previousHash};
+
+    std::cout << actualContext.previousHash;
 
     EXPECT_EQ(actualContext, expectedContext);
 }
