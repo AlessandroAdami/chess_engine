@@ -35,7 +35,8 @@ const ColoredPiece NO_PIECE = ColoredPiece(NONE, EMPTY);
 char pieceToChar(const ColoredPiece &cp);
 ColoredPiece charToColoredPiece(char c);
 inline int pieceIndex(ColoredPiece cp) {
-    if (cp == NO_PIECE) return -1;
+    if (cp == NO_PIECE)
+        return -1;
     return (cp.color == WHITE ? 0 : 6) + (int)(cp.piece);
 }
 
@@ -60,7 +61,7 @@ struct Square {
     bool operator!=(const Square &other) const { return !(*this == other); }
 };
 
-const Square INVALID_SQUARE = Square(-1,-1);
+const Square INVALID_SQUARE = Square(-1, -1);
 
 struct Move {
     Square from;
@@ -71,7 +72,8 @@ struct Move {
 
     Move(Square f, Square t) : from(f), to(t) {}
 
-    Move(Square f, Square t, ColoredPiece cp) : from(f), to(t), promotionPiece(cp) {}
+    Move(Square f, Square t, ColoredPiece cp)
+        : from(f), to(t), promotionPiece(cp) {}
 
     bool operator==(const Move &other) const {
         return from == other.from && to == other.to &&

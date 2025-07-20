@@ -19,7 +19,7 @@ int main() {
             std::cout << "Engine is thinking ..." << std::endl;
             Move move = engine.getBestMove();
             position.makeMove(move);
-            //position.printMove();
+            // position.printMove();
             position.printBoard();
             continue;
         }

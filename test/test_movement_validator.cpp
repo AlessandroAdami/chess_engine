@@ -359,36 +359,50 @@ TEST(MovementValidatorTest, GetLegalMoves) {
 
     std::vector<Move> legalMoves = validator.getLegalMoves(BLACK);
 
-    EXPECT_FALSE(vectorContainsMove(legalMoves, Move(Square(0, 0), Square(0, 0))));
-    EXPECT_FALSE(vectorContainsMove(legalMoves, Move(Square(1, 3),Square( 3, 3))));
-    EXPECT_FALSE(vectorContainsMove(legalMoves, Move(Square(0, 1), Square(2, 2))));
+    EXPECT_FALSE(
+        vectorContainsMove(legalMoves, Move(Square(0, 0), Square(0, 0))));
+    EXPECT_FALSE(
+        vectorContainsMove(legalMoves, Move(Square(1, 3), Square(3, 3))));
+    EXPECT_FALSE(
+        vectorContainsMove(legalMoves, Move(Square(0, 1), Square(2, 2))));
 
-    EXPECT_TRUE(vectorContainsMove(legalMoves, Move(Square(0, 4), Square(1, 5))));
-    EXPECT_TRUE(vectorContainsMove(legalMoves, Move(Square(0, 4), Square(1, 4))));
+    EXPECT_TRUE(
+        vectorContainsMove(legalMoves, Move(Square(0, 4), Square(1, 5))));
+    EXPECT_TRUE(
+        vectorContainsMove(legalMoves, Move(Square(0, 4), Square(1, 4))));
 
     fen = "r1bqk2r/pp1pppbp/2n2np1/8/3NP3/2N5/PPP1BPPP/R1BQK2R w KQkq - 3 7";
     position.loadFEN(fen);
 
     legalMoves = validator.getLegalMoves(WHITE);
 
-    EXPECT_TRUE(vectorContainsMove(legalMoves, Move(Square(7, 4), Square(7, 6))));
-    EXPECT_TRUE(vectorContainsMove(legalMoves, Move(Square(4, 3), Square(2, 2))));
-    EXPECT_TRUE(vectorContainsMove(legalMoves, Move(Square(4, 4), Square(3, 4))));
-    EXPECT_TRUE(vectorContainsMove(legalMoves, Move(Square(7, 3), Square(6, 3))));
+    EXPECT_TRUE(
+        vectorContainsMove(legalMoves, Move(Square(7, 4), Square(7, 6))));
+    EXPECT_TRUE(
+        vectorContainsMove(legalMoves, Move(Square(4, 3), Square(2, 2))));
+    EXPECT_TRUE(
+        vectorContainsMove(legalMoves, Move(Square(4, 4), Square(3, 4))));
+    EXPECT_TRUE(
+        vectorContainsMove(legalMoves, Move(Square(7, 3), Square(6, 3))));
 
     fen = "r3kb1r/pppN1ppp/2n1pB2/8/2B3b1/2N5/PPpQ1PPP/R3K2R b KQkq - 0 10";
     position.loadFEN(fen);
 
     legalMoves = validator.getLegalMoves(BLACK);
 
-    EXPECT_TRUE(vectorContainsMove(
-        legalMoves, Move(Square(6, 2), Square(7, 2), ColoredPiece(BLACK, QUEEN))));
-    EXPECT_TRUE(vectorContainsMove(
-        legalMoves, Move(Square(6, 2), Square(7, 2), ColoredPiece(BLACK, ROOK))));
-    EXPECT_TRUE(vectorContainsMove(
-        legalMoves, Move(Square(6, 2), Square(7, 2), ColoredPiece(BLACK, BISHOP))));
-    EXPECT_TRUE(vectorContainsMove(
-        legalMoves, Move(Square(6, 2), Square(7, 2), ColoredPiece(BLACK, KNIGHT))));
-    EXPECT_FALSE(vectorContainsMove(
-        legalMoves, Move(Square(6, 2), Square(7, 2), ColoredPiece(BLACK, PAWN))));
+    EXPECT_TRUE(
+        vectorContainsMove(legalMoves, Move(Square(6, 2), Square(7, 2),
+                                            ColoredPiece(BLACK, QUEEN))));
+    EXPECT_TRUE(
+        vectorContainsMove(legalMoves, Move(Square(6, 2), Square(7, 2),
+                                            ColoredPiece(BLACK, ROOK))));
+    EXPECT_TRUE(
+        vectorContainsMove(legalMoves, Move(Square(6, 2), Square(7, 2),
+                                            ColoredPiece(BLACK, BISHOP))));
+    EXPECT_TRUE(
+        vectorContainsMove(legalMoves, Move(Square(6, 2), Square(7, 2),
+                                            ColoredPiece(BLACK, KNIGHT))));
+    EXPECT_FALSE(
+        vectorContainsMove(legalMoves, Move(Square(6, 2), Square(7, 2),
+                                            ColoredPiece(BLACK, PAWN))));
 }

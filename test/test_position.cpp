@@ -64,7 +64,7 @@ TEST(PositionTest, MakeMoveIllegal) {
         "r1bqkbnr/pp1ppppp/2n5/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3";
     position.loadFEN(fen);
 
-    Move illegalRandomMove(Square(0, 0),Square( 7, 7));
+    Move illegalRandomMove(Square(0, 0), Square(7, 7));
     position.makeMove(illegalRandomMove);
 
     EXPECT_EQ(position.getFEN(), fen);
@@ -84,14 +84,14 @@ TEST(PositionTest, MakeMoveLegal) {
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     position.loadFEN(fen);
 
-    Move e4(Square(6, 4), Square( 4, 4));
+    Move e4(Square(6, 4), Square(4, 4));
     position.makeMove(e4);
 
     fen = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
 
     EXPECT_EQ(position.getFEN(), fen);
 
-    Move d5(Square(1, 3),Square(3, 3));
+    Move d5(Square(1, 3), Square(3, 3));
     position.makeMove(d5);
 
     fen = "rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 2";
@@ -121,7 +121,7 @@ TEST(PositionTest, MakeMoveLegal) {
     fen = "rnbqkbnr/pP3ppp/8/8/4p3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 5";
     position.loadFEN(fen);
 
-    Move bxa8q(Square(1, 1), Square(0, 0), ColoredPiece(WHITE,QUEEN));
+    Move bxa8q(Square(1, 1), Square(0, 0), ColoredPiece(WHITE, QUEEN));
     position.makeMove(bxa8q);
 
     fen = "Qnbqkbnr/p4ppp/8/8/4p3/8/PPPP1PPP/RNBQKBNR b KQk - 0 5";
@@ -163,7 +163,7 @@ TEST(PositionTest, GetMoveContext) {
 
     MoveContext expectedContext = {
         e4,
-        ColoredPiece(WHITE,PAWN),
+        ColoredPiece(WHITE, PAWN),
         NO_PIECE,
         INVALID_SQUARE,
         {KING_SIDE | QUEEN_SIDE, KING_SIDE | QUEEN_SIDE},
@@ -173,7 +173,7 @@ TEST(PositionTest, GetMoveContext) {
         false,
         false,
         false,
-    actualContext.previousHash};
+        actualContext.previousHash};
 
     EXPECT_EQ(actualContext, expectedContext);
 
@@ -185,7 +185,7 @@ TEST(PositionTest, GetMoveContext) {
     actualContext = position.getMoveContext(shortCastle);
 
     expectedContext = {shortCastle,
-            ColoredPiece(WHITE,KING),
+                       ColoredPiece(WHITE, KING),
                        NO_PIECE,
                        INVALID_SQUARE,
                        {KING_SIDE | QUEEN_SIDE, KING_SIDE | QUEEN_SIDE},
@@ -195,7 +195,7 @@ TEST(PositionTest, GetMoveContext) {
                        false,
                        false,
                        true,
-                    actualContext.previousHash};
+                       actualContext.previousHash};
 
     EXPECT_EQ(actualContext, expectedContext);
 
@@ -207,7 +207,7 @@ TEST(PositionTest, GetMoveContext) {
     actualContext = position.getMoveContext(exf6EnPassant);
 
     expectedContext = {exf6EnPassant,
-        ColoredPiece(WHITE,PAWN),
+                       ColoredPiece(WHITE, PAWN),
                        ColoredPiece(BLACK, PAWN),
                        Square(2, 5),
                        {KING_SIDE | QUEEN_SIDE, KING_SIDE | QUEEN_SIDE},
@@ -217,9 +217,56 @@ TEST(PositionTest, GetMoveContext) {
                        false,
                        true,
                        false,
-                    actualContext.previousHash};
+                       actualContext.previousHash};
 
     std::cout << actualContext.previousHash;
 
     EXPECT_EQ(actualContext, expectedContext);
+}
+
+TEST(PositionTest, HashIsReversibleAfterMakeUnmake) {
+    Position pos;
+    uint64_t originalHash = pos.zobristHash;
+
+    std::vector<Move> moves =
+        pos.movementValidator.getLegalMoves(pos.getTurn());
+    ASSERT_FALSE(moves.empty())
+        << "No legal moves available for initial position";
+
+    Move move = moves[0];
+
+    pos.makeMove(move);
+    pos.unmakeMove();
+
+    uint64_t restoredHash = pos.zobristHash;
+
+    EXPECT_EQ(originalHash, restoredHash)
+        << "Zobrist hash mismatch after make/unmake";
+}
+
+TEST(PositionTest, IdenticalPositionsHaveSameHash) {
+    Position pos1;
+    Position pos2;
+
+    ASSERT_EQ(pos1.getFEN(), pos2.getFEN())
+        << "Initial positions should be the same";
+
+    EXPECT_EQ(pos1.zobristHash, pos2.zobristHash)
+        << "Hashes differ for identical positions";
+}
+
+TEST(PositionTest, DifferentPositionsHaveDifferentHash) {
+    Position pos;
+    std::vector<Move> moves =
+        pos.movementValidator.getLegalMoves(pos.getTurn());
+    ASSERT_FALSE(moves.empty()) << "No legal moves available";
+
+    Move move = moves[0];
+    pos.makeMove(move);
+
+    uint64_t modifiedHash = pos.zobristHash;
+    Position original;
+
+    EXPECT_NE(modifiedHash, original.zobristHash)
+        << "Modified position should have different hash";
 }

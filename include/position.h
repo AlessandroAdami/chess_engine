@@ -4,8 +4,8 @@
 #include "move_maker.h"
 #include "move_parser.h"
 #include "movement_validator.h"
-#include "zobrist.h"
 #include "types.h"
+#include "zobrist.h"
 #include <string>
 
 // TODO: clean up

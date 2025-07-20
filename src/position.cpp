@@ -92,6 +92,8 @@ void Position::loadFEN(const std::string &fen) {
     this->halfmoveClock = halfmoveClock;
     this->fullmoveNumber = fullmoveNumber;
     this->moveMaker.clearMoveHistory();
+
+    initZobristHash();
 }
 
 std::string Position::getFEN() const {
@@ -118,7 +120,7 @@ std::string Position::getFEN() const {
     }
 
     bool isWhitesTurn = (turn == WHITE);
-    
+
     oss << ' ' << (isWhitesTurn ? 'w' : 'b') << ' ';
     if (castleState[0] & KING_SIDE)
         oss << 'K';
@@ -291,9 +293,7 @@ void Position::changeTurn() {
     this->turn = turnToSet;
 }
 
-void Position::setTurn(Color color) {
-    this->turn = color;
-}
+void Position::setTurn(Color color) { this->turn = color; }
 
 void Position::initZobristHash() {
     zobristHash = 0;
@@ -338,8 +338,9 @@ void Position::updateZobristHash(const Move &move) {
     // Promotions
     if (move.promotionPiece != NO_PIECE) {
         int promoIdx = pieceIndex(move.promotionPiece);
-        zobristHash ^= zobrist.pieceKeys[movingIdx][toSq]; // remove pawn at dest
-        zobristHash ^= zobrist.pieceKeys[promoIdx][toSq];  // add promoted piece
+        zobristHash ^=
+            zobrist.pieceKeys[movingIdx][toSq];           // remove pawn at dest
+        zobristHash ^= zobrist.pieceKeys[promoIdx][toSq]; // add promoted piece
     }
 
     // Castling rights and en passant
@@ -357,12 +358,15 @@ void Position::updateZobristHash(const Move &move) {
     zobristHash ^= zobrist.sideToMoveKey;
 }
 
-
 int Position::getCastlingRightsAsIndex() const {
     int index = 0;
-    if (castleState[0] & KING_SIDE)  index |= (1 << 0);
-    if (castleState[0] & QUEEN_SIDE) index |= (1 << 1);
-    if (castleState[1] & KING_SIDE)  index |= (1 << 2);
-    if (castleState[1] & QUEEN_SIDE) index |= (1 << 3);
+    if (castleState[0] & KING_SIDE)
+        index |= (1 << 0);
+    if (castleState[0] & QUEEN_SIDE)
+        index |= (1 << 1);
+    if (castleState[1] & KING_SIDE)
+        index |= (1 << 2);
+    if (castleState[1] & QUEEN_SIDE)
+        index |= (1 << 3);
     return index;
 }

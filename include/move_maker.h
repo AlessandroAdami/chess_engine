@@ -20,12 +20,12 @@ struct MoveContext {
 
     bool operator==(const MoveContext &other) const {
         return move == other.move && movedPiece == other.movedPiece &&
-        capturedPiece == other.capturedPiece &&
+               capturedPiece == other.capturedPiece &&
                previousEnPassant == other.previousEnPassant &&
                previousCastleState[0] == other.previousCastleState[0] &&
                previousCastleState[1] == other.previousCastleState[1] &&
                previousHalfmoveClock == other.previousHalfmoveClock &&
-               previousFullmoveNumber == other.previousFullmoveNumber && 
+               previousFullmoveNumber == other.previousFullmoveNumber &&
                previousTurn == other.previousTurn &&
                previousIsGameOver == other.previousIsGameOver &&
                wasEnPassantCapture == other.wasEnPassantCapture &&

@@ -24,7 +24,7 @@ Move Engine::minimax() {
     int alpha = -INF;
     int beta = INF;
 
-    Move bestMove = Move(Square(0,0),Square(0,0));
+    Move bestMove = Move(Square(0, 0), Square(0, 0));
     int bestScore = -INF;
 
     std::vector<Move> moves = position->movementValidator.getLegalMoves(color);

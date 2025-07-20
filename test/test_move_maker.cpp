@@ -298,7 +298,7 @@ TEST(MoveMakerTest, GetMoveContext) {
 
     MoveContext expectedContext = {
         exd6,
-        ColoredPiece(WHITE,PAWN),
+        ColoredPiece(WHITE, PAWN),
         ColoredPiece(BLACK, PAWN),
         Square(2, 3),
         {KING_SIDE | QUEEN_SIDE, KING_SIDE | QUEEN_SIDE},
@@ -307,7 +307,8 @@ TEST(MoveMakerTest, GetMoveContext) {
         WHITE,
         false,
         true,
-        false};
+        false,
+        0xC5E095EAC036ADAA};
 
     EXPECT_EQ(context, expectedContext);
 
@@ -316,14 +317,19 @@ TEST(MoveMakerTest, GetMoveContext) {
     Move ke7(Square(0, 4), Square(1, 4));
 
     context = moveMaker.getMoveContext(ke7);
-    expectedContext = {ke7,   
-        ColoredPiece(BLACK,KING),
-         NO_PIECE, 
-         INVALID_SQUARE, 
-         {QUEEN_SIDE, KING_SIDE},
+    expectedContext = {ke7,
+                       ColoredPiece(BLACK, KING),
+                       NO_PIECE,
+                       INVALID_SQUARE,
+                       {QUEEN_SIDE, KING_SIDE},
 
-                       3,     3,        BLACK,          false,
-                       false, false};
+                       3,
+                       3,
+                       BLACK,
+                       false,
+                       false,
+                       false,
+                       0xD167AC3D0C9ADEDF};
 
     EXPECT_EQ(context, expectedContext);
 
@@ -333,7 +339,7 @@ TEST(MoveMakerTest, GetMoveContext) {
 
     context = moveMaker.getMoveContext(castle);
     expectedContext = {castle,
-        ColoredPiece(WHITE,KING),
+                       ColoredPiece(WHITE, KING),
                        NO_PIECE,
                        INVALID_SQUARE,
                        {KING_SIDE | QUEEN_SIDE, KING_SIDE | QUEEN_SIDE},
@@ -342,7 +348,8 @@ TEST(MoveMakerTest, GetMoveContext) {
                        WHITE,
                        false,
                        false,
-                       true};
+                       true,
+                       0xE3343C1917BB9EB8};
 
     EXPECT_EQ(context, expectedContext);
 }
