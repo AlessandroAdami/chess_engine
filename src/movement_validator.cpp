@@ -6,8 +6,7 @@ MovementValidator::MovementValidator(Position *position) : position(position) {}
 bool MovementValidator::isValidMove(const Move &move) const {
     int fromRow = move.from.row, fromCol = move.from.col;
     int toRow = move.to.row, toCol = move.to.col;
-    ColoredPiece movingPiece =
-        this->position->getPiece(move.from);
+    ColoredPiece movingPiece = this->position->getPiece(move.from);
     ColoredPiece capturedPiece = this->position->getCapturedPiece(move);
     if (fromRow < 0 || fromRow >= 8 || fromCol < 0 || fromCol >= 8 ||
         toRow < 0 || toRow >= 8 || toCol < 0 || toCol >= 8) {

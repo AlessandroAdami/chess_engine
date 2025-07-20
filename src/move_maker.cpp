@@ -179,7 +179,7 @@ ColoredPiece MoveMaker::moveKing(const Move &move) {
     position->setPiece(toSquare, movingPiece);
     position->setPiece(fromSquare, NO_PIECE);
     if (king.color == WHITE) {
-position->castleState.white = NO_CASTLING;
+        position->castleState.white = NO_CASTLING;
     } else {
         position->castleState.black = NO_CASTLING;
     }
@@ -194,14 +194,14 @@ ColoredPiece MoveMaker::moveRook(const Move &move) {
 
     if (fromCol == 7) {
         if (rook.color == WHITE) {
-                position->castleState.white &= ~KING_SIDE;
+            position->castleState.white &= ~KING_SIDE;
         } else {
             position->castleState.black &= ~KING_SIDE;
         }
-        
+
     } else if (fromCol == 0) {
         if (rook.color == WHITE) {
-                position->castleState.white &= ~QUEEN_SIDE;
+            position->castleState.white &= ~QUEEN_SIDE;
         } else {
             position->castleState.black &= ~QUEEN_SIDE;
         }

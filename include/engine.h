@@ -33,6 +33,6 @@ class Engine {
     }
     int scoreMove(const Move &move, const Position *pos) const;
     Algorithm algorithm = MINIMAX;
-    
+
     friend class ChessEngineTest_EvaluatePosition_Test;
 };

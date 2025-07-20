@@ -8,14 +8,17 @@
 #include "zobrist.h"
 #include <string>
 
-// todo add list of pieces squares for efficiency
+/**
+ * TODO: add list of pieces squares for efficiency
+ */
+
 
 class Position {
   public:
     CheckScanner scanner;
     MovementValidator movementValidator;
+    MoveParser moveParser;
     uint64_t zobristHash;
-
     Position();
     Position(const Position &p);
     MoveContext makeMove(const Move &move);
@@ -37,7 +40,7 @@ class Position {
     Square getEnpassantSquare() const { return enPassantSquare; }
     Color getTurn() const { return turn; }
     int getCastleState(Color color) const {
-      return (color == WHITE) ? castleState.white : castleState.black;
+        return (color == WHITE) ? castleState.white : castleState.black;
     }
     bool isSquareEmpty(const Square &square) const;
     ColoredPiece getCapturedPiece(const Move &move) const;
@@ -58,7 +61,6 @@ class Position {
     int fullmoveNumber;
     CastlingState castleState;
     MoveMaker moveMaker;
-    MoveParser moveParser;
     Zobrist zobrist;
     void initZobristHash();
     int getCastlingRightsAsIndex() const;

@@ -219,8 +219,6 @@ TEST(PositionTest, GetMoveContext) {
                        false,
                        actualContext.previousHash};
 
-    std::cout << actualContext.previousHash;
-
     EXPECT_EQ(actualContext, expectedContext);
 }
 

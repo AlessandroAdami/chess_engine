@@ -18,8 +18,10 @@ int main() {
         if (activeEngine && position.getTurn() == engineColor && enginePlay) {
             std::cout << "Engine is thinking ..." << std::endl;
             Move move = engine.getBestMove();
+            std::cout << "Engine plays: \""
+                      << position.moveParser.moveToString(move) << "\""
+                      << std::endl;
             position.makeMove(move);
-            // position.printMove();
             position.printBoard();
             continue;
         }

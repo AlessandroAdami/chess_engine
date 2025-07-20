@@ -1,11 +1,20 @@
 #include "move_parser.h"
 #include "position.h"
+#include "types.h"
 #include <algorithm>
 #include <cctype>
 #include <stdexcept>
 #include <vector>
 
+std::vector<Move> legalMoves;
+
 MoveParser::MoveParser(Position *position) : position(position) {}
+
+void MoveParser::loadLegalMoves() const {
+    bool isWhitesTurn = (position->getTurn() == WHITE);
+    Color color = isWhitesTurn ? WHITE : BLACK;
+    legalMoves = position->movementValidator.getLegalMoves(color);
+}
 
 /**
  * Converts a move from algebraic notation (e.g. "e4", "Nf3", "O-O", "exf8=n")
@@ -16,10 +25,7 @@ Move MoveParser::moveStringToMove(const std::string &moveStr) {
     std::transform(normalizedInput.begin(), normalizedInput.end(),
                    normalizedInput.begin(), ::tolower);
 
-    bool isWhitesTurn = (position->getTurn() == WHITE);
-    Color color = isWhitesTurn ? WHITE : BLACK;
-    std::vector<Move> legalMoves =
-        position->movementValidator.getLegalMoves(color);
+    loadLegalMoves();
 
     std::vector<std::pair<Move, std::string>> moveSANPairs =
         getMoveSANPairs(legalMoves);
@@ -40,78 +46,82 @@ std::vector<std::pair<Move, std::string>>
 MoveParser::getMoveSANPairs(std::vector<Move> legalMoves) const {
     std::vector<std::pair<Move, std::string>> moveSANPairs;
     for (const Move &move : legalMoves) {
-        std::string moveRepresentation;
-
-        ColoredPiece cp = position->getPiece(move.from);
-        Piece type = cp.piece;
-
-        char fromCol = 'a' + move.from.col;
-        char toCol = 'a' + move.to.col;
-        char toRow = '1' + (7 - move.to.row);
-
-        bool isCapture = this->position->getCapturedPiece(move) != NO_PIECE;
-
-        if (type == KING && std::abs(move.to.col - move.from.col) == 2) {
-            moveRepresentation =
-                (move.to.col > move.from.col) ? "o-o" : "o-o-o";
-        } else if (type == PAWN) {
-            if (isCapture) {
-                moveRepresentation += fromCol;
-                moveRepresentation += 'x';
-            }
-            moveRepresentation += toCol;
-            moveRepresentation += toRow;
-
-            if (move.promotionPiece.piece != EMPTY) {
-                moveRepresentation += '=';
-                moveRepresentation +=
-                    std::tolower(pieceToChar(move.promotionPiece));
-            }
-        } else {
-            moveRepresentation += std::tolower(pieceToChar(cp));
-
-            bool neeedDisambiguation = false;
-            bool needCol = false;
-            bool needRow = false;
-            for (const Move &otherMove : legalMoves) {
-                bool sameDestination = otherMove.to == move.to;
-                bool differentSource = otherMove.from != move.from;
-                if (sameDestination && differentSource) {
-                    ColoredPiece otherPiece =
-                        position->getPiece(otherMove.from);
-                    if (otherPiece == cp) {
-                        neeedDisambiguation = true;
-                        if (otherMove.from.row == move.from.row)
-                            needCol = true;
-                        else if (otherMove.from.col == move.from.col)
-                            needRow = true;
-                    }
-                }
-            }
-
-            if (needCol && needRow) {
-                moveRepresentation += fromCol;
-                moveRepresentation += '1' + (7 - move.from.row);
-            } else if (needCol) {
-                moveRepresentation += fromCol;
-            } else if (needRow) {
-                moveRepresentation += '1' + (7 - move.from.row);
-            } else if (neeedDisambiguation) {
-                moveRepresentation += fromCol;
-            }
-
-            if (isCapture)
-                moveRepresentation += 'x';
-
-            moveRepresentation += toCol;
-            moveRepresentation += toRow;
-        }
-
-        std::transform(moveRepresentation.begin(), moveRepresentation.end(),
-                       moveRepresentation.begin(), ::tolower);
+        std::string moveRepresentation = moveToString(move);
 
         moveSANPairs.emplace_back(move, moveRepresentation);
     }
 
     return moveSANPairs;
+}
+
+std::string MoveParser::moveToString(const Move move) const {
+    loadLegalMoves();
+    std::string moveRepresentation;
+    ColoredPiece cp = position->getPiece(move.from);
+    Piece type = cp.piece;
+
+    char fromCol = 'a' + move.from.col;
+    char toCol = 'a' + move.to.col;
+    char toRow = '1' + (7 - move.to.row);
+
+    bool isCapture = this->position->getCapturedPiece(move) != NO_PIECE;
+
+    if (type == KING && std::abs(move.to.col - move.from.col) == 2) {
+        moveRepresentation = (move.to.col > move.from.col) ? "o-o" : "o-o-o";
+    } else if (type == PAWN) {
+        if (isCapture) {
+            moveRepresentation += fromCol;
+            moveRepresentation += 'x';
+        }
+        moveRepresentation += toCol;
+        moveRepresentation += toRow;
+
+        if (move.promotionPiece.piece != EMPTY) {
+            moveRepresentation += '=';
+            moveRepresentation +=
+                std::tolower(pieceToChar(move.promotionPiece));
+        }
+    } else {
+        moveRepresentation += std::tolower(pieceToChar(cp));
+
+        bool neeedDisambiguation = false;
+        bool needCol = false;
+        bool needRow = false;
+        for (const Move &otherMove : legalMoves) {
+            bool sameDestination = otherMove.to == move.to;
+            bool differentSource = otherMove.from != move.from;
+            if (sameDestination && differentSource) {
+                ColoredPiece otherPiece = position->getPiece(otherMove.from);
+                if (otherPiece == cp) {
+                    neeedDisambiguation = true;
+                    if (otherMove.from.row == move.from.row)
+                        needCol = true;
+                    else if (otherMove.from.col == move.from.col)
+                        needRow = true;
+                }
+            }
+        }
+
+        if (needCol && needRow) {
+            moveRepresentation += fromCol;
+            moveRepresentation += '1' + (7 - move.from.row);
+        } else if (needCol) {
+            moveRepresentation += fromCol;
+        } else if (needRow) {
+            moveRepresentation += '1' + (7 - move.from.row);
+        } else if (neeedDisambiguation) {
+            moveRepresentation += fromCol;
+        }
+
+        if (isCapture)
+            moveRepresentation += 'x';
+
+        moveRepresentation += toCol;
+        moveRepresentation += toRow;
+    }
+
+    std::transform(moveRepresentation.begin(), moveRepresentation.end(),
+                   moveRepresentation.begin(), ::tolower);
+
+    return moveRepresentation;
 }

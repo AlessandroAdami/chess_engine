@@ -50,11 +50,14 @@ struct CastlingState {
     int white;
     int black;
     CastlingState(int w, int b) : white(w), black(b) {}
-    CastlingState() : white(KING_SIDE | QUEEN_SIDE), black(KING_SIDE | QUEEN_SIDE) {}
+    CastlingState()
+        : white(KING_SIDE | QUEEN_SIDE), black(KING_SIDE | QUEEN_SIDE) {}
     bool operator==(const CastlingState &other) const {
         return white == other.white && black == other.black;
     }
-    bool operator!=(const CastlingState &other) const { return !(*this == other); }
+    bool operator!=(const CastlingState &other) const {
+        return !(*this == other);
+    }
 };
 
 struct Square {
