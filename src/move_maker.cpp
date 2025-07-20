@@ -88,22 +88,20 @@ MoveContext MoveMaker::movePiece(const Move &move) {
 
 void MoveMaker::updateCastleAfterRookCapture(const Move &move) {
     Square to = move.to;
-    int csIdxWhite = 0;
-    int csIdxBlack = 1;
     if (to.row == 0) {
         if (to.col == 0) {
-            position->castleState[csIdxBlack] &= ~QUEEN_SIDE;
+            position->castleState.black &= ~QUEEN_SIDE;
         }
         if (to.col == 7) {
-            position->castleState[csIdxBlack] &= ~KING_SIDE;
+            position->castleState.black &= ~KING_SIDE;
         }
     }
     if (to.row == 7) {
         if (to.col == 0) {
-            position->castleState[csIdxWhite] &= ~QUEEN_SIDE;
+            position->castleState.white &= ~QUEEN_SIDE;
         }
         if (to.col == 7) {
-            position->castleState[csIdxWhite] &= ~KING_SIDE;
+            position->castleState.white &= ~KING_SIDE;
         }
     }
 }
@@ -180,7 +178,11 @@ ColoredPiece MoveMaker::moveKing(const Move &move) {
     ColoredPiece movingPiece = position->getPiece(fromSquare);
     position->setPiece(toSquare, movingPiece);
     position->setPiece(fromSquare, NO_PIECE);
-    position->castleState[king.color == WHITE ? 0 : 1] = NO_CASTLING;
+    if (king.color == WHITE) {
+position->castleState.white = NO_CASTLING;
+    } else {
+        position->castleState.black = NO_CASTLING;
+    }
     return capturedPiece;
 }
 
@@ -191,9 +193,18 @@ ColoredPiece MoveMaker::moveRook(const Move &move) {
     int fromCol = move.from.col;
 
     if (fromCol == 7) {
-        position->castleState[rook.color == WHITE ? 0 : 1] &= ~KING_SIDE;
+        if (rook.color == WHITE) {
+                position->castleState.white &= ~KING_SIDE;
+        } else {
+            position->castleState.black &= ~KING_SIDE;
+        }
+        
     } else if (fromCol == 0) {
-        position->castleState[rook.color == WHITE ? 0 : 1] &= ~QUEEN_SIDE;
+        if (rook.color == WHITE) {
+                position->castleState.white &= ~QUEEN_SIDE;
+        } else {
+            position->castleState.black &= ~QUEEN_SIDE;
+        }
     }
 
     return position->getPiece(move.to);
@@ -241,8 +252,7 @@ void MoveMaker::unmovePiece(const MoveContext &context) {
     }
 
     position->enPassantSquare = context.previousEnPassant;
-    position->castleState[0] = context.previousCastleState[0];
-    position->castleState[1] = context.previousCastleState[1];
+    position->castleState = context.previousCastleState;
     position->turn = context.previousTurn;
     position->isGameOver = context.previousIsGameOver;
     position->halfmoveClock = context.previousHalfmoveClock;

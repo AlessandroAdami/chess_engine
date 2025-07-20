@@ -11,7 +11,6 @@
 // TODO: clean up
 // todo add list of pieces squares for efficiency
 // TODO: refactor movement validator
-// TODO: refactor castling state to avoid magic numbers
 
 class Position {
   public:
@@ -38,7 +37,7 @@ class Position {
     Square getEnpassantSquare() const { return enPassantSquare; }
     Color getTurn() const { return turn; }
     int getCastleState(Color color) const {
-        return castleState[color == WHITE ? 0 : 1];
+      return (color == WHITE) ? castleState.white : castleState.black;
     }
     bool isSquareEmpty(const Square &square) const;
     ColoredPiece getCapturedPiece(const Move &move) const;
@@ -58,7 +57,7 @@ class Position {
     bool isGameOver;
     int halfmoveClock;
     int fullmoveNumber;
-    int castleState[2] = {KING_SIDE | QUEEN_SIDE, KING_SIDE | QUEEN_SIDE};
+    CastlingState castleState;
     MoveMaker moveMaker;
     MoveParser moveParser;
     Zobrist zobrist;

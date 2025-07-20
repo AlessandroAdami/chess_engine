@@ -62,21 +62,21 @@ void Position::loadFEN(const std::string &fen) {
 
     turn = (activeColor == "w") ? WHITE : BLACK;
 
-    castleState[0] = 0;
-    castleState[1] = 0;
+    castleState.white = 0;
+    castleState.black = 0;
     for (char c : castling) {
         switch (c) {
         case 'K':
-            castleState[0] |= KING_SIDE;
+            castleState.white |= KING_SIDE;
             break;
         case 'Q':
-            castleState[0] |= QUEEN_SIDE;
+            castleState.white |= QUEEN_SIDE;
             break;
         case 'k':
-            castleState[1] |= KING_SIDE;
+            castleState.black |= KING_SIDE;
             break;
         case 'q':
-            castleState[1] |= QUEEN_SIDE;
+            castleState.black |= QUEEN_SIDE;
             break;
         }
     }
@@ -122,15 +122,15 @@ std::string Position::getFEN() const {
     bool isWhitesTurn = (turn == WHITE);
 
     oss << ' ' << (isWhitesTurn ? 'w' : 'b') << ' ';
-    if (castleState[0] & KING_SIDE)
+    if (castleState.white & KING_SIDE)
         oss << 'K';
-    if (castleState[0] & QUEEN_SIDE)
+    if (castleState.white & QUEEN_SIDE)
         oss << 'Q';
-    if (castleState[1] & KING_SIDE)
+    if (castleState.black & KING_SIDE)
         oss << 'k';
-    if (castleState[1] & QUEEN_SIDE)
+    if (castleState.black & QUEEN_SIDE)
         oss << 'q';
-    if (!(castleState[0] | castleState[1]))
+    if (!(castleState.white | castleState.black))
         oss << '-';
 
     if (enPassantSquare.row == -1 && enPassantSquare.col == -1) {
@@ -234,8 +234,7 @@ MoveContext Position::getMoveContext(const Move &move) {
     context.movedPiece = this->getPiece(move.from);
     context.capturedPiece = getCapturedPiece(move);
     context.previousEnPassant = this->enPassantSquare;
-    context.previousCastleState[0] = this->castleState[0];
-    context.previousCastleState[1] = this->castleState[1];
+    context.previousCastleState = this->castleState;
     context.previousHalfmoveClock = this->halfmoveClock;
     context.previousFullmoveNumber = this->fullmoveNumber;
     context.previousTurn = this->turn;
@@ -360,13 +359,13 @@ void Position::updateZobristHash(const Move &move) {
 
 int Position::getCastlingRightsAsIndex() const {
     int index = 0;
-    if (castleState[0] & KING_SIDE)
+    if (castleState.white & KING_SIDE)
         index |= (1 << 0);
-    if (castleState[0] & QUEEN_SIDE)
+    if (castleState.white & QUEEN_SIDE)
         index |= (1 << 1);
-    if (castleState[1] & KING_SIDE)
+    if (castleState.black & KING_SIDE)
         index |= (1 << 2);
-    if (castleState[1] & QUEEN_SIDE)
+    if (castleState.black & QUEEN_SIDE)
         index |= (1 << 3);
     return index;
 }

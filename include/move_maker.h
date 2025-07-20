@@ -9,7 +9,7 @@ struct MoveContext {
     ColoredPiece movedPiece;
     ColoredPiece capturedPiece;
     Square previousEnPassant;
-    int previousCastleState[2];
+    CastlingState previousCastleState;
     int previousHalfmoveClock;
     int previousFullmoveNumber;
     Color previousTurn;
@@ -22,8 +22,7 @@ struct MoveContext {
         return move == other.move && movedPiece == other.movedPiece &&
                capturedPiece == other.capturedPiece &&
                previousEnPassant == other.previousEnPassant &&
-               previousCastleState[0] == other.previousCastleState[0] &&
-               previousCastleState[1] == other.previousCastleState[1] &&
+               previousCastleState == other.previousCastleState &&
                previousHalfmoveClock == other.previousHalfmoveClock &&
                previousFullmoveNumber == other.previousFullmoveNumber &&
                previousTurn == other.previousTurn &&
