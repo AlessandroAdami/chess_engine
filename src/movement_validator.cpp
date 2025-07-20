@@ -7,7 +7,7 @@ bool MovementValidator::isValidMove(const Move &move) const {
     int fromRow = move.from.row, fromCol = move.from.col;
     int toRow = move.to.row, toCol = move.to.col;
     ColoredPiece movingPiece =
-        this->position->getPiece(Square(fromRow, fromCol));
+        this->position->getPiece(move.from);
     ColoredPiece capturedPiece = this->position->getCapturedPiece(move);
     if (fromRow < 0 || fromRow >= 8 || fromCol < 0 || fromCol >= 8 ||
         toRow < 0 || toRow >= 8 || toCol < 0 || toCol >= 8) {
@@ -86,28 +86,28 @@ bool MovementValidator::isValidPawnMovement(Move move) const {
         return false;
 
     if (fromCol == toCol && toRow == fromRow - colorIndex &&
-        this->position->getPiece(Square(toRow, toCol)) == NO_PIECE)
+        this->position->getPiece(move.to) == NO_PIECE)
         return true;
 
     if (fromRow == (isWhite ? 6 : 1) && fromCol == toCol &&
         toRow == fromRow - (2 * colorIndex) &&
-        this->position->getPiece(Square(toRow, toCol)) == NO_PIECE &&
+        this->position->getPiece(move.to) == NO_PIECE &&
         this->position->getPiece(Square(toRow + colorIndex, toCol)) ==
             NO_PIECE) {
         return true;
     }
     if (toCol == fromCol - 1 && toRow == fromRow - colorIndex &&
-        this->position->getPiece(Square(toRow, toCol)) != NO_PIECE)
+        this->position->getPiece(move.to) != NO_PIECE)
         return true;
     if (toCol == fromCol + 1 && toRow == fromRow - colorIndex &&
-        this->position->getPiece(Square(toRow, toCol)) != NO_PIECE)
+        this->position->getPiece(move.to) != NO_PIECE)
         return true;
 
-    if (Square(toRow, toCol) == this->position->getEnpassantSquare() &&
+    if (move.to == this->position->getEnpassantSquare() &&
         toCol == fromCol - 1 && toRow == fromRow - colorIndex &&
         this->position->getPiece(Square(toRow + colorIndex, toCol)) != NO_PIECE)
         return true;
-    if (Square(toRow, toCol) == this->position->getEnpassantSquare() &&
+    if (move.to == this->position->getEnpassantSquare() &&
         toCol == fromCol + 1 && toRow == fromRow - colorIndex &&
         this->position->getPiece(Square(toRow + colorIndex, toCol)) != NO_PIECE)
         return true;
@@ -181,7 +181,7 @@ bool MovementValidator::isValidKingMovement(Move move) const {
     int fromRow = move.from.row, fromCol = move.from.col;
     int toRow = move.to.row, toCol = move.to.col;
 
-    ColoredPiece cp = this->position->getPiece(Square(fromRow, fromCol));
+    ColoredPiece cp = this->position->getPiece(move.from);
     Color color = cp.color;
     bool isCastling =
         (std::abs(fromCol - toCol) == 2 && fromRow == toRow && fromCol == 4);

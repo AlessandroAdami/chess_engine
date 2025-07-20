@@ -8,28 +8,28 @@
 #include "zobrist.h"
 #include <string>
 
-// TODO: clean up
 // todo add list of pieces squares for efficiency
-// TODO: refactor movement validator
 
 class Position {
   public:
-    Position();
-    Position(const Position &p);
     CheckScanner scanner;
     MovementValidator movementValidator;
+    uint64_t zobristHash;
+
+    Position();
+    Position(const Position &p);
+    MoveContext makeMove(const Move &move);
+    void unmakeMove();
+    void remakeMove();
+    MoveContext movePiece(const Move &move);
+    void unmovePiece(const MoveContext &context);
     void loadFEN(const std::string &fen);
     std::string getFEN() const;
     void printBoard() const;
-    MoveContext makeMove(const Move &move);
     MoveContext makeMoveFromString(const std::string &moveStr) {
         Move move = moveParser.moveStringToMove(moveStr);
         return makeMove(move);
     }
-    MoveContext movePiece(const Move &move);
-    void unmovePiece(const MoveContext &context);
-    void unmakeMove();
-    void remakeMove();
     MoveContext getMoveContext(const Move &move);
 
     ColoredPiece getPiece(Square square) const;
@@ -48,7 +48,6 @@ class Position {
     bool getIsGameOver() const;
     void changeTurn();
     void setTurn(Color color);
-    uint64_t zobristHash;
 
   private:
     ColoredPiece board[8][8];
