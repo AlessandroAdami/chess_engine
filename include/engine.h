@@ -1,21 +1,28 @@
 #pragma once
 
 #include "position.h"
+#include <chrono>
 #include <unordered_map>
 
-enum Algorithm { MINIMAX, A_STAR };
+enum Algorithm { DEPTH_BOUNDED = 0, TIME_BOUNDED = 1 };
 
 class Engine {
   public:
     Engine(Position *position);
     Move getBestMove();
+    Move getBestMoveWithTimeLimit(int timeLimitMs);
 
   private:
+    Algorithm algorithm = TIME_BOUNDED;
     Position *position;
     std::unordered_map<uint64_t, int> transpositionTable;
     const int INF = 1000000;
     const int MATE_SCORE = 100000;
     const int MAX_DEPTH = 2;
+    const int MAX_TIME = 5000;
+    std::chrono::steady_clock::time_point startTime;
+    int timeLimitMs;
+    bool isTimeUp() const;
 
     int evaluate(Position *position) const;
     int evaluateLeaf(Position *position, Color color, int plyFromRoot) const;
@@ -32,7 +39,6 @@ class Engine {
         return (color == WHITE) ? BLACK : WHITE;
     }
     int scoreMove(const Move &move, const Position *pos) const;
-    Algorithm algorithm = MINIMAX;
 
     friend class ChessEngineTest_EvaluatePosition_Test;
 };

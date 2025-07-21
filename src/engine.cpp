@@ -3,15 +3,72 @@
 #include <algorithm>
 #include <iostream>
 
+std::unordered_map<uint64_t, Move> principalVariation;
+
 Engine::Engine(Position *position) { this->position = position; }
 
 Move Engine::getBestMove() {
+    principalVariation.clear();
     Move bestMove;
     switch (algorithm) {
+    case TIME_BOUNDED:
+        bestMove = getBestMoveWithTimeLimit(MAX_TIME);
+        break;
+    case DEPTH_BOUNDED:
+        bestMove = minimax();
+        break;
     default:
         bestMove = minimax();
     }
 
+    return bestMove;
+}
+
+Move Engine::getBestMoveWithTimeLimit(int timeLimitMs) {
+    this->timeLimitMs = timeLimitMs;
+    this->startTime = std::chrono::steady_clock::now();
+
+    Move bestMove;
+    int maxDepthReached = 0;
+    Color color = position->getTurn();
+
+    for (int depth = 1; depth <= INF; ++depth) {
+        Move currentBest;
+        int currentBestScore = -INF;
+
+        std::vector<Move> moves =
+            position->movementValidator.getLegalMoves(color);
+
+        std::sort(moves.begin(), moves.end(),
+                  [this](const Move &a, const Move &b) {
+                      return scoreMove(a, position) > scoreMove(b, position);
+                  });
+
+        for (const Move &move : moves) {
+            if (isTimeUp())
+                return bestMove;
+
+            position->makeMove(move);
+            int score =
+                -negamax(position, depth - 1, -INF, INF, oppositeColor(color));
+            position->unmakeMove();
+
+            if (score > currentBestScore) {
+                currentBest = move;
+                currentBestScore = score;
+            }
+        }
+
+        if (!isTimeUp()) {
+            bestMove = currentBest;
+            maxDepthReached = depth;
+        } else {
+            break;
+        }
+    }
+
+    std::cout << "Iterative deepening stopped at depth: " << maxDepthReached
+              << std::endl;
     return bestMove;
 }
 
@@ -65,6 +122,18 @@ int Engine::negamax(Position *position, int depth, int alpha, int beta,
     std::vector<Move> moves =
         position->movementValidator.getLegalMoves(position->getTurn());
 
+    Move pvMove;
+    auto it = principalVariation.find(position->zobristHash);
+    if (it != principalVariation.end()) {
+        pvMove = it->second;
+
+        // Move PV move to front if it exists in the list
+        auto pvIt = std::find(moves.begin(), moves.end(), pvMove);
+        if (pvIt != moves.end()) {
+            std::iter_swap(moves.begin(), pvIt);
+        }
+    }
+
     std::sort(moves.begin(), moves.end(),
               [this, position](const Move &a, const Move &b) {
                   return scoreMove(a, position) > scoreMove(b, position);
@@ -76,7 +145,13 @@ int Engine::negamax(Position *position, int depth, int alpha, int beta,
             -negamax(position, depth - 1, -beta, -alpha, oppositeColor(color));
         position->unmakeMove();
 
-        maxEval = std::max(maxEval, eval);
+        if (eval > maxEval) {
+            maxEval = eval;
+
+            if (depth > 0) {
+                principalVariation[position->zobristHash] = move;
+            }
+        }
         alpha = std::max(alpha, eval);
 
         if (alpha >= beta) {
@@ -283,4 +358,12 @@ Engine::getSortedAttackers(Position *pos, Square target) const {
               });
 
     return attackers;
+}
+
+bool Engine::isTimeUp() const {
+    auto now = std::chrono::steady_clock::now();
+    auto elapsed =
+        std::chrono::duration_cast<std::chrono::milliseconds>(now - startTime)
+            .count();
+    return elapsed >= timeLimitMs;
 }

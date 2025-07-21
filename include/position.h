@@ -12,7 +12,6 @@
  * TODO: add list of pieces squares for efficiency
  */
 
-
 class Position {
   public:
     CheckScanner scanner;
