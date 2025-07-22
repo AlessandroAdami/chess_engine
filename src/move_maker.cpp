@@ -4,11 +4,29 @@
 
 /**
  * This class simply makes moves on the chess board.
- * It assumes each move is legal.
- * The legality of the moves is checked by the MovementValidator class.
  */
 
 MoveMaker::MoveMaker(Position *position) : position(position){};
+
+MoveContext MoveMaker::makeMoveFromString(const std::string &moveStr) {
+        Move move = position->moveParser.moveStringToMove(moveStr);
+        return makeMove(move);
+    }
+
+MoveContext MoveMaker::makeMove(const Move &move) {
+if (!position->movementValidator.isValidMove(move)) {
+        std::cerr << "Illegal move.\n";
+        return MoveContext();
+    }
+    MoveContext context = makeLegalMove(move);
+    position->updateZobristHash(move);
+
+    if (position->isCheckmated() || position->isStalemated()) {
+        position->isGameOver = true;
+    }
+
+    return context;
+}
 
 /**
  * @param move the move to be made
@@ -16,7 +34,7 @@ MoveMaker::MoveMaker(Position *position) : position(position){};
  * @return the piece that was captured, or EMPTY if no piece was captured
  * Modifies the board in ChessBoard and updates the turn.
  */
-MoveContext MoveMaker::makeMove(const Move &move) {
+MoveContext MoveMaker::makeLegalMove(const Move &move) {
     if (moveCursor < (int)moveHistory.size()) {
         moveHistory.erase(moveHistory.begin() + moveCursor, moveHistory.end());
     }

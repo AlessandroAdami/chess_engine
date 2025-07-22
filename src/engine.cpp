@@ -48,10 +48,10 @@ Move Engine::getBestMoveWithTimeLimit(int timeLimitMs) {
             if (isTimeUp())
                 return bestMove;
 
-            position->makeMove(move);
+            position->moveMaker.makeMove(move);
             int score =
                 -negamax(position, depth - 1, -INF, INF, oppositeColor(color));
-            position->unmakeMove();
+            position->moveMaker.unmakeMove();
 
             if (score > currentBestScore) {
                 currentBest = move;
@@ -91,10 +91,10 @@ Move Engine::minimax() {
     });
 
     for (const Move &move : moves) {
-        position->makeMove(move);
+        position->moveMaker.makeMove(move);
         int score =
             -negamax(position, depth - 1, -beta, -alpha, oppositeColor(color));
-        position->unmakeMove();
+        position->moveMaker.unmakeMove();
 
         if (score > bestScore) {
             bestScore = score;
@@ -140,10 +140,10 @@ int Engine::negamax(Position *position, int depth, int alpha, int beta,
               });
 
     for (const Move &move : moves) {
-        position->makeMove(move);
+        position->moveMaker.makeMove(move);
         int eval =
             -negamax(position, depth - 1, -beta, -alpha, oppositeColor(color));
-        position->unmakeMove();
+        position->moveMaker.unmakeMove();
 
         if (eval > maxEval) {
             maxEval = eval;
@@ -284,10 +284,10 @@ int Engine::quiescence(Position *position, int alpha, int beta, Color color,
               });
 
     for (const Move &move : noisyMoves) {
-        position->makeMove(move);
+        position->moveMaker.makeMove(move);
         int score = -quiescence(position, -beta, -alpha, oppositeColor(color),
                                 plyFromRoot + 1);
-        position->unmakeMove();
+        position->moveMaker.unmakeMove();
 
         if (score >= beta)
             return beta;
@@ -317,7 +317,7 @@ int Engine::staticExchangeEval(Position *pos, Square target, Color sideToMove) {
 
         Move move;
         move.from = from, move.to = target;
-        position.movePiece(move);
+        position.moveMaker.movePiece(move);
 
         attackers = getSortedAttackers(&position, target);
         currentSide = oppositeColor(currentSide);

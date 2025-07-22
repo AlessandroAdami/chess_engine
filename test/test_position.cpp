@@ -65,7 +65,7 @@ TEST(PositionTest, MakeMoveIllegal) {
     position.loadFEN(fen);
 
     Move illegalRandomMove(Square(0, 0), Square(7, 7));
-    position.makeMove(illegalRandomMove);
+    position.moveMaker.makeMove(illegalRandomMove);
 
     EXPECT_EQ(position.getFEN(), fen);
 
@@ -73,7 +73,7 @@ TEST(PositionTest, MakeMoveIllegal) {
     position.loadFEN(fen);
 
     Move illegalCastlingMove(Square(7, 4), Square(7, 6));
-    position.makeMove(illegalCastlingMove);
+    position.moveMaker.makeMove(illegalCastlingMove);
 
     EXPECT_EQ(position.getFEN(), fen);
 }
@@ -85,14 +85,14 @@ TEST(PositionTest, MakeMoveLegal) {
     position.loadFEN(fen);
 
     Move e4(Square(6, 4), Square(4, 4));
-    position.makeMove(e4);
+    position.moveMaker.makeMove(e4);
 
     fen = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
 
     EXPECT_EQ(position.getFEN(), fen);
 
     Move d5(Square(1, 3), Square(3, 3));
-    position.makeMove(d5);
+    position.moveMaker.makeMove(d5);
 
     fen = "rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 2";
 
@@ -102,7 +102,7 @@ TEST(PositionTest, MakeMoveLegal) {
     position.loadFEN(fen);
 
     Move exf6EnPassant(Square(3, 4), Square(2, 5));
-    position.makeMove(exf6EnPassant);
+    position.moveMaker.makeMove(exf6EnPassant);
 
     fen = "rnbqkbnr/ppp1p1pp/5P2/3p4/8/8/PPPP1PPP/RNBQKBNR b KQkq - 0 3";
 
@@ -112,7 +112,7 @@ TEST(PositionTest, MakeMoveLegal) {
     position.loadFEN(fen);
 
     Move qxf7(Square(3, 7), Square(1, 5));
-    position.makeMove(qxf7);
+    position.moveMaker.makeMove(qxf7);
 
     fen = "rnbqkb1r/ppp2Qpp/3p1n2/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4";
 
@@ -122,7 +122,7 @@ TEST(PositionTest, MakeMoveLegal) {
     position.loadFEN(fen);
 
     Move bxa8q(Square(1, 1), Square(0, 0), ColoredPiece(WHITE, QUEEN));
-    position.makeMove(bxa8q);
+    position.moveMaker.makeMove(bxa8q);
 
     fen = "Qnbqkbnr/p4ppp/8/8/4p3/8/PPPP1PPP/RNBQKBNR b KQk - 0 5";
 
@@ -135,18 +135,18 @@ TEST(PositionTest, UndoRedoMove) {
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
     Move e4(Square(6, 4), Square(4, 4));
-    position.makeMove(e4);
+    position.moveMaker.makeMove(e4);
 
     fen = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
 
     EXPECT_EQ(position.getFEN(), fen);
 
-    position.unmakeMove();
+    position.moveMaker.unmakeMove();
 
     fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     EXPECT_EQ(position.getFEN(), fen);
 
-    position.remakeMove();
+    position.moveMaker.remakeMove();
 
     fen = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
 
@@ -223,20 +223,20 @@ TEST(PositionTest, GetMoveContext) {
 }
 
 TEST(PositionTest, HashIsReversibleAfterMakeUnmake) {
-    Position pos;
-    uint64_t originalHash = pos.zobristHash;
+    Position position;
+    uint64_t originalHash = position.zobristHash;
 
     std::vector<Move> moves =
-        pos.movementValidator.getLegalMoves(pos.getTurn());
+        position.movementValidator.getLegalMoves(position.getTurn());
     ASSERT_FALSE(moves.empty())
         << "No legal moves available for initial position";
 
     Move move = moves[0];
 
-    pos.makeMove(move);
-    pos.unmakeMove();
+    position.moveMaker.makeMove(move);
+    position.moveMaker.unmakeMove();
 
-    uint64_t restoredHash = pos.zobristHash;
+    uint64_t restoredHash = position.zobristHash;
 
     EXPECT_EQ(originalHash, restoredHash)
         << "Zobrist hash mismatch after make/unmake";
@@ -254,15 +254,15 @@ TEST(PositionTest, IdenticalPositionsHaveSameHash) {
 }
 
 TEST(PositionTest, DifferentPositionsHaveDifferentHash) {
-    Position pos;
+    Position position;
     std::vector<Move> moves =
-        pos.movementValidator.getLegalMoves(pos.getTurn());
+        position.movementValidator.getLegalMoves(position.getTurn());
     ASSERT_FALSE(moves.empty()) << "No legal moves available";
 
     Move move = moves[0];
-    pos.makeMove(move);
+    position.moveMaker.makeMove(move);
 
-    uint64_t modifiedHash = pos.zobristHash;
+    uint64_t modifiedHash = position.zobristHash;
     Position original;
 
     EXPECT_NE(modifiedHash, original.zobristHash)

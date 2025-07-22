@@ -21,7 +21,7 @@ int main() {
             std::cout << "Engine plays: \""
                       << position.moveParser.moveToString(move) << "\""
                       << std::endl;
-            position.makeMove(move);
+            position.moveMaker.makeLegalMove(move);
             position.printBoard();
             continue;
         }
@@ -38,10 +38,10 @@ int main() {
 
         try {
             if (moveStr.length() == 1 && moveStr[0] == 'u') {
-                position.unmakeMove();
+                position.moveMaker.unmakeMove();
                 enginePlay = false;
             } else if (moveStr.length() == 1 && moveStr[0] == 'r') {
-                position.remakeMove();
+                position.moveMaker.remakeMove();
                 enginePlay = false;
             } else if (moveStr.length() == 1 && moveStr[0] == 'e') {
                 activeEngine = true;
@@ -49,7 +49,7 @@ int main() {
                 enginePlay = true;
                 continue;
             } else {
-                position.makeMoveFromString(moveStr);
+                position.moveMaker.makeMoveFromString(moveStr);
                 enginePlay = true;
             }
             position.printBoard();

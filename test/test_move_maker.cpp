@@ -11,7 +11,7 @@ TEST(MoveMakerTest, PawnMakeMove) {
     MoveMaker moveMaker(&position);
 
     Move e4(Square(6, 4), Square(4, 4));
-    moveMaker.makeMove(e4);
+    moveMaker.makeLegalMove(e4);
 
     EXPECT_EQ(position.getFEN(),
               "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1");
@@ -20,7 +20,7 @@ TEST(MoveMakerTest, PawnMakeMove) {
     position.loadFEN(fen);
 
     Move d3(Square(6, 3), Square(5, 3));
-    moveMaker.makeMove(d3);
+    moveMaker.makeLegalMove(d3);
 
     EXPECT_EQ(position.getFEN(),
               "rnbqkbnr/pppppppp/8/8/8/3P4/PPP1PPPP/RNBQKBNR b KQkq - 0 1");
@@ -29,7 +29,7 @@ TEST(MoveMakerTest, PawnMakeMove) {
     position.loadFEN(fen);
 
     Move dxe4(Square(3, 3), Square(4, 4));
-    moveMaker.makeMove(dxe4);
+    moveMaker.makeLegalMove(dxe4);
 
     EXPECT_EQ(position.getFEN(),
               "rnbqkbnr/ppp1pppp/8/8/2P1p3/8/PP1P1PPP/RNBQKBNR w KQkq - 0 3");
@@ -38,7 +38,7 @@ TEST(MoveMakerTest, PawnMakeMove) {
     position.loadFEN(fen);
 
     Move dxc4(Square(3, 3), Square(4, 2));
-    moveMaker.makeMove(dxc4);
+    moveMaker.makeLegalMove(dxc4);
 
     EXPECT_EQ(position.getFEN(),
               "rnbqkbnr/ppp1pppp/8/8/2p1P3/8/PP1P1PPP/RNBQKBNR w KQkq - 0 3");
@@ -47,7 +47,7 @@ TEST(MoveMakerTest, PawnMakeMove) {
     position.loadFEN(fen);
 
     Move exf6EnPassant(Square(3, 4), Square(2, 5));
-    moveMaker.makeMove(exf6EnPassant);
+    moveMaker.makeLegalMove(exf6EnPassant);
 
     EXPECT_EQ(position.getFEN(),
               "rnbqkbnr/ppp1p1pp/5P2/3p4/8/8/PPPP1PPP/RNBQKBNR b KQkq - 0 3");
@@ -62,7 +62,7 @@ TEST(MoveMakerTest, KnightMakeMove) {
     MoveMaker moveMaker(&position);
 
     Move nxd4(Square(2, 2), Square(4, 3));
-    moveMaker.makeMove(nxd4);
+    moveMaker.makeLegalMove(nxd4);
 
     EXPECT_EQ(position.getFEN(),
               "r1bqkbnr/pppppppp/8/8/3n4/8/PPPPPPPP/RNBQKB1R w KQkq - 0 3");
@@ -71,7 +71,7 @@ TEST(MoveMakerTest, KnightMakeMove) {
     position.loadFEN(fen);
 
     Move nh3(Square(3, 6), Square(5, 7));
-    moveMaker.makeMove(nh3);
+    moveMaker.makeLegalMove(nh3);
 
     EXPECT_EQ(position.getFEN(),
               "rnbqkbnr/ppp1p1pp/8/3p1p2/8/7N/PPPPPPPP/RNBQKB1R b KQkq - 1 3");
@@ -86,7 +86,7 @@ TEST(MoveMakerTest, BishopMakeMove) {
     MoveMaker moveMaker(&position);
 
     Move bc4(Square(7, 5), Square(4, 2));
-    moveMaker.makeMove(bc4);
+    moveMaker.makeLegalMove(bc4);
 
     EXPECT_EQ(position.getFEN(),
               "rnbqkbnr/ppp1pppp/8/3p4/2B1P3/8/PPPP1PPP/RNBQK1NR b KQkq - 1 2");
@@ -95,7 +95,7 @@ TEST(MoveMakerTest, BishopMakeMove) {
     position.loadFEN(fen);
 
     Move bxf7(Square(4, 2), Square(1, 5));
-    moveMaker.makeMove(bxf7);
+    moveMaker.makeLegalMove(bxf7);
 
     EXPECT_EQ(position.getFEN(),
               "rnbqkbnr/pp2pBpp/3p4/2p5/4P3/8/PPPP1PPP/RNBQK1NR b KQkq - 0 3");
@@ -110,7 +110,7 @@ TEST(MoveMakerTest, RookMakeMove) {
     MoveMaker moveMaker(&position);
 
     Move re6(Square(2, 0), Square(2, 4));
-    moveMaker.makeMove(re6);
+    moveMaker.makeLegalMove(re6);
 
     EXPECT_EQ(position.getFEN(),
               "1nbqkbnr/1ppppppp/4r3/p7/7P/4R3/PPPPPPP1/RNBQKBN1 w Qk - 4 4");
@@ -119,7 +119,7 @@ TEST(MoveMakerTest, RookMakeMove) {
     position.loadFEN(fen);
 
     Move rxe6(Square(5, 4), Square(2, 4));
-    moveMaker.makeMove(rxe6);
+    moveMaker.makeLegalMove(rxe6);
 
     EXPECT_EQ(position.getFEN(),
               "1nbqkbnr/1ppppppp/4R3/p7/7P/8/PPPPPPP1/RNBQKBN1 b Qk - 0 4");
@@ -134,7 +134,7 @@ TEST(MoveMakerTest, QueenMakeMove) {
     MoveMaker moveMaker(&position);
 
     Move qc4(Square(7, 5), Square(4, 2));
-    moveMaker.makeMove(qc4);
+    moveMaker.makeLegalMove(qc4);
 
     EXPECT_EQ(position.getFEN(),
               "rnbqkbnr/ppp1pppp/8/3p4/2Q1P3/8/PPPP1PPP/RNBQK1NR b KQkq - 1 2");
@@ -143,7 +143,7 @@ TEST(MoveMakerTest, QueenMakeMove) {
     position.loadFEN(fen);
 
     Move qxf7(Square(4, 2), Square(1, 5));
-    moveMaker.makeMove(qxf7);
+    moveMaker.makeLegalMove(qxf7);
 
     EXPECT_EQ(position.getFEN(),
               "rnbqkbnr/pp2pQpp/3p4/2p5/4P3/8/PPPP1PPP/RNBQK1NR b KQkq - 0 3");
@@ -152,7 +152,7 @@ TEST(MoveMakerTest, QueenMakeMove) {
     position.loadFEN(fen);
 
     Move qe6(Square(2, 0), Square(2, 4));
-    moveMaker.makeMove(qe6);
+    moveMaker.makeLegalMove(qe6);
 
     EXPECT_EQ(position.getFEN(),
               "1nbqkbnr/1ppppppp/4q3/p7/7P/4Q3/PPPPPPP1/RNBQKBN1 w Qk - 4 4");
@@ -161,7 +161,7 @@ TEST(MoveMakerTest, QueenMakeMove) {
     position.loadFEN(fen);
 
     Move qxe6(Square(5, 4), Square(2, 4));
-    moveMaker.makeMove(qxe6);
+    moveMaker.makeLegalMove(qxe6);
 
     EXPECT_EQ(position.getFEN(),
               "1nbqkbnr/1ppppppp/4Q3/p7/7P/8/PPPPPPP1/RNBQKBN1 b Qk - 0 4");
@@ -176,7 +176,7 @@ TEST(MoveMakerTest, KingMakeMove) {
     MoveMaker moveMaker(&position);
 
     Move ke7(Square(0, 4), Square(1, 4));
-    moveMaker.makeMove(ke7);
+    moveMaker.makeLegalMove(ke7);
 
     EXPECT_EQ(position.getFEN(),
               "rnbq2nr/ppppkppp/8/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQ - 4 4");
@@ -185,7 +185,7 @@ TEST(MoveMakerTest, KingMakeMove) {
     position.loadFEN(fen);
 
     Move shortCastle(Square(7, 4), Square(7, 6));
-    moveMaker.makeMove(shortCastle);
+    moveMaker.makeLegalMove(shortCastle);
 
     EXPECT_EQ(position.getFEN(),
               "rnbq2nr/ppppkppp/8/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 b - - 5 4");
@@ -194,7 +194,7 @@ TEST(MoveMakerTest, KingMakeMove) {
     position.loadFEN(fen);
 
     Move longCastle(Square(7, 4), Square(7, 2));
-    moveMaker.makeMove(longCastle);
+    moveMaker.makeLegalMove(longCastle);
 
     EXPECT_EQ(
         position.getFEN(),
@@ -210,7 +210,7 @@ TEST(MoveMakerTest, UndoMove) {
     MoveMaker moveMaker(&position);
 
     Move exd6(Square(3, 4), Square(2, 3));
-    moveMaker.makeMove(exd6);
+    moveMaker.makeLegalMove(exd6);
 
     EXPECT_EQ(position.getFEN(),
               "rnbqkbnr/ppp1p1pp/3P4/5p2/8/8/PPPP1PPP/RNBQKBNR b KQkq - 0 3");
@@ -221,7 +221,7 @@ TEST(MoveMakerTest, UndoMove) {
               "rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3");
 
     Move ba6(Square(7, 5), Square(2, 0));
-    moveMaker.makeMove(ba6);
+    moveMaker.makeLegalMove(ba6);
     EXPECT_EQ(position.getFEN(),
               "rnbqkbnr/ppp1p1pp/B7/3pPp2/8/8/PPPP1PPP/RNBQK1NR b KQkq - 1 3");
 
@@ -229,9 +229,9 @@ TEST(MoveMakerTest, UndoMove) {
     EXPECT_EQ(position.getFEN(),
               "rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3");
 
-    moveMaker.makeMove(ba6);
+    moveMaker.makeLegalMove(ba6);
     Move nxa6(Square(0, 1), Square(2, 0));
-    moveMaker.makeMove(nxa6);
+    moveMaker.makeLegalMove(nxa6);
     EXPECT_EQ(position.getFEN(),
               "r1bqkbnr/ppp1p1pp/n7/3pPp2/8/8/PPPP1PPP/RNBQK1NR w KQkq - 0 4");
 

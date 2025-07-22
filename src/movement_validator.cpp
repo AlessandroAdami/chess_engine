@@ -33,12 +33,12 @@ bool MovementValidator::moveLeadsIntoCheck(Move move) const {
 
     MoveContext context = position->getMoveContext(move);
 
-    position->movePiece(move);
+    position->moveMaker.movePiece(move);
 
     Color color = context.previousTurn;
     bool isChecked = position->scanner.isInCheck(color);
 
-    position->unmovePiece(context);
+    position->moveMaker.unmovePiece(context);
 
     return isChecked;
 }

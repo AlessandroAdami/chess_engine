@@ -36,7 +36,9 @@ struct MoveContext {
 class MoveMaker {
   public:
     MoveMaker(Position *position);
+    MoveContext makeMoveFromString(const std::string &moveStr);
     MoveContext makeMove(const Move &move);
+    MoveContext makeLegalMove(const Move &move);
     MoveContext movePiece(const Move &move);
     void unmovePiece(const MoveContext &context);
     MoveContext getMoveContext(const Move &move) const;
@@ -46,6 +48,7 @@ class MoveMaker {
         moveHistory.clear();
         moveCursor = 0;
     }
+    
     ColoredPiece getCapturedPiece(const Move &move) const;
 
   private:

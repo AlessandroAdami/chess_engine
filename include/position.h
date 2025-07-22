@@ -10,28 +10,21 @@
 
 /**
  * TODO: add list of pieces squares for efficiency
+ * TODO: add docu
  */
 
 class Position {
   public:
+    MoveMaker moveMaker;
     CheckScanner scanner;
     MovementValidator movementValidator;
     MoveParser moveParser;
     uint64_t zobristHash;
     Position();
     Position(const Position &p);
-    MoveContext makeMove(const Move &move);
-    void unmakeMove();
-    void remakeMove();
-    MoveContext movePiece(const Move &move);
-    void unmovePiece(const MoveContext &context);
     void loadFEN(const std::string &fen);
     std::string getFEN() const;
     void printBoard() const;
-    MoveContext makeMoveFromString(const std::string &moveStr) {
-        Move move = moveParser.moveStringToMove(moveStr);
-        return makeMove(move);
-    }
     MoveContext getMoveContext(const Move &move);
 
     ColoredPiece getPiece(Square square) const;
@@ -59,7 +52,6 @@ class Position {
     int halfmoveClock;
     int fullmoveNumber;
     CastlingState castleState;
-    MoveMaker moveMaker;
     Zobrist zobrist;
     void initZobristHash();
     int getCastlingRightsAsIndex() const;

@@ -161,53 +161,6 @@ void Position::printBoard() const {
 }
 
 /**
- * Makes a move on the chessboard if it's valid.
- * @returns the piece that was moved, or an empty ColoredPiece if the move was
- * illegal.
- */
-MoveContext Position::makeMove(const Move &move) {
-    if (!movementValidator.isValidMove(move)) {
-        std::cerr << "Illegal move.\n";
-        return MoveContext();
-    }
-    MoveContext context = this->moveMaker.makeMove(move);
-    updateZobristHash(move);
-
-    if (isCheckmated() || isStalemated()) {
-        isGameOver = true;
-    }
-
-    return context;
-}
-
-/**
- * Undoes the most recent move and updates the game state accordingly.
- */
-void Position::unmakeMove() { this->moveMaker.unmakeMove(); }
-
-/**
- * Redoes the most recent undone move and updates the game state accordingly.
- * If there are no moves to redo, this function does nothing.
- */
-void Position::remakeMove() { this->moveMaker.remakeMove(); }
-
-/**
- * Moves a piece without having an effect on the game state
- * (e.g. does not change the turn, does not add to move history).
- * This is used for previewing moves.
- */
-MoveContext Position::movePiece(const Move &move) {
-    return this->moveMaker.movePiece(move);
-}
-
-/**
- * Like movePiece, but undoes the move and restores the previous position state.
- */
-void Position::unmovePiece(const MoveContext &context) {
-    this->moveMaker.unmovePiece(context);
-}
-
-/**
  * @returns the piece at the given square.
  */
 ColoredPiece Position::getPiece(Square square) const {
