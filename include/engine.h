@@ -4,6 +4,10 @@
 #include <chrono>
 #include <unordered_map>
 
+/**
+ * Finds the best move for the playing side.
+ */
+
 enum Algorithm { DEPTH_BOUNDED = 0, TIME_BOUNDED = 1 };
 
 class Engine {

@@ -10,7 +10,15 @@
 
 /**
  * TODO: add list of pieces squares for efficiency
- * TODO: add docu
+ * TODO: idea: instead of checking every suqare for piece move,
+ * explicitely generate the legal squares for that piece
+ * e.g getLegalMovesRook
+ */
+
+/**
+ * Representing a chess position, with the board state and other uniquely
+ * specifying information. Delegates move making, legality checking, king check
+ * validation and move parsing to other modules.
  */
 
 class Position {

@@ -3,6 +3,10 @@
 #include "types.h"
 class Position;
 
+/**
+ * Checking behaviour for the current board's color (given as param).
+ */
+
 class CheckScanner {
   public:
     CheckScanner(Position *board);

@@ -1,11 +1,6 @@
 #include "check_scanner.h"
 #include "position.h"
 
-/**
- * Looks for checks in the board, assumes you are asking about the color whose
- * move it is
- */
-
 CheckScanner::CheckScanner(Position *position) : position(position) {}
 
 bool CheckScanner::isInCheck(Color color) const {

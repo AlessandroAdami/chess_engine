@@ -2,36 +2,26 @@
 #include "position.h"
 #include <iostream>
 
-/**
- * This class simply makes moves on the chess board.
- */
-
 MoveMaker::MoveMaker(Position *position) : position(position){};
 
 MoveContext MoveMaker::makeMoveFromString(const std::string &moveStr) {
-        Move move = position->moveParser.moveStringToMove(moveStr);
-        return makeMove(move);
-    }
+    Move move = position->moveParser.moveStringToMove(moveStr);
+    return makeMove(move);
+}
 
 MoveContext MoveMaker::makeMove(const Move &move) {
-if (!position->movementValidator.isValidMove(move)) {
+    if (!position->movementValidator.isValidMove(move)) {
         std::cerr << "Illegal move.\n";
         return MoveContext();
     }
-    MoveContext context = makeLegalMove(move);
-    position->updateZobristHash(move);
+    return makeLegalMove(move);
 
-    if (position->isCheckmated() || position->isStalemated()) {
-        position->isGameOver = true;
-    }
-
-    return context;
 }
 
 /**
  * @param move the move to be made
  * @cond requires move to be legal
- * @return the piece that was captured, or EMPTY if no piece was captured
+ * @return the context of the move BEFORE it is played
  * Modifies the board in ChessBoard and updates the turn.
  */
 MoveContext MoveMaker::makeLegalMove(const Move &move) {
@@ -52,12 +42,15 @@ MoveContext MoveMaker::makeLegalMove(const Move &move) {
 
     this->position->changeTurn();
 
+    position->updateZobristHash(move);
+
+    if (position->isCheckmated() || position->isStalemated()) {
+        position->isGameOver = true;
+    }
+
     return context;
 }
 
-/**
- * Gets the move context for the given move.
- */
 MoveContext MoveMaker::getMoveContext(const Move &move) const {
     return this->position->getMoveContext(move);
 }

@@ -106,6 +106,10 @@ Move Engine::minimax() {
     return bestMove;
 }
 
+/**
+ * Negamax implementation of minimax, with alpha-beta pruning,
+ * hashmap of already-seen positions, and semi-smart move ordering selection.
+ */
 int Engine::negamax(Position *position, int depth, int alpha, int beta,
                     Color color) {
     uint64_t hash = position->zobristHash;
@@ -205,9 +209,6 @@ int Engine::evaluateLeaf(Position *position, Color color,
     return (color == WHITE) ? score : -score;
 }
 
-/**
- * Material values for each piece type.
- */
 int Engine::getPieceValue(const ColoredPiece &cp) const {
     int value = 0;
     int colorMultiplier = (cp.color == WHITE) ? 1 : -1;
@@ -256,6 +257,10 @@ int Engine::scoreMove(const Move &move, const Position *pos) const {
     return 0;
 }
 
+/**
+ * Looks for further best move until all leafs are capture-free positons
+ * (quiesceing).
+ */
 int Engine::quiescence(Position *position, int alpha, int beta, Color color,
                        int plyFromRoot) {
     int stand_pat = evaluateLeaf(position, color, plyFromRoot);

@@ -4,6 +4,10 @@
 #include <vector>
 class Position;
 
+/**
+ * Checks legality of moves for given position
+ */
+
 class MovementValidator {
   public:
     MovementValidator(Position *position);

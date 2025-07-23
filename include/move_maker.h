@@ -3,6 +3,10 @@
 #include "types.h"
 #include <vector>
 
+/**
+ * Makes moves on the chessboard, handles move history and rewinding.
+ */
+
 class Position;
 struct MoveContext {
     Move move;
@@ -48,7 +52,7 @@ class MoveMaker {
         moveHistory.clear();
         moveCursor = 0;
     }
-    
+
     ColoredPiece getCapturedPiece(const Move &move) const;
 
   private:

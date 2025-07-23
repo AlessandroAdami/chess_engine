@@ -4,6 +4,11 @@
 #include <string>
 #include <vector>
 
+/**
+ * Parses move strings (e.g. "e4", "Nf3", "O-O", "exf8=n") into move object for
+ * given position
+ */
+
 class Position;
 
 class MoveParser {

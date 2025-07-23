@@ -31,8 +31,7 @@ Position::Position(const Position &p)
 /**
  * Loads the board state from a FEN string.
  * The FEN string should be in the format:
- * <board state> <active color> <castling rights> <en passant square> <halfmove>
- * <fullmove>
+ * <state> <color> <castling rights> <enPassant square> <halfmove> <fullmove>
  */
 void Position::loadFEN(const std::string &fen) {
     for (int r = 0; r < 8; r++) {
@@ -160,9 +159,6 @@ void Position::printBoard() const {
     std::cout << "   a b c d e f g h\n";
 }
 
-/**
- * @returns the piece at the given square.
- */
 ColoredPiece Position::getPiece(Square square) const {
     return board[square.row][square.col];
 }
@@ -171,16 +167,10 @@ void Position::setPiece(Square square, ColoredPiece cp) {
     board[square.row][square.col] = cp;
 }
 
-/**
- * @returns true if the given square is empty (i.e., contains no piece).
- */
 bool Position::isSquareEmpty(const Square &square) const {
     return getPiece(square) == NO_PIECE;
 }
 
-/**
- * @returns the move contex of the given move
- */
 MoveContext Position::getMoveContext(const Move &move) {
     MoveContext context;
     context.move = move;
@@ -247,6 +237,9 @@ void Position::changeTurn() {
 
 void Position::setTurn(Color color) { this->turn = color; }
 
+/**
+ * Idempotent. Only called by loadFen(fen) to initialize the Zobrist hash.
+ */
 void Position::initZobristHash() {
     zobristHash = 0;
     for (int row = 0; row < 8; ++row) {
@@ -279,34 +272,31 @@ void Position::updateZobristHash(const Move &move) {
     int movingIdx = pieceIndex(moving);
     int capturedIdx = pieceIndex(captured);
 
-    // Toggle moving piece from and to
     zobristHash ^= zobrist.pieceKeys[movingIdx][fromSq];
     zobristHash ^= zobrist.pieceKeys[movingIdx][toSq];
 
-    // Toggle captured piece off
     if (capturedIdx != -1)
         zobristHash ^= zobrist.pieceKeys[capturedIdx][toSq];
 
-    // Promotions
     if (move.promotionPiece != NO_PIECE) {
         int promoIdx = pieceIndex(move.promotionPiece);
-        zobristHash ^=
-            zobrist.pieceKeys[movingIdx][toSq];           // remove pawn at dest
-        zobristHash ^= zobrist.pieceKeys[promoIdx][toSq]; // add promoted piece
+        zobristHash ^= zobrist.pieceKeys[movingIdx][toSq];
+        zobristHash ^= zobrist.pieceKeys[promoIdx][toSq];
     }
 
+    // TODO: huh? you dont have old castling rights at this point
     // Castling rights and en passant
     // XOR out old castling rights
     zobristHash ^= zobrist.castlingRightsKey[getCastlingRightsAsIndex()];
     // XOR in new castling rights
     zobristHash ^= zobrist.castlingRightsKey[getCastlingRightsAsIndex()];
 
+    // TODO: also huh?
     if (enPassantSquare != INVALID_SQUARE)
         zobristHash ^= zobrist.enPassantFileKey[enPassantSquare.col];
     if (enPassantSquare != INVALID_SQUARE)
         zobristHash ^= zobrist.enPassantFileKey[enPassantSquare.col];
 
-    // Toggle side to move
     zobristHash ^= zobrist.sideToMoveKey;
 }
 
