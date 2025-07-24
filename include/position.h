@@ -32,16 +32,13 @@ class Position {
     Position(const Position &p);
     void loadFEN(const std::string &fen);
     std::string getFEN() const;
+    void loadPiecesSquares();
     void printBoard() const;
+    void addPieceSquare(Square s, Color c);
+    void removePieceSquare(Square s, Color c);
     MoveContext getMoveContext(const Move &move);
-
     ColoredPiece getPiece(Square square) const;
     void setPiece(Square square, ColoredPiece cp);
-    Square getEnpassantSquare() const { return enPassantSquare; }
-    Color getTurn() const { return turn; }
-    int getCastleState(Color color) const {
-        return (color == WHITE) ? castleState.white : castleState.black;
-    }
     bool isSquareEmpty(const Square &square) const;
     ColoredPiece getCapturedPiece(const Move &move) const;
     bool isEnPassant(const Move &move) const;
@@ -51,9 +48,18 @@ class Position {
     bool getIsGameOver() const;
     void changeTurn();
     void setTurn(Color color);
+    Square getEnpassantSquare() const { return enPassantSquare; }
+    Color getTurn() const { return turn; }
+    int getCastleState(Color color) const {
+        return (color == WHITE) ? castleState.white : castleState.black;
+    }
+    std::unordered_set<Square> getPiecesSquares(Color color) {
+        return (color == WHITE) ? piecesSquares.white : piecesSquares.black;
+    }
 
   private:
     ColoredPiece board[8][8];
+    PiecesSquares piecesSquares;
     Square enPassantSquare;
     Color turn;
     bool isGameOver;

@@ -17,13 +17,13 @@ class Engine {
     Move getBestMoveWithTimeLimit(int timeLimitMs);
 
   private:
-    Algorithm algorithm = TIME_BOUNDED;
+    Algorithm algorithm = DEPTH_BOUNDED;
     Position *position;
     std::unordered_map<uint64_t, int> transpositionTable;
     const int INF = 1000000;
     const int MATE_SCORE = 100000;
     const int MAX_DEPTH = 2;
-    const int MAX_TIME = 5000; // five seconds per move
+    const int MAX_TIME = 5000;
     std::chrono::steady_clock::time_point startTime;
     int timeLimitMs;
     bool isTimeUp() const;

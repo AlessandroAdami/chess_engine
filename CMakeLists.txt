@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.10)
 project(ChessEngine)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_CLANG_TIDY clang-tidy)
-# For debugging
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_BUILD_TYPE Debug)
 
 file(GLOB_RECURSE ALL_SOURCE_FILES

@@ -268,3 +268,13 @@ TEST(PositionTest, DifferentPositionsHaveDifferentHash) {
     EXPECT_NE(modifiedHash, original.zobristHash)
         << "Modified position should have different hash";
 }
+
+TEST(PositionTest, PiecesLists) {
+    Position position;
+    
+    Move e4(Square(6,4),Square(4,4));
+
+    std::unordered_set<Square> whitePiecesSquares = position.getPiecesSquares(WHITE);
+
+    EXPECT_TRUE(whitePiecesSquares.contains(Square(7,7)));
+}

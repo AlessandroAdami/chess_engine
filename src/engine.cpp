@@ -48,7 +48,7 @@ Move Engine::getBestMoveWithTimeLimit(int timeLimitMs) {
             if (isTimeUp())
                 return bestMove;
 
-            position->moveMaker.makeMove(move);
+            position->moveMaker.makeLegalMove(move);
             int score =
                 -negamax(position, depth - 1, -INF, INF, oppositeColor(color));
             position->moveMaker.unmakeMove();
@@ -91,7 +91,7 @@ Move Engine::minimax() {
     });
 
     for (const Move &move : moves) {
-        position->moveMaker.makeMove(move);
+        position->moveMaker.makeLegalMove(move);
         int score =
             -negamax(position, depth - 1, -beta, -alpha, oppositeColor(color));
         position->moveMaker.unmakeMove();
@@ -144,7 +144,7 @@ int Engine::negamax(Position *position, int depth, int alpha, int beta,
               });
 
     for (const Move &move : moves) {
-        position->moveMaker.makeMove(move);
+        position->moveMaker.makeLegalMove(move);
         int eval =
             -negamax(position, depth - 1, -beta, -alpha, oppositeColor(color));
         position->moveMaker.unmakeMove();
@@ -289,7 +289,7 @@ int Engine::quiescence(Position *position, int alpha, int beta, Color color,
               });
 
     for (const Move &move : noisyMoves) {
-        position->moveMaker.makeMove(move);
+        position->moveMaker.makeLegalMove(move);
         int score = -quiescence(position, -beta, -alpha, oppositeColor(color),
                                 plyFromRoot + 1);
         position->moveMaker.unmakeMove();

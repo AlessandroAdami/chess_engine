@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 enum Piece {
@@ -75,6 +76,16 @@ struct Square {
     bool operator!=(const Square &other) const { return !(*this == other); }
 };
 
+namespace std {
+template <> struct hash<Square> {
+    std::size_t operator()(const Square &s) const noexcept {
+        int r = s.row + 8;
+        int c = s.col + 8;
+        return std::hash<int>()(r) ^ (std::hash<int>()(c) << 1);
+    }
+};
+}
+
 const Square INVALID_SQUARE = Square(-1, -1);
 
 struct Move {
@@ -99,3 +110,10 @@ struct Move {
 
 std::string getMoveString(Move move);
 bool vectorContainsMove(std::vector<Move> moves, Move move);
+
+struct PiecesSquares {
+    std::unordered_set<Square> white;
+    std::unordered_set<Square> black;
+
+    PiecesSquares() : white(), black() {}
+};

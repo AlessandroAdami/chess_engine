@@ -93,6 +93,7 @@ void Position::loadFEN(const std::string &fen) {
     this->moveMaker.clearMoveHistory();
 
     initZobristHash();
+    loadPiecesSquares();
 }
 
 std::string Position::getFEN() const {
@@ -145,6 +146,20 @@ std::string Position::getFEN() const {
     return oss.str();
 }
 
+void Position::loadPiecesSquares() {
+    for (int row = 0; row < 8; ++row) {
+        for (int col = 0; col < 8; ++col) {
+            Square s(row, col);
+            ColoredPiece cp = getPiece(s);
+            if (cp.color == WHITE) {
+                piecesSquares.white.insert(s);
+            } else if (cp.color == BLACK) {
+                piecesSquares.black.insert(s);
+            }
+        }
+    }
+}
+
 void Position::printBoard() const {
     std::cout << "\n   a b c d e f g h\n";
     std::cout << "   ~~~~~~~~~~~~~~~\n";
@@ -165,6 +180,12 @@ ColoredPiece Position::getPiece(Square square) const {
 
 void Position::setPiece(Square square, ColoredPiece cp) {
     board[square.row][square.col] = cp;
+    if (cp.color == WHITE) {
+        removePieceSquare(square, BLACK);
+    } else if (cp.color == BLACK) {
+        removePieceSquare(square, WHITE);
+    }
+    addPieceSquare(square, cp.color);
 }
 
 bool Position::isSquareEmpty(const Square &square) const {
@@ -311,4 +332,20 @@ int Position::getCastlingRightsAsIndex() const {
     if (castleState.black & QUEEN_SIDE)
         index |= (1 << 3);
     return index;
+}
+
+void Position::addPieceSquare(Square s, Color c) {
+    if (c == WHITE) {
+        piecesSquares.white.insert(s);
+    } else if (c == BLACK) {
+        piecesSquares.black.insert(s);
+    }
+}
+
+void Position::removePieceSquare(Square s, Color c) {
+    if (c == WHITE) {
+        piecesSquares.white.erase(s);
+    } else if (c == BLACK) {
+        piecesSquares.black.erase(s);
+    }
 }

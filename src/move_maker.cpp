@@ -15,7 +15,6 @@ MoveContext MoveMaker::makeMove(const Move &move) {
         return MoveContext();
     }
     return makeLegalMove(move);
-
 }
 
 /**
@@ -94,6 +93,7 @@ MoveContext MoveMaker::movePiece(const Move &move) {
 
     position->setPiece(move.to, movingPiece);
     position->setPiece(move.from, NO_PIECE);
+
     return context;
 }
 
