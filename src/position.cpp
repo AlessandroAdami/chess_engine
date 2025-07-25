@@ -3,7 +3,6 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <vector>
 
 const std::string startFEN =
     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -147,6 +146,8 @@ std::string Position::getFEN() const {
 }
 
 void Position::loadPiecesSquares() {
+    piecesSquares.white.clear();
+    piecesSquares.black.clear();
     for (int row = 0; row < 8; ++row) {
         for (int col = 0; col < 8; ++col) {
             Square s(row, col);
@@ -180,6 +181,11 @@ ColoredPiece Position::getPiece(Square square) const {
 
 void Position::setPiece(Square square, ColoredPiece cp) {
     board[square.row][square.col] = cp;
+    if (cp.color == NONE) {
+        removePieceSquare(square, BLACK);
+        removePieceSquare(square, WHITE);
+        return;
+    }
     if (cp.color == WHITE) {
         removePieceSquare(square, BLACK);
     } else if (cp.color == BLACK) {
@@ -305,14 +311,14 @@ void Position::updateZobristHash(const Move &move) {
         zobristHash ^= zobrist.pieceKeys[promoIdx][toSq];
     }
 
-    // TODO: huh? you dont have old castling rights at this point
+    // TODO: what did I do here? you dont have old castling rights at this point
     // Castling rights and en passant
     // XOR out old castling rights
     zobristHash ^= zobrist.castlingRightsKey[getCastlingRightsAsIndex()];
     // XOR in new castling rights
     zobristHash ^= zobrist.castlingRightsKey[getCastlingRightsAsIndex()];
 
-    // TODO: also huh?
+    // TODO: second what did I do here?
     if (enPassantSquare != INVALID_SQUARE)
         zobristHash ^= zobrist.enPassantFileKey[enPassantSquare.col];
     if (enPassantSquare != INVALID_SQUARE)

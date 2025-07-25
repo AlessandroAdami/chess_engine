@@ -271,10 +271,51 @@ TEST(PositionTest, DifferentPositionsHaveDifferentHash) {
 
 TEST(PositionTest, PiecesLists) {
     Position position;
-    
-    Move e4(Square(6,4),Square(4,4));
 
-    std::unordered_set<Square> whitePiecesSquares = position.getPiecesSquares(WHITE);
+    Move e4(Square(6, 4), Square(4, 4));
 
-    EXPECT_TRUE(whitePiecesSquares.contains(Square(7,7)));
+    std::unordered_set<Square> whitePiecesSquares =
+        position.getPiecesSquares(WHITE);
+
+    EXPECT_TRUE(whitePiecesSquares.contains(Square(7, 7)));
+    EXPECT_TRUE(whitePiecesSquares.contains(Square(6, 4)));
+    EXPECT_FALSE(whitePiecesSquares.contains(Square(0, 0)));
+    EXPECT_FALSE(whitePiecesSquares.contains(Square(1, 3)));
+
+    std::unordered_set<Square> blackPiecesSquares =
+        position.getPiecesSquares(BLACK);
+    EXPECT_TRUE(blackPiecesSquares.contains(Square(0, 0)));
+    EXPECT_TRUE(blackPiecesSquares.contains(Square(1, 3)));
+    EXPECT_FALSE(blackPiecesSquares.contains(Square(7, 7)));
+    EXPECT_FALSE(blackPiecesSquares.contains(Square(6, 4)));
+
+    position.loadFEN("r1bqkb1r/pp1ppppp/5n2/2p5/3nP3/2N2N2/PPPP1PPP/R1BQKB1R w KQkq - 0 1");
+
+    whitePiecesSquares = position.getPiecesSquares(WHITE);
+    EXPECT_TRUE(whitePiecesSquares.contains(Square(5, 5)));
+    EXPECT_TRUE(whitePiecesSquares.contains(Square(5, 2)));
+    blackPiecesSquares = position.getPiecesSquares(BLACK);
+    EXPECT_TRUE(blackPiecesSquares.contains(Square(4, 3)));
+    EXPECT_TRUE(blackPiecesSquares.contains(Square(3, 2)));
+
+    Move nxd4(Square(5,5), Square(4,3));
+    position.moveMaker.makeLegalMove(nxd4);
+    whitePiecesSquares = position.getPiecesSquares(WHITE);
+    EXPECT_TRUE(whitePiecesSquares.contains(Square(4, 3)));
+    EXPECT_FALSE(whitePiecesSquares.contains(Square(5, 5)));
+    blackPiecesSquares = position.getPiecesSquares(BLACK);
+    EXPECT_FALSE(blackPiecesSquares.contains(Square(4, 3)));
+
+    position.loadFEN("rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 3");
+    whitePiecesSquares = position.getPiecesSquares(WHITE);
+    EXPECT_TRUE(whitePiecesSquares.contains(Square(3, 4)));
+    blackPiecesSquares = position.getPiecesSquares(BLACK);
+    EXPECT_TRUE(blackPiecesSquares.contains(Square(3, 5)));
+    Move exf6EnPassant(Square(3,4), Square(2,5));
+    position.moveMaker.makeLegalMove(exf6EnPassant);
+    whitePiecesSquares = position.getPiecesSquares(WHITE);
+    EXPECT_TRUE(whitePiecesSquares.contains(Square(2, 5)));
+    EXPECT_FALSE(whitePiecesSquares.contains(Square(3, 4)));
+    blackPiecesSquares = position.getPiecesSquares(BLACK);
+    EXPECT_FALSE(blackPiecesSquares.contains(Square(3, 5)));
 }

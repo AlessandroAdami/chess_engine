@@ -224,22 +224,23 @@ bool MovementValidator::isValidKingMovement(Move move) const {
     return isDiagonalMove || isStraightMove;
 }
 
+// TODO: write individual getLegalPawnMoves class
 /**
  * @param color the color for which to get legal moves.
  * @returns a vector of all legal moves for the given color.
  */
 std::vector<Move> MovementValidator::getLegalMoves(Color color) {
     std::vector<Move> legalMoves;
-    for (int row = 0; row < 8; ++row) {
-        for (int col = 0; col < 8; ++col) {
-            ColoredPiece piece = this->position->getPiece(Square(row, col));
+    std::unordered_set<Square> piecesSquares = position->getPiecesSquares(color);
+    for (Square from : piecesSquares) {
+        ColoredPiece piece = this->position->getPiece(from);
             if (piece.color != color)
                 continue;
 
             for (int targetRow = 0; targetRow < 8; ++targetRow) {
                 for (int targetCol = 0; targetCol < 8; ++targetCol) {
-                    Move move{Square(row, col), Square(targetRow, targetCol),
-                              NO_PIECE};
+                    Move move(from, Square(targetRow, targetCol),
+                              NO_PIECE);
                     if (piece.piece == PAWN) {
                         // Handle pawn promotion
                         int promotionRow = (color == WHITE) ? 0 : 7;
@@ -262,7 +263,7 @@ std::vector<Move> MovementValidator::getLegalMoves(Color color) {
                     }
                 }
             }
-        }
     }
+    
     return legalMoves;
 }

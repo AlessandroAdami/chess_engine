@@ -1,5 +1,6 @@
 #include "check_scanner.h"
 #include "position.h"
+#include "types.h"
 
 CheckScanner::CheckScanner(Position *position) : position(position) {}
 
@@ -10,16 +11,13 @@ bool CheckScanner::isInCheck(Color color) const {
 }
 
 Square CheckScanner::getKingSquare(Color color) const {
-    ColoredPiece wK = ColoredPiece(WHITE, KING);
-    ColoredPiece bK = ColoredPiece(BLACK, KING);
-    for (int row = 0; row < 8; ++row) {
-        for (int col = 0; col < 8; ++col) {
-            if (position->getPiece(Square(row, col)) == wK && color == WHITE) {
-                return Square(row, col);
-            } else if (position->getPiece(Square(row, col)) == bK &&
-                       color == BLACK) {
-                return Square(row, col);
-            }
+    ColoredPiece king = ColoredPiece(color,KING);
+
+    std::unordered_set<Square> piecesSquares = position->getPiecesSquares(color);
+
+    for (Square square : piecesSquares) {
+        if (position->getPiece(square) == king) {
+            return square;
         }
     }
     return INVALID_SQUARE;
@@ -38,16 +36,16 @@ bool CheckScanner::isInStalemate(Color color) const {
 }
 
 bool CheckScanner::areThereLegalMoves(Color color) const {
-    for (int row = 0; row < 8; ++row) {
-        for (int col = 0; col < 8; ++col) {
-            ColoredPiece cp = position->getPiece(Square(row, col));
+    std::unordered_set<Square> piecesSquares = position->getPiecesSquares(color);
+    for (Square from : piecesSquares) {
+        ColoredPiece cp = position->getPiece(from);
             if (cp.color != color)
                 continue;
 
             for (int targetRow = 0; targetRow < 8; ++targetRow) {
                 for (int targetCol = 0; targetCol < 8; ++targetCol) {
-                    Move move{Square(row, col), Square(targetRow, targetCol),
-                              NO_PIECE};
+                    Move move(from, Square(targetRow, targetCol),
+                              NO_PIECE);
                     if (cp.piece == PAWN) {
                         // Handle pawn promotion
                         int promotionRow = (cp.color == WHITE) ? 0 : 7;
@@ -70,19 +68,21 @@ bool CheckScanner::areThereLegalMoves(Color color) const {
                     }
                 }
             }
-        }
     }
+    
     return false;
 }
 
 bool CheckScanner::isSquareInCheck(Square target, Color color) const {
-    for (int row = 0; row < 8; ++row) {
-        for (int col = 0; col < 8; ++col) {
-            ColoredPiece cp = position->getPiece(Square(row, col));
+    Color opponent = (color == WHITE) ? BLACK : WHITE;
+    std::unordered_set<Square> opponentPiecesSquares = position->getPiecesSquares(opponent);
+
+    for (Square from : opponentPiecesSquares) {
+        ColoredPiece cp = position->getPiece(from);
             if (cp.color == color || cp == NO_PIECE)
                 continue;
 
-            Move move{Square(row, col), target};
+            Move move(from, target);
             if (cp.piece == PAWN) {
                 // Handle pawn promotion
                 int promotionRow = (cp.color == WHITE) ? 0 : 7;
@@ -104,7 +104,7 @@ bool CheckScanner::isSquareInCheck(Square target, Color color) const {
                            cp.piece, move)) {
                 return true;
             }
-        }
     }
+    
     return false;
 }
