@@ -1,5 +1,6 @@
 #include "../include/movement_validator.h"
 #include "../include/position.h"
+#include "types.h"
 #include <gtest/gtest.h>
 
 TEST(MovementValidatorTest, PawnGoodMovement) {
@@ -405,4 +406,61 @@ TEST(MovementValidatorTest, GetLegalMoves) {
     EXPECT_FALSE(
         vectorContainsMove(legalMoves, Move(Square(6, 2), Square(7, 2),
                                             ColoredPiece(BLACK, PAWN))));
+}
+
+TEST(MovementValidatorTest, GetLegalMovements) {
+    Position position;
+    MovementValidator validator(&position);
+
+    Square from = Square(6, 4);
+    std::vector<Move> moves = validator.getLegalPawnMovements(from, WHITE);
+
+    EXPECT_TRUE(vectorContainsMove(moves, Move(from, Square(4, 4))));
+    EXPECT_TRUE(vectorContainsMove(moves, Move(from, Square(5, 4))));
+
+    from = Square(7, 6);
+    moves = validator.getLegalKnightMovements(from, WHITE);
+
+    EXPECT_TRUE(vectorContainsMove(moves, Move(from, Square(5, 7))));
+    EXPECT_TRUE(vectorContainsMove(moves, Move(from, Square(5, 5))));
+
+    position.loadFEN(
+        "rnbqkbnr/pppp1ppp/8/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR b KQkq - 1 2");
+    from = Square(4, 2);
+    moves = validator.getLegalBishopMovements(from, WHITE);
+
+    EXPECT_TRUE(vectorContainsMove(moves, Move(from, Square(7, 5))));
+    EXPECT_TRUE(vectorContainsMove(moves, Move(from, Square(1, 5))));
+    EXPECT_TRUE(vectorContainsMove(moves, Move(from, Square(3, 1))));
+
+    position.loadFEN(
+        "1nbqkbnr/pppp1ppp/8/2r1p3/2B1P3/8/PPPP1PPP/RNBQK1NR b KQk - 1 2");
+    from = Square(3, 2);
+    moves = validator.getLegalRookMovements(from, BLACK);
+
+    EXPECT_TRUE(vectorContainsMove(moves, Move(from, Square(3, 0))));
+    EXPECT_TRUE(vectorContainsMove(moves, Move(from, Square(2, 2))));
+    EXPECT_TRUE(vectorContainsMove(moves, Move(from, Square(4, 2))));
+    EXPECT_FALSE(vectorContainsMove(moves, Move(from, Square(3, 7))));
+
+    position.loadFEN(
+        "rnb1kbnr/pppp1ppp/8/2q1p3/2B1P3/8/PPPP1PPP/RNBQK1NR b KQk - 1 2");
+    from = Square(3, 2);
+    moves = validator.getLegalQueenMovements(from, BLACK);
+
+    EXPECT_TRUE(vectorContainsMove(moves, Move(from, Square(3, 0))));
+    EXPECT_TRUE(vectorContainsMove(moves, Move(from, Square(2, 2))));
+    EXPECT_TRUE(vectorContainsMove(moves, Move(from, Square(4, 2))));
+    EXPECT_FALSE(vectorContainsMove(moves, Move(from, Square(3, 7))));
+    EXPECT_TRUE(vectorContainsMove(moves, Move(from, Square(1, 4))));
+    EXPECT_TRUE(vectorContainsMove(moves, Move(from, Square(6, 5))));
+
+    position.loadFEN(
+        "rnb1kb1r/pppp1ppp/5n2/2q1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQk - 3 3");
+    from = Square(7, 4);
+    moves = validator.getLegalKingMovements(from, WHITE);
+
+    EXPECT_TRUE(vectorContainsMove(moves, Move(from, Square(6, 4))));
+    EXPECT_TRUE(vectorContainsMove(moves, Move(from, Square(7, 5))));
+    EXPECT_TRUE(vectorContainsMove(moves, Move(from, Square(7, 6))));
 }

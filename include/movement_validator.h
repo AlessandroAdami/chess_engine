@@ -5,7 +5,7 @@
 class Position;
 
 /**
- * Checks legality of moves for given position
+ * Checks and generates legal moves for a given position.
  */
 
 class MovementValidator {
@@ -24,4 +24,12 @@ class MovementValidator {
     bool isValidQueenMovement(Move move) const;
     bool isValidKingMovement(Move move) const;
     bool moveLeadsIntoCheck(Move move) const;
+    std::vector<Move> getLegalPawnMovements(Square from, Color color) const;
+    std::vector<Move> getLegalKnightMovements(Square from, Color color) const;
+    std::vector<Move> getLegalBishopMovements(Square from, Color color) const;
+    std::vector<Move> getLegalRookMovements(Square from, Color color) const;
+    std::vector<Move> getLegalQueenMovements(Square from, Color color) const;
+    std::vector<Move> getLegalKingMovements(Square from, Color color) const;
+
+    friend class MovementValidatorTest_GetLegalMovements_Test;
 };

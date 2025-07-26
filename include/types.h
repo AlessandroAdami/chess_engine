@@ -74,6 +74,7 @@ struct Square {
     }
 
     bool operator!=(const Square &other) const { return !(*this == other); }
+    bool isValid() { return (row < 8 && row > -1 && col < 8 && col > -1); }
 };
 
 namespace std {
@@ -84,7 +85,7 @@ template <> struct hash<Square> {
         return std::hash<int>()(r) ^ (std::hash<int>()(c) << 1);
     }
 };
-}
+} // namespace std
 
 const Square INVALID_SQUARE = Square(-1, -1);
 

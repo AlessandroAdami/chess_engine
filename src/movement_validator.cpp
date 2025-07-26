@@ -1,5 +1,7 @@
 #include "movement_validator.h"
 #include "position.h"
+#include "types.h"
+#include <algorithm>
 
 MovementValidator::MovementValidator(Position *position) : position(position) {}
 
@@ -224,46 +226,233 @@ bool MovementValidator::isValidKingMovement(Move move) const {
     return isDiagonalMove || isStraightMove;
 }
 
-// TODO: write individual getLegalPawnMoves class
 /**
  * @param color the color for which to get legal moves.
  * @returns a vector of all legal moves for the given color.
  */
 std::vector<Move> MovementValidator::getLegalMoves(Color color) {
     std::vector<Move> legalMoves;
-    std::unordered_set<Square> piecesSquares = position->getPiecesSquares(color);
-    for (Square from : piecesSquares) {
-        ColoredPiece piece = this->position->getPiece(from);
-            if (piece.color != color)
-                continue;
+    std::unordered_set<Square> piecesSquares =
+        position->getPiecesSquares(color);
 
-            for (int targetRow = 0; targetRow < 8; ++targetRow) {
-                for (int targetCol = 0; targetCol < 8; ++targetCol) {
-                    Move move(from, Square(targetRow, targetCol),
-                              NO_PIECE);
-                    if (piece.piece == PAWN) {
-                        // Handle pawn promotion
-                        int promotionRow = (color == WHITE) ? 0 : 7;
-                        if (targetRow == promotionRow) {
-                            for (const Piece &promotionPiece :
-                                 {QUEEN, ROOK, BISHOP, KNIGHT}) {
-                                move.promotionPiece =
-                                    ColoredPiece(color, promotionPiece);
-                                if (position->movementValidator.isValidMove(
-                                        move)) {
-                                    legalMoves.push_back(move);
-                                }
-                            }
-                        } else if (position->movementValidator.isValidMove(
-                                       move)) {
-                            legalMoves.push_back(move);
-                        }
-                    } else if (position->movementValidator.isValidMove(move)) {
-                        legalMoves.push_back(move);
+    for (Square from : piecesSquares) {
+        std::vector<Move> pieceMoves;
+        ColoredPiece cp = this->position->getPiece(from);
+        switch (cp.piece) {
+        case PAWN:
+            pieceMoves = getLegalPawnMovements(from, color);
+            break;
+        case KNIGHT:
+            pieceMoves = getLegalKnightMovements(from, color);
+            break;
+        case BISHOP:
+            pieceMoves = getLegalBishopMovements(from, color);
+            break;
+        case ROOK:
+            pieceMoves = getLegalRookMovements(from, color);
+            break;
+        case QUEEN:
+            pieceMoves = getLegalQueenMovements(from, color);
+            break;
+        case KING:
+            pieceMoves = getLegalKingMovements(from, color);
+            break;
+        default: // NO_PIECE
+            break;
+        }
+        std::erase_if(pieceMoves, [&](const Move &move) {
+            return moveLeadsIntoCheck(move);
+        });
+        legalMoves.insert(legalMoves.end(), pieceMoves.begin(),
+                          pieceMoves.end());
+    }
+
+    return legalMoves;
+}
+
+std::vector<Move> MovementValidator::getLegalPawnMovements(Square from,
+                                                           Color color) const {
+    std::vector<Move> pawnMoves;
+
+    int direction = (color == WHITE) ? -1 : 1;
+    int startRow = (color == WHITE) ? 6 : 1;
+    int promotionRow = (color == WHITE) ? 0 : 7;
+
+    Square oneStep(from.row + direction, from.col);
+    Square twoStep(from.row + 2 * direction, from.col);
+
+    if (oneStep.isValid() && position->getPiece(oneStep) == NO_PIECE) {
+        if (oneStep.row == promotionRow) {
+            for (Piece p : {QUEEN, ROOK, BISHOP, KNIGHT}) {
+                ColoredPiece cp(color, p);
+                pawnMoves.push_back(Move(from, oneStep, cp));
+            }
+        } else {
+            pawnMoves.push_back(Move(from, oneStep));
+        }
+
+        if (from.row == startRow && position->getPiece(twoStep) == NO_PIECE) {
+            pawnMoves.push_back(Move(from, twoStep));
+        }
+    }
+
+    for (int dc : {-1, 1}) {
+        Square diag(from.row + direction, from.col + dc);
+        if (diag.isValid()) {
+            ColoredPiece target = position->getPiece(diag);
+            if (target != NO_PIECE && target.color != color) {
+                if (diag.row == promotionRow) {
+                    for (Piece p : {QUEEN, ROOK, BISHOP, KNIGHT}) {
+                        ColoredPiece cp(color, p);
+                        pawnMoves.push_back(Move(from, diag, cp));
                     }
+                } else {
+                    pawnMoves.push_back(Move(from, diag));
                 }
             }
+        }
     }
-    
-    return legalMoves;
+
+    Square ep = position->getEnpassantSquare();
+    if (ep.isValid() && ep.row == from.row + direction &&
+        std::abs(ep.col - from.col) == 1) {
+        pawnMoves.push_back(Move(from, ep));
+    }
+
+    return pawnMoves;
+}
+
+std::vector<Move>
+MovementValidator::getLegalKnightMovements(Square from, Color color) const {
+    std::vector<Move> knightMoves;
+    std::vector<Square> toSquares;
+    int fromRow = from.row, fromCol = from.col;
+    toSquares.push_back(Square(fromRow + 2, fromCol + 1));
+    toSquares.push_back(Square(fromRow + 2, fromCol - 1));
+    toSquares.push_back(Square(fromRow + 1, fromCol + 2));
+    toSquares.push_back(Square(fromRow + 1, fromCol - 2));
+    toSquares.push_back(Square(fromRow - 1, fromCol + 2));
+    toSquares.push_back(Square(fromRow - 1, fromCol - 2));
+    toSquares.push_back(Square(fromRow - 2, fromCol + 1));
+    toSquares.push_back(Square(fromRow - 2, fromCol - 1));
+
+    for (Square to : toSquares) {
+        bool isValidSquare =
+            (to.col < 8 && to.col > -1 && to.row < 8 && to.row > -1);
+        bool isNotFriend = position->getPiece(to).color != color;
+        if (isValidSquare && isNotFriend) {
+            knightMoves.push_back(Move(from, to));
+        }
+    }
+    return knightMoves;
+}
+
+std::vector<Move>
+MovementValidator::getLegalBishopMovements(Square from, Color color) const {
+    std::vector<Move> bishopMoves;
+    static const std::vector<std::pair<int, int>> directions = {
+        {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+
+    for (auto [dr, dc] : directions) {
+        int r = from.row + dr, c = from.col + dc;
+        while (r >= 0 && r < 8 && c >= 0 && c < 8) {
+            Square to(r, c);
+            ColoredPiece cp = position->getPiece(to);
+            if (cp == NO_PIECE) {
+                bishopMoves.push_back(Move(from, to));
+            } else {
+                if (cp.color != color)
+                    bishopMoves.push_back(Move(from, to));
+                break;
+            }
+            r += dr;
+            c += dc;
+        }
+    }
+
+    return bishopMoves;
+}
+
+std::vector<Move> MovementValidator::getLegalRookMovements(Square from,
+                                                           Color color) const {
+    std::vector<Move> rookMoves;
+    static const std::vector<std::pair<int, int>> directions = {
+        {1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+
+    for (auto [dr, dc] : directions) {
+        int r = from.row + dr, c = from.col + dc;
+        while (r >= 0 && r < 8 && c >= 0 && c < 8) {
+            Square to(r, c);
+            ColoredPiece cp = position->getPiece(to);
+            if (cp == NO_PIECE) {
+                rookMoves.push_back(Move(from, to));
+            } else {
+                if (cp.color != color)
+                    rookMoves.push_back(Move(from, to));
+                break;
+            }
+            r += dr;
+            c += dc;
+        }
+    }
+
+    return rookMoves;
+}
+
+std::vector<Move> MovementValidator::getLegalQueenMovements(Square from,
+                                                            Color color) const {
+    std::vector<Move> queenMoves;
+
+    static const std::vector<std::pair<int, int>> directions = {
+        {1, 0}, {-1, 0}, {0, 1}, {0, -1}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+
+    for (auto [dr, dc] : directions) {
+        int r = from.row + dr, c = from.col + dc;
+        while (r >= 0 && r < 8 && c >= 0 && c < 8) {
+            Square to(r, c);
+            ColoredPiece cp = position->getPiece(to);
+            if (cp == NO_PIECE) {
+                queenMoves.push_back(Move(from, to));
+            } else {
+                if (cp.color != color)
+                    queenMoves.push_back(Move(from, to));
+                break;
+            }
+            r += dr;
+            c += dc;
+        }
+    }
+
+    return queenMoves;
+}
+
+std::vector<Move> MovementValidator::getLegalKingMovements(Square from,
+                                                           Color color) const {
+    std::vector<Move> kingMoves;
+    static const std::vector<std::pair<int, int>> deltas = {
+        {-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1}};
+
+    for (auto [dr, dc] : deltas) {
+        int r = from.row + dr, c = from.col + dc;
+        if (r >= 0 && r < 8 && c >= 0 && c < 8) {
+            Square to(r, c);
+            ColoredPiece cp = position->getPiece(to);
+            if (cp == NO_PIECE || cp.color != color) {
+                kingMoves.push_back(Move(from, to));
+            }
+        }
+    }
+
+    int fromRowCastling = (color == WHITE) ? 7 : 0;
+    Square fromCastling(fromRowCastling, 4);
+    if (from == fromCastling) {
+        for (Square to :
+             {Square(fromRowCastling, 2), Square(fromRowCastling, 6)}) {
+            Move move(from, to);
+            if (isValidKingMovement(move)) {
+                kingMoves.push_back(move);
+            }
+        }
+    }
+    return kingMoves;
 }
