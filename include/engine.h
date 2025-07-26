@@ -10,6 +10,19 @@
 
 enum Algorithm { DEPTH_BOUNDED = 0, TIME_BOUNDED = 1 };
 
+enum NodeType {
+    EXACT,
+    LOWERBOUND,
+    UPPERBOUND
+};
+
+struct TTEntry {
+    int score;
+    int depth;
+    NodeType type;
+    Move bestMove;
+};
+
 class Engine {
   public:
     Engine(Position *position);
@@ -17,9 +30,9 @@ class Engine {
     Move getBestMoveWithTimeLimit(int timeLimitMs);
 
   private:
-    Algorithm algorithm = DEPTH_BOUNDED;
+    Algorithm algorithm = TIME_BOUNDED;
     Position *position;
-    std::unordered_map<uint64_t, int> transpositionTable;
+    std::unordered_map<uint64_t, TTEntry> transpositionTable;
     const int INF = 1000000;
     const int MATE_SCORE = 100000;
     const int MAX_DEPTH = 2;

@@ -17,8 +17,6 @@ Move Engine::getBestMove() {
     case DEPTH_BOUNDED:
         bestMove = minimax();
         break;
-    default:
-        bestMove = minimax();
     }
 
     return bestMove;
@@ -108,65 +106,97 @@ Move Engine::minimax() {
 
 /**
  * Negamax implementation of minimax, with alpha-beta pruning,
- * hashmap of already-seen positions, and semi-smart move ordering selection.
+ * hashmap of already-seen positions, and move ordering selection.
+ TODO: refactor long method
  */
-int Engine::negamax(Position *position, int depth, int alpha, int beta,
-                    Color color) {
+int Engine::negamax(Position *position, int depth, int alpha, int beta, Color color) {
+    if (isTimeUp()) return 0;
+    int alphaOrig = alpha;
     uint64_t hash = position->zobristHash;
-    if (transpositionTable.find(hash) != transpositionTable.end()) {
-        return transpositionTable[hash];
+
+    // Transposition table lookup
+    auto ttIt = transpositionTable.find(hash);
+    if (ttIt != transpositionTable.end()) {
+        const TTEntry &entry = ttIt->second;
+        if (entry.depth >= depth) {
+            switch (entry.type) {
+                case EXACT:
+                    return entry.score;
+                case LOWERBOUND:
+                    alpha = std::max(alpha, entry.score);
+                    break;
+                case UPPERBOUND:
+                    beta = std::min(beta, entry.score);
+                    break;
+            }
+            if (alpha >= beta)
+                return entry.score;
+        }
     }
+
     if (depth == 0 || position->getIsGameOver()) {
         int eval = quiescence(position, -INF, INF, color, MAX_DEPTH - depth);
-        transpositionTable[hash] = eval;
+        transpositionTable[hash] = TTEntry{
+            .score = eval,
+            .depth = depth,
+            .type = EXACT,
+            .bestMove = Move()
+        };
         return eval;
     }
 
     int maxEval = -INF;
-    std::vector<Move> moves =
-        position->movementValidator.getLegalMoves(position->getTurn());
+    Move bestMove;
 
-    Move pvMove;
-    auto it = principalVariation.find(position->zobristHash);
-    if (it != principalVariation.end()) {
-        pvMove = it->second;
+    std::vector<Move> moves = position->movementValidator.getLegalMoves(position->getTurn());
 
-        // Move PV move to front if it exists in the list
-        auto pvIt = std::find(moves.begin(), moves.end(), pvMove);
-        if (pvIt != moves.end()) {
-            std::iter_swap(moves.begin(), pvIt);
-        }
+    // PV move ordering from TT
+    auto pvIt = transpositionTable.find(position->zobristHash);
+    if (pvIt != transpositionTable.end()) {
+        const Move &pvMove = pvIt->second.bestMove;
+        auto it = std::find(moves.begin(), moves.end(), pvMove);
+        if (it != moves.end())
+            std::iter_swap(moves.begin(), it);
     }
 
     std::sort(moves.begin(), moves.end(),
-              [this, position](const Move &a, const Move &b) {
-                  return scoreMove(a, position) > scoreMove(b, position);
-              });
+        [this, position](const Move &a, const Move &b) {
+            return scoreMove(a, position) > scoreMove(b, position);
+        });
 
     for (const Move &move : moves) {
         position->moveMaker.makeLegalMove(move);
-        int eval =
-            -negamax(position, depth - 1, -beta, -alpha, oppositeColor(color));
+        int eval = -negamax(position, depth - 1, -beta, -alpha, oppositeColor(color));
         position->moveMaker.unmakeMove();
 
         if (eval > maxEval) {
             maxEval = eval;
-
-            if (depth > 0) {
-                principalVariation[position->zobristHash] = move;
-            }
+            bestMove = move;
         }
+
         alpha = std::max(alpha, eval);
-
-        if (alpha >= beta) {
-            break;
-        }
+        if (alpha >= beta)
+            break; // beta cutoff
     }
 
-    transpositionTable[hash] = maxEval;
+    // Determine node type
+    NodeType nodeType = EXACT;
+    if (maxEval <= alphaOrig)
+        nodeType = UPPERBOUND;
+    else if (maxEval >= beta)
+        nodeType = LOWERBOUND;
+
+    // Store in TT
+    transpositionTable[hash] = TTEntry{
+        .score = maxEval,
+        .depth = depth,
+        .type = nodeType,
+        .bestMove = bestMove
+    };
 
     return maxEval;
 }
+
 
 /**
  * Simple material-based evaluation (positive for white, negative for black).

@@ -14,7 +14,9 @@
  * validation and move parsing to other modules.
  */
 
-// TODO: test zobrist hash more extensively
+/**
+* TODO: implement UCI (universal chess interface), find relevant GUI libraries using UCI
+*/
 
 class Position {
   public:
