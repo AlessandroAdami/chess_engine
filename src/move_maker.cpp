@@ -41,7 +41,7 @@ MoveContext MoveMaker::makeLegalMove(const Move &move) {
 
     this->position->changeTurn();
 
-    position->updateZobristHash(move);
+    position->updateZobristHash(move, context);
 
     if (position->isCheckmated() || position->isStalemated()) {
         position->isGameOver = true;

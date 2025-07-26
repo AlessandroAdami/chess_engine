@@ -1,4 +1,5 @@
 #include "position.h"
+#include "move_maker.h"
 #include "types.h"
 #include <iostream>
 #include <sstream>
@@ -283,13 +284,14 @@ void Position::initZobristHash() {
     if (turn == WHITE)
         zobristHash ^= zobrist.sideToMoveKey;
 
-    zobristHash ^= zobrist.castlingRightsKey[getCastlingRightsAsIndex()];
+    zobristHash ^=
+        zobrist.castlingRightsKey[getCastlingRightsAsIndex(castleState)];
 
     if (enPassantSquare != INVALID_SQUARE)
         zobristHash ^= zobrist.enPassantFileKey[enPassantSquare.col];
 }
 
-void Position::updateZobristHash(const Move &move) {
+void Position::updateZobristHash(const Move &move, MoveContext context) {
     int fromSq = move.from.row * 8 + move.from.col;
     int toSq = move.to.row * 8 + move.to.col;
 
@@ -311,31 +313,32 @@ void Position::updateZobristHash(const Move &move) {
         zobristHash ^= zobrist.pieceKeys[promoIdx][toSq];
     }
 
-    // TODO: what did I do here? you dont have old castling rights at this point
-    // Castling rights and en passant
     // XOR out old castling rights
-    zobristHash ^= zobrist.castlingRightsKey[getCastlingRightsAsIndex()];
+    zobristHash ^= zobrist.castlingRightsKey[getCastlingRightsAsIndex(
+        context.previousCastleState)];
     // XOR in new castling rights
-    zobristHash ^= zobrist.castlingRightsKey[getCastlingRightsAsIndex()];
+    zobristHash ^=
+        zobrist.castlingRightsKey[getCastlingRightsAsIndex(castleState)];
 
-    // TODO: second what did I do here?
+    // XOR out old enPassant file
     if (enPassantSquare != INVALID_SQUARE)
-        zobristHash ^= zobrist.enPassantFileKey[enPassantSquare.col];
+        zobristHash ^= zobrist.enPassantFileKey[context.previousEnPassant.col];
+    // XOR out new enPassant file
     if (enPassantSquare != INVALID_SQUARE)
         zobristHash ^= zobrist.enPassantFileKey[enPassantSquare.col];
 
     zobristHash ^= zobrist.sideToMoveKey;
 }
 
-int Position::getCastlingRightsAsIndex() const {
+int Position::getCastlingRightsAsIndex(CastlingState state) const {
     int index = 0;
-    if (castleState.white & KING_SIDE)
+    if (state.white & KING_SIDE)
         index |= (1 << 0);
-    if (castleState.white & QUEEN_SIDE)
+    if (state.white & QUEEN_SIDE)
         index |= (1 << 1);
-    if (castleState.black & KING_SIDE)
+    if (state.black & KING_SIDE)
         index |= (1 << 2);
-    if (castleState.black & QUEEN_SIDE)
+    if (state.black & QUEEN_SIDE)
         index |= (1 << 3);
     return index;
 }

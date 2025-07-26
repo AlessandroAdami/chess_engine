@@ -14,6 +14,8 @@
  * validation and move parsing to other modules.
  */
 
+// TODO: test zobrist hash more extensively
+
 class Position {
   public:
     MoveMaker moveMaker;
@@ -61,8 +63,8 @@ class Position {
     CastlingState castleState;
     Zobrist zobrist;
     void initZobristHash();
-    int getCastlingRightsAsIndex() const;
-    void updateZobristHash(const Move &move);
+    int getCastlingRightsAsIndex(CastlingState state) const;
+    void updateZobristHash(const Move &move, MoveContext context);
 
     friend class MoveMaker;
 };

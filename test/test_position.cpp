@@ -1,5 +1,6 @@
 #include "../include/position.h"
 #include "../include/types.h"
+#include "zobrist.h"
 #include <gtest/gtest.h>
 
 TEST(PositionTest, LoadFenFromStartingPosition) {
@@ -222,27 +223,54 @@ TEST(PositionTest, GetMoveContext) {
     EXPECT_EQ(actualContext, expectedContext);
 }
 
-TEST(PositionTest, HashIsReversibleAfterMakeUnmake) {
-    Position position;
-    uint64_t originalHash = position.zobristHash;
+TEST(ZobristHashTest, HashStabilityUnderReversibleMove) {
+    Position pos;
+    uint64_t initialHash = pos.zobristHash;
 
-    std::vector<Move> moves =
-        position.movementValidator.getLegalMoves(position.getTurn());
-    ASSERT_FALSE(moves.empty())
-        << "No legal moves available for initial position";
+    Move move(Square(6, 4), Square(5, 4));
 
-    Move move = moves[0];
+    ASSERT_EQ(pos.getPiece(move.from).piece, PAWN);
 
-    position.moveMaker.makeMove(move);
-    position.moveMaker.unmakeMove();
+    pos.moveMaker.makeMove(move);
+    uint64_t afterMoveHash = pos.zobristHash;
 
-    uint64_t restoredHash = position.zobristHash;
+    pos.moveMaker.unmakeMove();
+    uint64_t finalHash = pos.zobristHash;
 
-    EXPECT_EQ(originalHash, restoredHash)
-        << "Zobrist hash mismatch after make/unmake";
+    EXPECT_NE(initialHash, afterMoveHash);
+    EXPECT_EQ(initialHash, finalHash);
 }
 
-TEST(PositionTest, IdenticalPositionsHaveSameHash) {
+TEST(ZobristHashTest, PerComponentXorReversibility) {
+    Zobrist zobrist = Zobrist();
+    uint64_t h = 0;
+
+    int idx = pieceIndex(ColoredPiece(WHITE, ROOK));
+    int sq = 7 * 8 + 0;
+    uint64_t pieceKey = zobrist.pieceKeys[idx][sq];
+    h ^= pieceKey;
+    h ^= pieceKey;
+    EXPECT_EQ(h, 0);
+
+    for (int i = 0; i < 16; ++i) {
+        uint64_t hash = zobrist.castlingRightsKey[i];
+        uint64_t state = 0;
+        state ^= hash;
+        state ^= hash;
+        EXPECT_EQ(state, 0);
+    }
+
+    for (int f = 0; f < 8; ++f) {
+        uint64_t fileKey = zobrist.enPassantFileKey[f];
+        uint64_t test = 0;
+        test ^= fileKey;
+        test ^= fileKey;
+        EXPECT_EQ(test, 0);
+    }
+}
+
+
+TEST(ZobristHashTest, IdenticalPositionsHaveSameHash) {
     Position pos1;
     Position pos2;
 
@@ -251,9 +279,16 @@ TEST(PositionTest, IdenticalPositionsHaveSameHash) {
 
     EXPECT_EQ(pos1.zobristHash, pos2.zobristHash)
         << "Hashes differ for identical positions";
+
+    Move e4(Square(6, 4), Square(4, 4));
+    pos1.moveMaker.makeLegalMove(e4);
+    pos2.moveMaker.makeLegalMove(e4);
+
+    EXPECT_EQ(pos1.zobristHash, pos2.zobristHash)
+        << "Hashes differ for identical positions";
 }
 
-TEST(PositionTest, DifferentPositionsHaveDifferentHash) {
+TEST(ZobristHashTest, DifferentPositionsHaveDifferentHash) {
     Position position;
     std::vector<Move> moves =
         position.movementValidator.getLegalMoves(position.getTurn());
