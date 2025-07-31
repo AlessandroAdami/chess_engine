@@ -28,10 +28,12 @@ add_custom_target(
 #    COMMENT "Auto-formatting source files"
 #)
 
-# Main executable
+# Main executables
 add_executable(chess_engine src/main.cpp)
+add_executable(chess_uci src/uci.cpp)
 
 file(GLOB LIB_RESOURCES "src/*.cpp")
+list(FILTER LIB_RESOURCES EXCLUDE REGEX ".*uci\\.cpp$")
 
 add_library(chesslib ${LIB_RESOURCES})
 
@@ -39,8 +41,11 @@ add_library(chesslib ${LIB_RESOURCES})
 target_include_directories(chesslib PUBLIC include)
 
 # Link main executable to library
-target_link_libraries(chess_engine PRIVATE chesslib)
+target_include_directories(chess_engine PRIVATE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/include)
+target_include_directories(chess_uci PRIVATE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/include)
 
+target_link_libraries(chess_engine PRIVATE chesslib)
+target_link_libraries(chess_uci PRIVATE chesslib)
 # --------- GoogleTest Setup ---------
 
 include(FetchContent)

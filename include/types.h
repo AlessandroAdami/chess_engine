@@ -109,34 +109,36 @@ struct Move {
     bool operator!=(const Move &other) const { return !(*this == other); }
 
     std::string toUCI() {
-        std::string uci;
+    std::string uci;
 
-        uci += static_cast<char>('a' + from.col);
-        uci += static_cast<char>('1' + from.row);
-        uci += static_cast<char>('a' + to.col);
-        uci += static_cast<char>('1' + to.row);
+    uci += static_cast<char>('a' + from.col);
+    uci += static_cast<char>('1' + (7 - from.row));
 
-        if (promotionPiece != NO_COLORED_PIECE) {
-            switch (promotionPiece.piece) {
-            case QUEEN:
-                uci += 'q';
-                break;
-            case ROOK:
-                uci += 'r';
-                break;
-            case BISHOP:
-                uci += 'b';
-                break;
-            case KNIGHT:
-                uci += 'n';
-                break;
-            default:
-                break;
-            }
+    uci += static_cast<char>('a' + to.col);
+    uci += static_cast<char>('1' + (7 - to.row));
+
+    if (promotionPiece != NO_COLORED_PIECE) {
+        switch (promotionPiece.piece) {
+        case QUEEN:
+            uci += 'q';
+            break;
+        case ROOK:
+            uci += 'r';
+            break;
+        case BISHOP:
+            uci += 'b';
+            break;
+        case KNIGHT:
+            uci += 'n';
+            break;
+        default:
+            break;
         }
-
-        return uci;
     }
+
+    return uci;
+}
+
 };
 
 std::string getMoveString(Move move);

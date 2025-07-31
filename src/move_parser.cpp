@@ -126,25 +126,24 @@ std::string MoveParser::moveToString(const Move move) const {
     return moveRepresentation;
 }
 
-Move uciToMove(const std::string &uci, const Position *position) {
+Move MoveParser::uciToMove(const std::string &uci) {
     if (uci.size() < 4)
-        return Move(); // Invalid move
+        return Move();
 
-    // Parse from square
     int fromCol = uci[0] - 'a';
-    int fromRow = uci[1] - '1';
-    Square from(fromRow, fromCol);
-
-    // Parse to square
     int toCol = uci[2] - 'a';
-    int toRow = uci[3] - '1';
+
+    int fromRow = 8 - (uci[1] - '0');
+    int toRow = 8 - (uci[3] - '0');
+
+    Square from(fromRow, fromCol);
     Square to(toRow, toCol);
 
     ColoredPiece promotion = NO_COLORED_PIECE;
 
     if (uci.size() == 5) {
         Piece promotedPiece;
-        switch (uci[4]) {
+        switch (std::tolower(uci[4])) {
         case 'q':
             promotedPiece = QUEEN;
             break;
