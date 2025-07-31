@@ -1,4 +1,5 @@
 #include "zobrist.h"
+#include <random>
 
 Zobrist::Zobrist() {
     std::mt19937_64 rng(0xCAFEBABE);
