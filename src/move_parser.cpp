@@ -64,7 +64,7 @@ std::string MoveParser::moveToString(const Move move) const {
     char toCol = 'a' + move.to.col;
     char toRow = '1' + (7 - move.to.row);
 
-    bool isCapture = this->position->getCapturedPiece(move) != NO_PIECE;
+    bool isCapture = this->position->getCapturedPiece(move) != NO_COLORED_PIECE;
 
     if (type == KING && std::abs(move.to.col - move.from.col) == 2) {
         moveRepresentation = (move.to.col > move.from.col) ? "o-o" : "o-o-o";
@@ -124,4 +124,48 @@ std::string MoveParser::moveToString(const Move move) const {
                    moveRepresentation.begin(), ::tolower);
 
     return moveRepresentation;
+}
+
+Move uciToMove(const std::string &uci, const Position *position) {
+    if (uci.size() < 4)
+        return Move(); // Invalid move
+
+    // Parse from square
+    int fromCol = uci[0] - 'a';
+    int fromRow = uci[1] - '1';
+    Square from(fromRow, fromCol);
+
+    // Parse to square
+    int toCol = uci[2] - 'a';
+    int toRow = uci[3] - '1';
+    Square to(toRow, toCol);
+
+    ColoredPiece promotion = NO_COLORED_PIECE;
+
+    if (uci.size() == 5) {
+        Piece promotedPiece;
+        switch (uci[4]) {
+        case 'q':
+            promotedPiece = QUEEN;
+            break;
+        case 'r':
+            promotedPiece = ROOK;
+            break;
+        case 'b':
+            promotedPiece = BISHOP;
+            break;
+        case 'n':
+            promotedPiece = KNIGHT;
+            break;
+        default:
+            promotedPiece = EMPTY;
+        }
+
+        if (promotedPiece != EMPTY) {
+            Color turn = position->getTurn();
+            promotion = ColoredPiece{turn, promotedPiece};
+        }
+    }
+
+    return Move(from, to, promotion);
 }

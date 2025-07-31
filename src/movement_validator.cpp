@@ -15,7 +15,7 @@ bool MovementValidator::isValidMove(const Move &move) const {
         return false;
     }
 
-    if (movingPiece == NO_PIECE)
+    if (movingPiece == NO_COLORED_PIECE)
         return false;
     if (movingPiece.color == capturedPiece.color)
         return false;
@@ -83,34 +83,36 @@ bool MovementValidator::isValidPawnMovement(Move move) const {
     int toCol = move.to.col, toRow = move.to.row;
     int promotionRow = (cp.color == WHITE) ? 0 : 7;
 
-    if (toRow == promotionRow && move.promotionPiece == NO_PIECE)
+    if (toRow == promotionRow && move.promotionPiece == NO_COLORED_PIECE)
         return false;
 
     if (fromCol == toCol && toRow == fromRow - colorIndex &&
-        this->position->getPiece(move.to) == NO_PIECE)
+        this->position->getPiece(move.to) == NO_COLORED_PIECE)
         return true;
 
     if (fromRow == (isWhite ? 6 : 1) && fromCol == toCol &&
         toRow == fromRow - (2 * colorIndex) &&
-        this->position->getPiece(move.to) == NO_PIECE &&
+        this->position->getPiece(move.to) == NO_COLORED_PIECE &&
         this->position->getPiece(Square(toRow + colorIndex, toCol)) ==
-            NO_PIECE) {
+            NO_COLORED_PIECE) {
         return true;
     }
     if (toCol == fromCol - 1 && toRow == fromRow - colorIndex &&
-        this->position->getPiece(move.to) != NO_PIECE)
+        this->position->getPiece(move.to) != NO_COLORED_PIECE)
         return true;
     if (toCol == fromCol + 1 && toRow == fromRow - colorIndex &&
-        this->position->getPiece(move.to) != NO_PIECE)
+        this->position->getPiece(move.to) != NO_COLORED_PIECE)
         return true;
 
     if (move.to == this->position->getEnpassantSquare() &&
         toCol == fromCol - 1 && toRow == fromRow - colorIndex &&
-        this->position->getPiece(Square(toRow + colorIndex, toCol)) != NO_PIECE)
+        this->position->getPiece(Square(toRow + colorIndex, toCol)) !=
+            NO_COLORED_PIECE)
         return true;
     if (move.to == this->position->getEnpassantSquare() &&
         toCol == fromCol + 1 && toRow == fromRow - colorIndex &&
-        this->position->getPiece(Square(toRow + colorIndex, toCol)) != NO_PIECE)
+        this->position->getPiece(Square(toRow + colorIndex, toCol)) !=
+            NO_COLORED_PIECE)
         return true;
 
     return false;
@@ -281,7 +283,7 @@ std::vector<Move> MovementValidator::getLegalPawnMovements(Square from,
     Square oneStep(from.row + direction, from.col);
     Square twoStep(from.row + 2 * direction, from.col);
 
-    if (oneStep.isValid() && position->getPiece(oneStep) == NO_PIECE) {
+    if (oneStep.isValid() && position->getPiece(oneStep) == NO_COLORED_PIECE) {
         if (oneStep.row == promotionRow) {
             for (Piece p : {QUEEN, ROOK, BISHOP, KNIGHT}) {
                 ColoredPiece cp(color, p);
@@ -291,7 +293,8 @@ std::vector<Move> MovementValidator::getLegalPawnMovements(Square from,
             pawnMoves.push_back(Move(from, oneStep));
         }
 
-        if (from.row == startRow && position->getPiece(twoStep) == NO_PIECE) {
+        if (from.row == startRow &&
+            position->getPiece(twoStep) == NO_COLORED_PIECE) {
             pawnMoves.push_back(Move(from, twoStep));
         }
     }
@@ -300,7 +303,7 @@ std::vector<Move> MovementValidator::getLegalPawnMovements(Square from,
         Square diag(from.row + direction, from.col + dc);
         if (diag.isValid()) {
             ColoredPiece target = position->getPiece(diag);
-            if (target != NO_PIECE && target.color != color) {
+            if (target != NO_COLORED_PIECE && target.color != color) {
                 if (diag.row == promotionRow) {
                     for (Piece p : {QUEEN, ROOK, BISHOP, KNIGHT}) {
                         ColoredPiece cp(color, p);
@@ -358,7 +361,7 @@ MovementValidator::getLegalBishopMovements(Square from, Color color) const {
         while (r >= 0 && r < 8 && c >= 0 && c < 8) {
             Square to(r, c);
             ColoredPiece cp = position->getPiece(to);
-            if (cp == NO_PIECE) {
+            if (cp == NO_COLORED_PIECE) {
                 bishopMoves.push_back(Move(from, to));
             } else {
                 if (cp.color != color)
@@ -384,7 +387,7 @@ std::vector<Move> MovementValidator::getLegalRookMovements(Square from,
         while (r >= 0 && r < 8 && c >= 0 && c < 8) {
             Square to(r, c);
             ColoredPiece cp = position->getPiece(to);
-            if (cp == NO_PIECE) {
+            if (cp == NO_COLORED_PIECE) {
                 rookMoves.push_back(Move(from, to));
             } else {
                 if (cp.color != color)
@@ -411,7 +414,7 @@ std::vector<Move> MovementValidator::getLegalQueenMovements(Square from,
         while (r >= 0 && r < 8 && c >= 0 && c < 8) {
             Square to(r, c);
             ColoredPiece cp = position->getPiece(to);
-            if (cp == NO_PIECE) {
+            if (cp == NO_COLORED_PIECE) {
                 queenMoves.push_back(Move(from, to));
             } else {
                 if (cp.color != color)
@@ -437,7 +440,7 @@ std::vector<Move> MovementValidator::getLegalKingMovements(Square from,
         if (r >= 0 && r < 8 && c >= 0 && c < 8) {
             Square to(r, c);
             ColoredPiece cp = position->getPiece(to);
-            if (cp == NO_PIECE || cp.color != color) {
+            if (cp == NO_COLORED_PIECE || cp.color != color) {
                 kingMoves.push_back(Move(from, to));
             }
         }

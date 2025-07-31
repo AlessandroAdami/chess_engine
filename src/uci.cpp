@@ -1,7 +1,25 @@
-#include <iostream>
-#include <string>
+#include "uci.h"
 #include "engine.h"
-#include "position.h"
+#include <iostream>
+#include <sstream>
+
+const std::string fen =
+    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+
+void parsePositionCommand(const std::string &line, Position &pos) {
+    if (line.find("startpos") != std::string::npos) {
+        pos.loadFEN(fen);
+        size_t movesIdx = line.find("moves");
+        if (movesIdx != std::string::npos) {
+            std::istringstream iss(line.substr(movesIdx + 6));
+            std::string moveStr;
+            while (iss >> moveStr) {
+                Move move = pos.moveParser.uciToMove(moveStr);
+                pos.moveMaker.makeLegalMove(move);
+            }
+        }
+    }
+}
 
 void uciLoop() {
     std::string line;
@@ -16,12 +34,19 @@ void uciLoop() {
         } else if (line == "isready") {
             std::cout << "readyok\n";
         } else if (line.rfind("position", 0) == 0) {
-            // Handle setting position
-            // e.g., "position startpos moves e2e4 e7e5"
+            parsePositionCommand(line, position);
         } else if (line.rfind("go", 0) == 0) {
-            // Start search, e.g. call engine.getBestMove()
-            Move best = engine.getBestMove();
-            std::cout << "bestmove " << best.toUCI() << "\n";
+            int movetime = 1000;
+            std::istringstream iss(line);
+            std::string token;
+            while (iss >> token) {
+                if (token == "movetime" && iss >> token) {
+                    movetime = std::stoi(token);
+                }
+            }
+
+            Move bestMove = engine.getBestMoveWithTimeLimit(movetime);
+            std::cout << "bestmove " << bestMove.toUCI() << "\n";
         } else if (line == "quit") {
             break;
         }

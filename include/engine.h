@@ -10,11 +10,7 @@
 
 enum Algorithm { DEPTH_BOUNDED = 0, TIME_BOUNDED = 1 };
 
-enum NodeType {
-    EXACT,
-    LOWERBOUND,
-    UPPERBOUND
-};
+enum NodeType { EXACT, LOWERBOUND, UPPERBOUND };
 
 struct TTEntry {
     int score;

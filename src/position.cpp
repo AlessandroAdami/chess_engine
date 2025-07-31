@@ -13,7 +13,7 @@ Position::Position()
       moveParser(this) {
     for (int row = 0; row < 8; ++row)
         for (int col = 0; col < 8; ++col)
-            board[row][col] = NO_PIECE;
+            board[row][col] = NO_COLORED_PIECE;
     loadFEN(startFEN);
     this->isGameOver = false;
 }
@@ -36,7 +36,7 @@ Position::Position(const Position &p)
 void Position::loadFEN(const std::string &fen) {
     for (int r = 0; r < 8; r++) {
         for (int c = 0; c < 8; c++) {
-            board[r][c] = NO_PIECE;
+            board[r][c] = NO_COLORED_PIECE;
         }
     }
     std::istringstream iss(fen);
@@ -101,7 +101,7 @@ std::string Position::getFEN() const {
     for (int row = 0; row < 8; ++row) {
         int emptyCount = 0;
         for (int col = 0; col < 8; ++col) {
-            if (board[row][col] == NO_PIECE) {
+            if (board[row][col] == NO_COLORED_PIECE) {
                 emptyCount++;
             } else {
                 if (emptyCount > 0) {
@@ -196,7 +196,7 @@ void Position::setPiece(Square square, ColoredPiece cp) {
 }
 
 bool Position::isSquareEmpty(const Square &square) const {
-    return getPiece(square) == NO_PIECE;
+    return getPiece(square) == NO_COLORED_PIECE;
 }
 
 MoveContext Position::getMoveContext(const Move &move) {
@@ -307,7 +307,7 @@ void Position::updateZobristHash(const Move &move, MoveContext context) {
     if (capturedIdx != -1)
         zobristHash ^= zobrist.pieceKeys[capturedIdx][toSq];
 
-    if (move.promotionPiece != NO_PIECE) {
+    if (move.promotionPiece != NO_COLORED_PIECE) {
         int promoIdx = pieceIndex(move.promotionPiece);
         zobristHash ^= zobrist.pieceKeys[movingIdx][toSq];
         zobristHash ^= zobrist.pieceKeys[promoIdx][toSq];

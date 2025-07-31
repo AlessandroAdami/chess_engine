@@ -46,7 +46,7 @@ bool CheckScanner::areThereLegalMoves(Color color) const {
 
         for (int targetRow = 0; targetRow < 8; ++targetRow) {
             for (int targetCol = 0; targetCol < 8; ++targetCol) {
-                Move move(from, Square(targetRow, targetCol), NO_PIECE);
+                Move move(from, Square(targetRow, targetCol), NO_COLORED_PIECE);
                 if (cp.piece == PAWN) {
                     // Handle pawn promotion
                     int promotionRow = (cp.color == WHITE) ? 0 : 7;
@@ -79,7 +79,7 @@ bool CheckScanner::isSquareInCheck(Square target, Color color) const {
 
     for (Square from : opponentPiecesSquares) {
         ColoredPiece cp = position->getPiece(from);
-        if (cp.color == color || cp == NO_PIECE)
+        if (cp.color == color || cp == NO_COLORED_PIECE)
             continue;
 
         Move move(from, target);

@@ -109,8 +109,10 @@ Move Engine::minimax() {
  * hashmap of already-seen positions, and move ordering selection.
  TODO: refactor long method
  */
-int Engine::negamax(Position *position, int depth, int alpha, int beta, Color color) {
-    if (isTimeUp()) return 0;
+int Engine::negamax(Position *position, int depth, int alpha, int beta,
+                    Color color) {
+    if (isTimeUp())
+        return 0;
     int alphaOrig = alpha;
     uint64_t hash = position->zobristHash;
 
@@ -120,14 +122,14 @@ int Engine::negamax(Position *position, int depth, int alpha, int beta, Color co
         const TTEntry &entry = ttIt->second;
         if (entry.depth >= depth) {
             switch (entry.type) {
-                case EXACT:
-                    return entry.score;
-                case LOWERBOUND:
-                    alpha = std::max(alpha, entry.score);
-                    break;
-                case UPPERBOUND:
-                    beta = std::min(beta, entry.score);
-                    break;
+            case EXACT:
+                return entry.score;
+            case LOWERBOUND:
+                alpha = std::max(alpha, entry.score);
+                break;
+            case UPPERBOUND:
+                beta = std::min(beta, entry.score);
+                break;
             }
             if (alpha >= beta)
                 return entry.score;
@@ -137,18 +139,15 @@ int Engine::negamax(Position *position, int depth, int alpha, int beta, Color co
     if (depth == 0 || position->getIsGameOver()) {
         int eval = quiescence(position, -INF, INF, color, MAX_DEPTH - depth);
         transpositionTable[hash] = TTEntry{
-            .score = eval,
-            .depth = depth,
-            .type = EXACT,
-            .bestMove = Move()
-        };
+            .score = eval, .depth = depth, .type = EXACT, .bestMove = Move()};
         return eval;
     }
 
     int maxEval = -INF;
     Move bestMove;
 
-    std::vector<Move> moves = position->movementValidator.getLegalMoves(position->getTurn());
+    std::vector<Move> moves =
+        position->movementValidator.getLegalMoves(position->getTurn());
 
     // PV move ordering from TT
     auto pvIt = transpositionTable.find(position->zobristHash);
@@ -160,13 +159,14 @@ int Engine::negamax(Position *position, int depth, int alpha, int beta, Color co
     }
 
     std::sort(moves.begin(), moves.end(),
-        [this, position](const Move &a, const Move &b) {
-            return scoreMove(a, position) > scoreMove(b, position);
-        });
+              [this, position](const Move &a, const Move &b) {
+                  return scoreMove(a, position) > scoreMove(b, position);
+              });
 
     for (const Move &move : moves) {
         position->moveMaker.makeLegalMove(move);
-        int eval = -negamax(position, depth - 1, -beta, -alpha, oppositeColor(color));
+        int eval =
+            -negamax(position, depth - 1, -beta, -alpha, oppositeColor(color));
         position->moveMaker.unmakeMove();
 
         if (eval > maxEval) {
@@ -187,16 +187,13 @@ int Engine::negamax(Position *position, int depth, int alpha, int beta, Color co
         nodeType = LOWERBOUND;
 
     // Store in TT
-    transpositionTable[hash] = TTEntry{
-        .score = maxEval,
-        .depth = depth,
-        .type = nodeType,
-        .bestMove = bestMove
-    };
+    transpositionTable[hash] = TTEntry{.score = maxEval,
+                                       .depth = depth,
+                                       .type = nodeType,
+                                       .bestMove = bestMove};
 
     return maxEval;
 }
-
 
 /**
  * Simple material-based evaluation (positive for white, negative for black).
@@ -276,11 +273,11 @@ int Engine::scoreMove(const Move &move, const Position *pos) const {
     int attackerVal = std::abs(getPieceValue(attacker));
     int victimVal = std::abs(getPieceValue(victim));
 
-    if (victim != NO_PIECE) {
+    if (victim != NO_COLORED_PIECE) {
         return 10000 + (victimVal - attackerVal);
     }
 
-    if (move.promotionPiece != NO_PIECE) {
+    if (move.promotionPiece != NO_COLORED_PIECE) {
         return 9000 + std::abs(getPieceValue(move.promotionPiece));
     }
 
@@ -306,9 +303,10 @@ int Engine::quiescence(Position *position, int alpha, int beta, Color color,
     for (const Move &move : moves) {
         ColoredPiece target =
             position->getPiece(Square(move.to.row, move.to.col));
-        bool isCapture = target != NO_PIECE;
+        bool isCapture = target != NO_COLORED_PIECE;
         bool isGoodCapture = staticExchangeEval(position, move.to, color) >= 0;
-        if ((isCapture && isGoodCapture) || move.promotionPiece != NO_PIECE) {
+        if ((isCapture && isGoodCapture) ||
+            move.promotionPiece != NO_COLORED_PIECE) {
             noisyMoves.push_back(move);
         }
     }
@@ -373,7 +371,7 @@ Engine::getSortedAttackers(Position *pos, Square target) const {
         for (int col = 0; col < 8; ++col) {
             Square from{row, col};
             ColoredPiece cp = pos->getPiece(from);
-            if (cp == NO_PIECE)
+            if (cp == NO_COLORED_PIECE)
                 continue;
             Move move;
             move.from = from, move.to = target;

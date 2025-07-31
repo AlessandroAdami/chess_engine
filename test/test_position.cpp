@@ -30,7 +30,7 @@ TEST(PositionTest, LoadFenFromStartingPosition) {
         EXPECT_EQ(position.getPiece(Square(1, i)), ColoredPiece(BLACK, PAWN));
 
         for (int j = 2; j < 6; j++) {
-            EXPECT_EQ(position.getPiece(Square(j, i)), NO_PIECE);
+            EXPECT_EQ(position.getPiece(Square(j, i)), NO_COLORED_PIECE);
         }
     }
 
@@ -165,7 +165,7 @@ TEST(PositionTest, GetMoveContext) {
     MoveContext expectedContext = {
         e4,
         ColoredPiece(WHITE, PAWN),
-        NO_PIECE,
+        NO_COLORED_PIECE,
         INVALID_SQUARE,
         {KING_SIDE | QUEEN_SIDE, KING_SIDE | QUEEN_SIDE},
         0,
@@ -187,7 +187,7 @@ TEST(PositionTest, GetMoveContext) {
 
     expectedContext = {shortCastle,
                        ColoredPiece(WHITE, KING),
-                       NO_PIECE,
+                       NO_COLORED_PIECE,
                        INVALID_SQUARE,
                        {KING_SIDE | QUEEN_SIDE, KING_SIDE | QUEEN_SIDE},
                        2,
@@ -268,7 +268,6 @@ TEST(ZobristHashTest, PerComponentXorReversibility) {
         EXPECT_EQ(test, 0);
     }
 }
-
 
 TEST(ZobristHashTest, IdenticalPositionsHaveSameHash) {
     Position pos1;

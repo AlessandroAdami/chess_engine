@@ -31,12 +31,12 @@ struct ColoredPiece {
     }
 };
 
-const ColoredPiece NO_PIECE = ColoredPiece(NONE, EMPTY);
+const ColoredPiece NO_COLORED_PIECE = ColoredPiece(NONE, EMPTY);
 
 char pieceToChar(const ColoredPiece &cp);
 ColoredPiece charToColoredPiece(char c);
 inline int pieceIndex(ColoredPiece cp) {
-    if (cp == NO_PIECE)
+    if (cp == NO_COLORED_PIECE)
         return -1;
     return (cp.color == WHITE ? 0 : 6) + (int)(cp.piece);
 }
@@ -92,7 +92,7 @@ const Square INVALID_SQUARE = Square(-1, -1);
 struct Move {
     Square from;
     Square to;
-    ColoredPiece promotionPiece = NO_PIECE;
+    ColoredPiece promotionPiece = NO_COLORED_PIECE;
 
     Move() : from(INVALID_SQUARE), to(INVALID_SQUARE) {}
 
@@ -107,6 +107,36 @@ struct Move {
     }
 
     bool operator!=(const Move &other) const { return !(*this == other); }
+
+    std::string toUCI() {
+        std::string uci;
+
+        uci += static_cast<char>('a' + from.col);
+        uci += static_cast<char>('1' + from.row);
+        uci += static_cast<char>('a' + to.col);
+        uci += static_cast<char>('1' + to.row);
+
+        if (promotionPiece != NO_COLORED_PIECE) {
+            switch (promotionPiece.piece) {
+            case QUEEN:
+                uci += 'q';
+                break;
+            case ROOK:
+                uci += 'r';
+                break;
+            case BISHOP:
+                uci += 'b';
+                break;
+            case KNIGHT:
+                uci += 'n';
+                break;
+            default:
+                break;
+            }
+        }
+
+        return uci;
+    }
 };
 
 std::string getMoveString(Move move);

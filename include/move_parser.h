@@ -15,6 +15,7 @@ class MoveParser {
   public:
     MoveParser(Position *position);
     Move moveStringToMove(const std::string &moveStr);
+    Move uciToMove(const std::string &moveStr);
     std::string moveToString(const Move move) const;
     void loadLegalMoves() const;
 

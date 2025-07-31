@@ -15,8 +15,9 @@
  */
 
 /**
-* TODO: implement UCI (universal chess interface), find relevant GUI libraries using UCI
-*/
+ * TODO: implement UCI (universal chess interface), find relevant GUI libraries
+ * using UCI
+ */
 
 class Position {
   public:

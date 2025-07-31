@@ -274,7 +274,7 @@ TEST(MoveMakerTest, GetCapturedPiece) {
     Move nh3(Square(3, 6), Square(5, 7));
     capturedPiece = moveMaker.getCapturedPiece(nh3);
 
-    EXPECT_EQ(capturedPiece, NO_PIECE);
+    EXPECT_EQ(capturedPiece, NO_COLORED_PIECE);
 
     fen = "rnbq2nr/ppppkppp/8/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQ - 4 4";
     position.loadFEN(fen);
@@ -282,7 +282,7 @@ TEST(MoveMakerTest, GetCapturedPiece) {
     Move shortCastle(Square(7, 4), Square(7, 6));
     capturedPiece = moveMaker.getCapturedPiece(shortCastle);
 
-    EXPECT_EQ(capturedPiece, NO_PIECE);
+    EXPECT_EQ(capturedPiece, NO_COLORED_PIECE);
 }
 
 TEST(MoveMakerTest, GetMoveContext) {
@@ -319,7 +319,7 @@ TEST(MoveMakerTest, GetMoveContext) {
     context = moveMaker.getMoveContext(ke7);
     expectedContext = {ke7,
                        ColoredPiece(BLACK, KING),
-                       NO_PIECE,
+                       NO_COLORED_PIECE,
                        INVALID_SQUARE,
                        {QUEEN_SIDE, KING_SIDE},
 
@@ -340,7 +340,7 @@ TEST(MoveMakerTest, GetMoveContext) {
     context = moveMaker.getMoveContext(castle);
     expectedContext = {castle,
                        ColoredPiece(WHITE, KING),
-                       NO_PIECE,
+                       NO_COLORED_PIECE,
                        INVALID_SQUARE,
                        {KING_SIDE | QUEEN_SIDE, KING_SIDE | QUEEN_SIDE},
                        0,
