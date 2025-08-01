@@ -107,7 +107,6 @@ Move Engine::minimax() {
 /**
  * Negamax implementation of minimax, with alpha-beta pruning,
  * hashmap of already-seen positions, and move ordering selection.
- TODO: refactor long method
  */
 int Engine::negamax(Position *position, int depth, int alpha, int beta,
                     Color color) {

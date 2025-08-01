@@ -14,10 +14,7 @@
  * validation and move parsing to other modules.
  */
 
-/**
- * TODO: implement UCI (universal chess interface), find relevant GUI libraries
- * using UCI
- */
+// TODO: write scirpt to build executable (GUI)
 
 class Position {
   public:
@@ -57,13 +54,13 @@ class Position {
 
   private:
     ColoredPiece board[8][8];
-    PiecesSquares piecesSquares;
     Square enPassantSquare;
     Color turn;
+    CastlingState castleState;
+    PiecesSquares piecesSquares;
     bool isGameOver;
     int halfmoveClock;
     int fullmoveNumber;
-    CastlingState castleState;
     Zobrist zobrist;
     void initZobristHash();
     int getCastlingRightsAsIndex(CastlingState state) const;
