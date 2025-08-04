@@ -32,7 +32,7 @@ class Engine {
     const int INF = 1000000;
     const int MATE_SCORE = 100000;
     const int MAX_DEPTH = 2;
-    const int MAX_TIME = 5000;
+    const int MAX_TIME = 1000;
     std::chrono::steady_clock::time_point startTime;
     int timeLimitMs;
     bool isTimeUp() const;

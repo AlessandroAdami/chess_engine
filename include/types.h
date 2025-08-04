@@ -2,8 +2,9 @@
 #include <string>
 #include <unordered_set>
 #include <vector>
+#include <cstdint>
 
-enum Piece {
+enum Piece : int8_t {
     EMPTY = 0,
     PAWN = 1,
     KNIGHT = 2,
@@ -13,7 +14,7 @@ enum Piece {
     KING = 6
 };
 
-enum Color { WHITE = 1, BLACK = -1, NONE = 0 };
+enum Color : int8_t { WHITE = 1, BLACK = -1, NONE = 0 };
 
 struct ColoredPiece {
     Color color;
@@ -62,12 +63,12 @@ struct CastlingState {
 };
 
 struct Square {
-    int row;
-    int col;
+    int8_t row;
+    int8_t col;
 
     Square() : row(-1), col(-1) {}
 
-    Square(int r, int c) : row(r), col(c) {}
+    Square(int8_t r, int8_t c) : row(r), col(c) {}
 
     bool operator==(const Square &other) const {
         return row == other.row && col == other.col;
@@ -109,36 +110,35 @@ struct Move {
     bool operator!=(const Move &other) const { return !(*this == other); }
 
     std::string toUCI() {
-    std::string uci;
+        std::string uci;
 
-    uci += static_cast<char>('a' + from.col);
-    uci += static_cast<char>('1' + (7 - from.row));
+        uci += static_cast<char>('a' + from.col);
+        uci += static_cast<char>('1' + (7 - from.row));
 
-    uci += static_cast<char>('a' + to.col);
-    uci += static_cast<char>('1' + (7 - to.row));
+        uci += static_cast<char>('a' + to.col);
+        uci += static_cast<char>('1' + (7 - to.row));
 
-    if (promotionPiece != NO_COLORED_PIECE) {
-        switch (promotionPiece.piece) {
-        case QUEEN:
-            uci += 'q';
-            break;
-        case ROOK:
-            uci += 'r';
-            break;
-        case BISHOP:
-            uci += 'b';
-            break;
-        case KNIGHT:
-            uci += 'n';
-            break;
-        default:
-            break;
+        if (promotionPiece != NO_COLORED_PIECE) {
+            switch (promotionPiece.piece) {
+            case QUEEN:
+                uci += 'q';
+                break;
+            case ROOK:
+                uci += 'r';
+                break;
+            case BISHOP:
+                uci += 'b';
+                break;
+            case KNIGHT:
+                uci += 'n';
+                break;
+            default:
+                break;
+            }
         }
+
+        return uci;
     }
-
-    return uci;
-}
-
 };
 
 std::string getMoveString(Move move);

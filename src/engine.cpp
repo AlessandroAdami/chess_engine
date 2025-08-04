@@ -366,8 +366,8 @@ std::vector<std::pair<Square, ColoredPiece>>
 Engine::getSortedAttackers(Position *pos, Square target) const {
     std::vector<std::pair<Square, ColoredPiece>> attackers;
 
-    for (int row = 0; row < 8; ++row) {
-        for (int col = 0; col < 8; ++col) {
+    for (int8_t row = 0; row < 8; ++row) {
+        for (int8_t col = 0; col < 8; ++col) {
             Square from{row, col};
             ColoredPiece cp = pos->getPiece(from);
             if (cp == NO_COLORED_PIECE)
