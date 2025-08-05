@@ -81,6 +81,11 @@ size_t tensorIndex(int plane, int row, int col) {
            row * BOARD_SIZE + col;
 }
 
+void clearAllPlanes(
+    std::array<float, NUM_PLANES * BOARD_SIZE * BOARD_SIZE> &tensor) {
+    tensor.fill(0.0f);
+}
+
 void clearPiecePlanes(
     std::array<float, NUM_PLANES * BOARD_SIZE * BOARD_SIZE> &tensor, int r,
     int c) {

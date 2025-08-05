@@ -15,7 +15,7 @@
  * validation and move parsing to other modules.
  */
 
-// TODO: no friend class, just setters and getters!
+// TODO: test inputTensor changes
 
 class Position {
   public:
@@ -38,12 +38,13 @@ class Position {
     void setCastleState(Color color, int state);
     bool getIsGameOver() const;
     void changeTurn();
+    std::array<float, 18 * 8 * 8> getInputTensor() const;
     Square getEnPassantSquare() const;
     Color getTurn() const;
     int getCastleState(Color color) const;
     std::unordered_set<Square> getPiecesSquares(Color color) const;
     void increaseMoveCounts(const ColoredPiece movingCP,
-                                      const ColoredPiece capturedCP);
+                            const ColoredPiece capturedCP);
 
   private:
     /**
@@ -64,8 +65,9 @@ class Position {
     int fullmoveNumber;
     Zobrist zobrist;
     void initZobristHash();
+    void initInputTensor();
     int getCastlingRightsAsIndex(CastlingState state) const;
     void updateZobristHash(const Move &move, MoveContext context);
 
-    friend class MoveMaker; //TODO:remove
+    friend class MoveMaker; // TODO:remove
 };

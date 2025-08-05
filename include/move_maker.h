@@ -19,8 +19,8 @@ struct MoveContext {
     int previousHalfmoveClock;
     int previousFullmoveNumber;
     Color previousTurn;
-    bool wasEnPassantCapture = false;
-    bool wasCastling = false;
+    bool wasEnPassantCapture;
+    bool wasCastling;
     uint64_t previousHash;
     std::array<float, 18 * 8 * 8> previousInputTensor;
 

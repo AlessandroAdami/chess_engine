@@ -1,5 +1,6 @@
 #include "../include/move_maker.h"
 #include "../include/position.h"
+#include "types.h"
 #include <gtest/gtest.h>
 
 TEST(MoveMakerTest, PawnMakeMove) {
@@ -307,7 +308,8 @@ TEST(MoveMakerTest, GetMoveContext) {
         WHITE,
         true,
         false,
-        0xC5E095EAC036ADAA};
+        0xC5E095EAC036ADAA,
+        context.previousInputTensor};
 
     EXPECT_EQ(context, expectedContext);
 
@@ -327,7 +329,8 @@ TEST(MoveMakerTest, GetMoveContext) {
                        BLACK,
                        false,
                        false,
-                       0xD167AC3D0C9ADEDF};
+                       0xD167AC3D0C9ADEDF,
+                       context.previousInputTensor};
 
     EXPECT_EQ(context, expectedContext);
 
@@ -346,7 +349,81 @@ TEST(MoveMakerTest, GetMoveContext) {
                        WHITE,
                        false,
                        true,
-                       0xE3343C1917BB9EB8};
+                       0xE3343C1917BB9EB8,
+                       context.previousInputTensor};
 
     EXPECT_EQ(context, expectedContext);
+}
+
+TEST(MoveMakerTest, InputTensorStatic) {
+    Position position;
+
+    std::array<float, 18 * 8 * 8> tensor = position.getInputTensor();
+
+    // white pieces
+    EXPECT_FLOAT_EQ(tensor[tensorIndex(0, 6, 6)], 1.0f);
+    EXPECT_FLOAT_EQ(tensor[tensorIndex(1, 7, 6)], 1.0f);
+    EXPECT_FLOAT_EQ(tensor[tensorIndex(2, 7, 5)], 1.0f);
+    EXPECT_FLOAT_EQ(tensor[tensorIndex(3, 7, 7)], 1.0f);
+    EXPECT_FLOAT_EQ(tensor[tensorIndex(4, 7, 3)], 1.0f);
+    EXPECT_FLOAT_EQ(tensor[tensorIndex(5, 7, 4)], 1.0f);
+
+    // black pieces
+    EXPECT_FLOAT_EQ(tensor[tensorIndex(6, 1, 6)], 1.0f);
+    EXPECT_FLOAT_EQ(tensor[tensorIndex(7, 0, 6)], 1.0f);
+    EXPECT_FLOAT_EQ(tensor[tensorIndex(8, 0, 5)], 1.0f);
+    EXPECT_FLOAT_EQ(tensor[tensorIndex(9, 0, 7)], 1.0f);
+    EXPECT_FLOAT_EQ(tensor[tensorIndex(10, 0, 3)], 1.0f);
+    EXPECT_FLOAT_EQ(tensor[tensorIndex(11, 0, 4)], 1.0f);
+
+    // white turn so plane to 1.0
+    EXPECT_FLOAT_EQ(tensor[tensorIndex(12, 0, 0)], 1.0f);
+
+    // all castling is possible
+    EXPECT_FLOAT_EQ(tensor[tensorIndex(13, 0, 0)], 1.0f);
+    EXPECT_FLOAT_EQ(tensor[tensorIndex(14, 6, 7)], 1.0f);
+    EXPECT_FLOAT_EQ(tensor[tensorIndex(15, 2, 3)], 1.0f);
+    EXPECT_FLOAT_EQ(tensor[tensorIndex(16, 4, 6)], 1.0f);
+
+    // no en passant
+    EXPECT_FLOAT_EQ(tensor[tensorIndex(17, 0, 0)], 0.0f);
+    EXPECT_FLOAT_EQ(tensor[tensorIndex(17, 1, 3)], 0.0f);
+}
+
+TEST(MoveMakerTest, InputTensorMoveUpdate) {
+    Position position;
+
+    std::string fen =
+        "r2qkbnr/pppbpppp/2n5/1B1pP3/8/5N2/PPPP1PPP/RNBQK2R b KQkq - 4 4";
+    position.loadFEN(fen);
+
+    std::array<float, 18 * 8 * 8> tensor = position.getInputTensor();
+
+    // turn and en passant
+    EXPECT_FLOAT_EQ(tensor[tensorIndex(12, 0, 0)], 0.0f);
+    EXPECT_FLOAT_EQ(tensor[tensorIndex(17, 0, 5)], 0.0f);
+    EXPECT_FLOAT_EQ(tensor[tensorIndex(17, 7, 5)], 0.0f);
+
+    position.moveMaker.makeLegalMove(Move(Square(1, 5), Square(3, 5)));
+    tensor = position.getInputTensor();
+
+    EXPECT_FLOAT_EQ(tensor[tensorIndex(12, 0, 0)], 1.0f);
+    EXPECT_FLOAT_EQ(tensor[tensorIndex(17, 0, 5)], 1.0f);
+    EXPECT_FLOAT_EQ(tensor[tensorIndex(17, 7, 5)], 1.0f);
+
+    // castling
+    position.moveMaker.makeLegalMove(Move(Square(7, 4), Square(7, 6)));
+    tensor = position.getInputTensor();
+
+    EXPECT_FLOAT_EQ(tensor[tensorIndex(13, 0, 0)], 0.0f);
+
+    fen = "r3kbnr/pppbqppp/2n1p3/1B1pP3/3P4/5N2/PPP2PPP/RNBQK2R b Kkq - 1 7";
+    position.loadFEN(fen);
+    position.moveMaker.makeLegalMove(Move(Square(0, 4), Square(0, 2)));
+    tensor = position.getInputTensor();
+
+    EXPECT_FLOAT_EQ(tensor[tensorIndex(13, 0, 0)], 1.0f);
+    EXPECT_FLOAT_EQ(tensor[tensorIndex(14, 0, 0)], 0.0f);
+    EXPECT_FLOAT_EQ(tensor[tensorIndex(15, 0, 0)], 0.0f);
+    EXPECT_FLOAT_EQ(tensor[tensorIndex(16, 0, 0)], 0.0f);
 }

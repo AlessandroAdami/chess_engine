@@ -157,6 +157,9 @@ constexpr int BOARD_SIZE = 8;
 
 size_t tensorIndex(int plane, int row, int col);
 
+void clearAllPlanes(
+    std::array<float, NUM_PLANES * BOARD_SIZE * BOARD_SIZE> &tensor);
+
 void clearPiecePlanes(
     std::array<float, NUM_PLANES * BOARD_SIZE * BOARD_SIZE> &tensor, int r,
     int c);

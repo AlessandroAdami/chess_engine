@@ -91,6 +91,7 @@ void Position::loadFEN(const std::string &fen) {
 
     initZobristHash();
     loadPiecesSquares();
+    initInputTensor();
 }
 
 std::string Position::getFEN() const {
@@ -276,6 +277,38 @@ void Position::updateZobristHash(const Move &move, MoveContext context) {
     zobristHash ^= zobrist.sideToMoveKey;
 }
 
+void Position::initInputTensor() {
+    clearAllPlanes(inputTensor);
+
+    for (int row = 0; row < 8; ++row) {
+        for (int col = 0; col < 8; ++col) {
+            setPiecePlane(inputTensor, board[row][col], row, col);
+        }
+    }
+
+    if (turn == WHITE) {
+        fillPlane(inputTensor, 12, 1.0f);
+    }
+
+    if (castleState.white & KING_SIDE)
+        fillPlane(inputTensor, 13, 1.0f);
+    if (castleState.white & QUEEN_SIDE)
+        fillPlane(inputTensor, 14, 1.0f);
+    if (castleState.black & KING_SIDE)
+        fillPlane(inputTensor, 15, 1.0f);
+    if (castleState.black & QUEEN_SIDE)
+        fillPlane(inputTensor, 16, 1.0f);
+
+    if (enPassantSquare.isValid()) {
+        int file = enPassantSquare.col;
+        if (file >= 0 && file < BOARD_SIZE) {
+            for (int r = 0; r < BOARD_SIZE; ++r) {
+                inputTensor[tensorIndex(17, r, file)] = 1.0f;
+            }
+        }
+    }
+}
+
 int Position::getCastlingRightsAsIndex(CastlingState state) const {
     int index = 0;
     if (state.white & KING_SIDE)
@@ -319,6 +352,10 @@ void Position::setEnPassantSquare(Square square) {
 void Position::setCastleState(Color color, int state) {
     if (color == WHITE) {
         this->castleState.white = state;
+        if (!(state & KING_SIDE) || !(state & QUEEN_SIDE)) {
+            fillPlane(this->inputTensor, 13, 0.0f);
+            fillPlane(this->inputTensor, 14, 0.0f);
+        }
         if (state & KING_SIDE) {
             fillPlane(this->inputTensor, 13, 1.0f);
         }
@@ -327,6 +364,10 @@ void Position::setCastleState(Color color, int state) {
         }
     } else {
         this->castleState.black = state;
+        if (!(state & KING_SIDE) || !(state & QUEEN_SIDE)) {
+            fillPlane(this->inputTensor, 15, 0.0f);
+            fillPlane(this->inputTensor, 16, 0.0f);
+        }
         if (state & KING_SIDE) {
             fillPlane(this->inputTensor, 15, 1.0f);
         }
@@ -349,7 +390,7 @@ std::unordered_set<Square> Position::getPiecesSquares(Color color) const {
 }
 
 void Position::increaseMoveCounts(const ColoredPiece movingCP,
-                                      const ColoredPiece capturedCP) {
+                                  const ColoredPiece capturedCP) {
     if (movingCP.piece == PAWN) {
         this->halfmoveClock = 0;
     } else if (capturedCP != NO_COLORED_PIECE) {
@@ -360,4 +401,8 @@ void Position::increaseMoveCounts(const ColoredPiece movingCP,
 
     bool isWhitesTurn = (this->getTurn() == WHITE);
     this->fullmoveNumber += isWhitesTurn ? 0 : 1;
+}
+
+std::array<float, 18 * 8 * 8> Position::getInputTensor() const {
+    return this->inputTensor;
 }
