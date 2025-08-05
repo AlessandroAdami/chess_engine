@@ -1,9 +1,9 @@
 #pragma once
+#include <array>
 #include <cstdint>
 #include <string>
 #include <unordered_set>
 #include <vector>
-#include <array>
 
 enum Piece : int8_t {
     EMPTY = 0,
@@ -166,4 +166,4 @@ void setPiecePlane(
     const ColoredPiece &cp, int r, int c);
 
 void fillPlane(std::array<float, NUM_PLANES * BOARD_SIZE * BOARD_SIZE> &tensor,
-                int plane, float v);
+               int plane, float v);

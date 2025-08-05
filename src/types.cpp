@@ -76,8 +76,6 @@ bool vectorContainsMove(std::vector<Move> moves, Move move) {
     return false;
 }
 
-
-
 size_t tensorIndex(int plane, int row, int col) {
     return static_cast<size_t>(plane) * BOARD_SIZE * BOARD_SIZE +
            row * BOARD_SIZE + col;
@@ -105,7 +103,7 @@ void setPiecePlane(
 }
 
 void fillPlane(std::array<float, NUM_PLANES * BOARD_SIZE * BOARD_SIZE> &tensor,
-                int plane, float v) {
+               int plane, float v) {
     for (int r = 0; r < BOARD_SIZE; ++r)
         for (int c = 0; c < BOARD_SIZE; ++c)
             tensor[tensorIndex(plane, r, c)] = v;

@@ -199,11 +199,12 @@ int Engine::negamax(Position *position, int depth, int alpha, int beta,
  */
 int Engine::evaluate(Position *position) const {
     int score = 0;
-    if (position->isCheckmated()) {
+    Color color = position->getTurn();
+    if (position->scanner.isInCheckmate(color)) {
         bool isWhitesTurn = position->getTurn() == WHITE;
         score = isWhitesTurn ? -MATE_SCORE : MATE_SCORE;
         return score;
-    } else if (position->isStalemated()) {
+    } else if (position->scanner.isInStalemate(color)) {
         return 0;
     }
 
@@ -222,12 +223,13 @@ int Engine::evaluate(Position *position) const {
  */
 int Engine::evaluateLeaf(Position *position, Color color,
                          int plyFromRoot) const {
-    if (position->isCheckmated()) {
+    Color current = position->getTurn();
+    if (position->scanner.isInCheckmate(current)) {
         int mateScore = MATE_SCORE - plyFromRoot;
-        return (position->getTurn() == color) ? -mateScore : mateScore;
+        return (current == color) ? -mateScore : mateScore;
     }
 
-    if (position->isStalemated()) {
+    if (position->scanner.isInStalemate(current)) {
         return 0;
     }
 

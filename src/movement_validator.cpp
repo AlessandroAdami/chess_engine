@@ -8,7 +8,8 @@ bool MovementValidator::isValidMove(const Move &move) const {
     int fromRow = move.from.row, fromCol = move.from.col;
     int toRow = move.to.row, toCol = move.to.col;
     ColoredPiece movingPiece = this->position->getPiece(move.from);
-    ColoredPiece capturedPiece = this->position->getCapturedPiece(move);
+    ColoredPiece capturedPiece =
+        this->position->moveMaker.getCapturedPiece(move);
     if (fromRow < 0 || fromRow >= 8 || fromCol < 0 || fromCol >= 8 ||
         toRow < 0 || toRow >= 8 || toCol < 0 || toCol >= 8) {
         return false;
@@ -32,7 +33,7 @@ bool MovementValidator::isValidMove(const Move &move) const {
 
 bool MovementValidator::moveLeadsIntoCheck(Move move) const {
 
-    MoveContext context = position->getMoveContext(move);
+    MoveContext context = position->moveMaker.getMoveContext(move);
 
     position->moveMaker.movePiece(move);
 
@@ -204,7 +205,7 @@ bool MovementValidator::isValidKingMovement(Move move) const {
                         Square(fromRow, col), color)) {
                     return false;
                 }
-                ColoredPiece p = position->getPiece(Square(toRow,col));
+                ColoredPiece p = position->getPiece(Square(toRow, col));
                 if (p != NO_COLORED_PIECE) {
                     return false;
                 }
@@ -216,7 +217,7 @@ bool MovementValidator::isValidKingMovement(Move move) const {
                         Square(fromRow, col), color)) {
                     return false;
                 }
-                ColoredPiece p = position->getPiece(Square(toRow,col));
+                ColoredPiece p = position->getPiece(Square(toRow, col));
                 if (p != NO_COLORED_PIECE) {
                     return false;
                 }

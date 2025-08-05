@@ -15,7 +15,6 @@ Position::Position()
         for (int col = 0; col < 8; ++col)
             board[row][col] = NO_COLORED_PIECE;
     loadFEN(startFEN);
-    this->isGameOver = false;
 }
 
 Position::Position(const Position &p)
@@ -24,8 +23,6 @@ Position::Position(const Position &p)
 
     std::string fen = p.getFEN();
     this->loadFEN(fen);
-
-    isGameOver = p.isGameOver;
 }
 
 /**
@@ -197,59 +194,6 @@ void Position::setPiece(Square square, ColoredPiece cp) {
     setPiecePlane(this->inputTensor, cp, square.row, square.col);
 }
 
-MoveContext Position::getMoveContext(const Move &move) {
-    MoveContext context;
-    context.move = move;
-    context.movedPiece = this->getPiece(move.from);
-    context.capturedPiece = getCapturedPiece(move);
-    context.previousEnPassant = this->enPassantSquare;
-    context.previousCastleState = this->castleState;
-    context.previousHalfmoveClock = this->halfmoveClock;
-    context.previousFullmoveNumber = this->fullmoveNumber;
-    context.previousTurn = this->turn;
-    context.previousIsGameOver = this->isGameOver;
-    context.wasEnPassantCapture = isEnPassant(move);
-    context.wasCastling = isCastling(move);
-    context.previousHash = this->zobristHash;
-    context.previousInputTensor = this->inputTensor;
-
-    return context;
-}
-
-ColoredPiece Position::getCapturedPiece(const Move &move) const {
-    ColoredPiece capturedPiece = getPiece(move.to);
-    if (isEnPassant(move)) {
-        int colorIndex = (getPiece(move.from).color == WHITE) ? 1 : -1;
-        Square toSquare = move.to;
-        capturedPiece =
-            getPiece(Square(toSquare.row + colorIndex, toSquare.col));
-    }
-    return capturedPiece;
-}
-
-bool Position::isEnPassant(const Move &move) const {
-    ColoredPiece movingPiece = getPiece(move.from);
-    if (movingPiece.piece != PAWN)
-        return false;
-    return move.to == this->enPassantSquare;
-}
-
-bool Position::isCastling(const Move &move) const {
-    ColoredPiece movingPiece = getPiece(move.from);
-    if (movingPiece.piece != KING)
-        return false;
-    Square fromSquare = move.from;
-    Square toSquare = move.to;
-    return std::abs(fromSquare.col - toSquare.col) == 2;
-}
-
-bool Position::isCheckmated() const {
-    return this->scanner.isInCheckmate(this->turn);
-}
-bool Position::isStalemated() const {
-    return this->scanner.isInStalemate(this->turn);
-}
-
 bool Position::getIsGameOver() const {
     Color color = getTurn();
 
@@ -263,7 +207,7 @@ void Position::changeTurn() {
     if (this->turn == WHITE) {
         fillPlane(this->inputTensor, 12, 1.0f);
     } else {
-        fillPlane(this->inputTensor,12, 0.0f);
+        fillPlane(this->inputTensor, 12, 0.0f);
     }
 }
 
@@ -375,7 +319,7 @@ void Position::setEnPassantSquare(Square square) {
 void Position::setCastleState(Color color, int state) {
     if (color == WHITE) {
         this->castleState.white = state;
-        if (state & KING_SIDE)  {
+        if (state & KING_SIDE) {
             fillPlane(this->inputTensor, 13, 1.0f);
         }
         if (state & QUEEN_SIDE) {
@@ -383,11 +327,37 @@ void Position::setCastleState(Color color, int state) {
         }
     } else {
         this->castleState.black = state;
-        if (state & KING_SIDE)  {
+        if (state & KING_SIDE) {
             fillPlane(this->inputTensor, 15, 1.0f);
         }
         if (state & QUEEN_SIDE) {
             fillPlane(this->inputTensor, 16, 1.0f);
         }
     }
+}
+
+Square Position::getEnPassantSquare() const { return this->enPassantSquare; }
+
+Color Position::getTurn() const { return turn; }
+
+int Position::getCastleState(Color color) const {
+    return (color == WHITE) ? castleState.white : castleState.black;
+}
+
+std::unordered_set<Square> Position::getPiecesSquares(Color color) const {
+    return (color == WHITE) ? piecesSquares.white : piecesSquares.black;
+}
+
+void Position::increaseMoveCounts(const ColoredPiece movingCP,
+                                      const ColoredPiece capturedCP) {
+    if (movingCP.piece == PAWN) {
+        this->halfmoveClock = 0;
+    } else if (capturedCP != NO_COLORED_PIECE) {
+        this->halfmoveClock = 0;
+    } else {
+        this->halfmoveClock++;
+    }
+
+    bool isWhitesTurn = (this->getTurn() == WHITE);
+    this->fullmoveNumber += isWhitesTurn ? 0 : 1;
 }

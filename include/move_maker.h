@@ -19,7 +19,6 @@ struct MoveContext {
     int previousHalfmoveClock;
     int previousFullmoveNumber;
     Color previousTurn;
-    bool previousIsGameOver;
     bool wasEnPassantCapture = false;
     bool wasCastling = false;
     uint64_t previousHash;
@@ -33,7 +32,6 @@ struct MoveContext {
                previousHalfmoveClock == other.previousHalfmoveClock &&
                previousFullmoveNumber == other.previousFullmoveNumber &&
                previousTurn == other.previousTurn &&
-               previousIsGameOver == other.previousIsGameOver &&
                wasEnPassantCapture == other.wasEnPassantCapture &&
                wasCastling == other.wasCastling &&
                previousHash == other.previousHash &&
@@ -67,7 +65,7 @@ class MoveMaker {
     ColoredPiece moveKing(const Move &move);
     ColoredPiece moveRook(const Move &move);
     ColoredPiece promotePawn(const Move &move);
-    void increaseHalfmoveClock(const ColoredPiece movingPiece,
-                               const ColoredPiece capturedPiece) const;
     void updateCastleAfterRookCapture(const Move &move);
+    bool isEnPassant(const Move &move) const;
+    bool isCastling(const Move &move) const;
 };

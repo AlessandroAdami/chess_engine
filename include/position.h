@@ -10,13 +10,12 @@
 #include <string>
 
 /**
- * Representing a chess position, with the board state and other uniquely
- * specifying information. Delegates move making, legality checking, king check
+ * Representing a chess position
+ * Delegates the state of the game, move making, legality checking, king check
  * validation and move parsing to other modules.
  */
 
-// TODO: write script to build executable (GUI)
-// TODO: this is a god class, extract position-state class !!
+// TODO: no friend class, just setters and getters!
 
 class Position {
   public:
@@ -33,26 +32,18 @@ class Position {
     void printBoard() const;
     void addPieceSquare(Square s, Color c);
     void removePieceSquare(Square s, Color c);
-    MoveContext getMoveContext(const Move &move);
     ColoredPiece getPiece(Square square) const;
     void setPiece(Square square, ColoredPiece cp);
     void setEnPassantSquare(Square square);
     void setCastleState(Color color, int state);
-    ColoredPiece getCapturedPiece(const Move &move) const;
-    bool isEnPassant(const Move &move) const;
-    bool isCastling(const Move &move) const;
-    bool isCheckmated() const;
-    bool isStalemated() const;
     bool getIsGameOver() const;
     void changeTurn();
-    Square getEnPassantSquare() const { return enPassantSquare; }
-    Color getTurn() const { return turn; }
-    int getCastleState(Color color) const {
-        return (color == WHITE) ? castleState.white : castleState.black;
-    }
-    std::unordered_set<Square> getPiecesSquares(Color color) {
-        return (color == WHITE) ? piecesSquares.white : piecesSquares.black;
-    }
+    Square getEnPassantSquare() const;
+    Color getTurn() const;
+    int getCastleState(Color color) const;
+    std::unordered_set<Square> getPiecesSquares(Color color) const;
+    void increaseMoveCounts(const ColoredPiece movingCP,
+                                      const ColoredPiece capturedCP);
 
   private:
     /**
@@ -69,7 +60,6 @@ class Position {
     Color turn;
     CastlingState castleState;
     PiecesSquares piecesSquares;
-    bool isGameOver;
     int halfmoveClock;
     int fullmoveNumber;
     Zobrist zobrist;
@@ -77,5 +67,5 @@ class Position {
     int getCastlingRightsAsIndex(CastlingState state) const;
     void updateZobristHash(const Move &move, MoveContext context);
 
-    friend class MoveMaker;
+    friend class MoveMaker; //TODO:remove
 };

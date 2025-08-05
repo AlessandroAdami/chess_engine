@@ -36,38 +36,59 @@ MoveContext MoveMaker::makeLegalMove(const Move &move) {
     ColoredPiece capturedPiece = context.capturedPiece;
     movePiece(move);
 
-    increaseHalfmoveClock(movingPiece, capturedPiece);
-    bool isWhitesTurn = (this->position->getTurn() == WHITE);
-    this->position->fullmoveNumber += isWhitesTurn ? 0 : 1;
+    position->increaseMoveCounts(movingPiece, capturedPiece);
 
     this->position->changeTurn();
 
     position->updateZobristHash(move, context);
 
-    if (position->isCheckmated() || position->isStalemated()) {
-        position->isGameOver = true;
-    }
-
     return context;
 }
 
 MoveContext MoveMaker::getMoveContext(const Move &move) const {
-    return this->position->getMoveContext(move);
+    MoveContext context;
+    context.move = move;
+    context.movedPiece = position->getPiece(move.from);
+    context.capturedPiece = this->getCapturedPiece(move);
+    context.previousEnPassant = position->enPassantSquare;
+    context.previousCastleState = position->castleState;
+    context.previousHalfmoveClock = position->halfmoveClock;
+    context.previousFullmoveNumber = position->fullmoveNumber;
+    context.previousTurn = position->turn;
+    context.wasEnPassantCapture = this->isEnPassant(move);
+    context.wasCastling = this->isCastling(move);
+    context.previousHash = position->zobristHash;
+    context.previousInputTensor = position->inputTensor;
+
+    return context;
 }
 
 ColoredPiece MoveMaker::getCapturedPiece(const Move &move) const {
-    return position->getCapturedPiece(move);
+    ColoredPiece capturedPiece = position->getPiece(move.to);
+    if (this->isEnPassant(move)) {
+        int colorIndex =
+            (position->getPiece(move.from).color == WHITE) ? 1 : -1;
+        Square toSquare = move.to;
+        capturedPiece =
+            position->getPiece(Square(toSquare.row + colorIndex, toSquare.col));
+    }
+    return capturedPiece;
 }
 
-void MoveMaker::increaseHalfmoveClock(const ColoredPiece movingCP,
-                                      const ColoredPiece capturedCP) const {
-    if (movingCP.piece == PAWN) {
-        this->position->halfmoveClock = 0;
-    } else if (capturedCP != NO_COLORED_PIECE) {
-        this->position->halfmoveClock = 0;
-    } else {
-        this->position->halfmoveClock++;
-    }
+bool MoveMaker::isEnPassant(const Move &move) const {
+    ColoredPiece movingPiece = position->getPiece(move.from);
+    if (movingPiece.piece != PAWN)
+        return false;
+    return move.to == position->getEnPassantSquare();
+}
+
+bool MoveMaker::isCastling(const Move &move) const {
+    ColoredPiece movingPiece = position->getPiece(move.from);
+    if (movingPiece.piece != KING)
+        return false;
+    Square fromSquare = move.from;
+    Square toSquare = move.to;
+    return std::abs(fromSquare.col - toSquare.col) == 2;
 }
 
 MoveContext MoveMaker::movePiece(const Move &move) {
@@ -142,7 +163,8 @@ ColoredPiece MoveMaker::movePawn(const Move &move) {
     }
 
     if (std::abs(fromSquare.row - toSquare.row) == 2) {
-        this->position->setEnPassantSquare(Square(toSquare.row + colorIndex, toSquare.col));
+        this->position->setEnPassantSquare(
+            Square(toSquare.row + colorIndex, toSquare.col));
         capturedPiece = NO_COLORED_PIECE;
     } else {
         this->position->setEnPassantSquare(INVALID_SQUARE);
@@ -220,7 +242,6 @@ ColoredPiece MoveMaker::moveRook(const Move &move) {
         if (rook.color == WHITE) {
             int state = position->getCastleState(WHITE) & ~QUEEN_SIDE;
             position->setCastleState(WHITE, state);
-            position->castleState.white &= ~QUEEN_SIDE;
         } else {
             int state = position->getCastleState(BLACK) & ~QUEEN_SIDE;
             position->setCastleState(BLACK, state);
@@ -274,7 +295,6 @@ void MoveMaker::unmovePiece(const MoveContext &context) {
     position->enPassantSquare = context.previousEnPassant;
     position->castleState = context.previousCastleState;
     position->turn = context.previousTurn;
-    position->isGameOver = context.previousIsGameOver;
     position->halfmoveClock = context.previousHalfmoveClock;
     position->fullmoveNumber = context.previousFullmoveNumber;
     position->inputTensor = context.previousInputTensor;

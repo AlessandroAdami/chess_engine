@@ -305,7 +305,6 @@ TEST(MoveMakerTest, GetMoveContext) {
         0,
         3,
         WHITE,
-        false,
         true,
         false,
         0xC5E095EAC036ADAA};
@@ -328,7 +327,6 @@ TEST(MoveMakerTest, GetMoveContext) {
                        BLACK,
                        false,
                        false,
-                       false,
                        0xD167AC3D0C9ADEDF};
 
     EXPECT_EQ(context, expectedContext);
@@ -346,7 +344,6 @@ TEST(MoveMakerTest, GetMoveContext) {
                        0,
                        4,
                        WHITE,
-                       false,
                        false,
                        true,
                        0xE3343C1917BB9EB8};

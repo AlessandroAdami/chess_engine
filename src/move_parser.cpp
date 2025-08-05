@@ -64,7 +64,8 @@ std::string MoveParser::moveToString(const Move move) const {
     char toCol = 'a' + move.to.col;
     char toRow = '1' + (7 - move.to.row);
 
-    bool isCapture = this->position->getCapturedPiece(move) != NO_COLORED_PIECE;
+    bool isCapture =
+        this->position->moveMaker.getCapturedPiece(move) != NO_COLORED_PIECE;
 
     if (type == KING && std::abs(move.to.col - move.from.col) == 2) {
         moveRepresentation = (move.to.col > move.from.col) ? "o-o" : "o-o-o";
