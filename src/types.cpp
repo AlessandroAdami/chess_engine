@@ -1,5 +1,5 @@
 #include "types.h"
-#include <iostream>
+#include <array>
 #include <vector>
 
 char pieceToChar(const ColoredPiece &cp) {
@@ -74,4 +74,39 @@ bool vectorContainsMove(std::vector<Move> moves, Move move) {
         }
     }
     return false;
+}
+
+
+
+size_t tensorIndex(int plane, int row, int col) {
+    return static_cast<size_t>(plane) * BOARD_SIZE * BOARD_SIZE +
+           row * BOARD_SIZE + col;
+}
+
+void clearPiecePlanes(
+    std::array<float, NUM_PLANES * BOARD_SIZE * BOARD_SIZE> &tensor, int r,
+    int c) {
+    for (int p = 0; p < 12; ++p) {
+        tensor[tensorIndex(p, r, c)] = 0.0f;
+    }
+}
+
+void setPiecePlane(
+    std::array<float, NUM_PLANES * BOARD_SIZE * BOARD_SIZE> &tensor,
+    const ColoredPiece &cp, int r, int c) {
+    if (cp.piece == EMPTY || cp.color == NONE)
+        return;
+    int plane_base = (cp.color == WHITE) ? 0 : 6;
+    int piece_index = static_cast<int>(cp.piece); // PAWN=1 ... KING=6
+    int piece_plane = plane_base + (piece_index - 1);
+    if (piece_plane >= 0 && piece_plane < 12) {
+        tensor[tensorIndex(piece_plane, r, c)] = 1.0f;
+    }
+}
+
+void fillPlane(std::array<float, NUM_PLANES * BOARD_SIZE * BOARD_SIZE> &tensor,
+                int plane, float v) {
+    for (int r = 0; r < BOARD_SIZE; ++r)
+        for (int c = 0; c < BOARD_SIZE; ++c)
+            tensor[tensorIndex(plane, r, c)] = v;
 }

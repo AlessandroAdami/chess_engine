@@ -6,6 +6,7 @@
 #include "movement_validator.h"
 #include "types.h"
 #include "zobrist.h"
+#include <array>
 #include <string>
 
 /**
@@ -14,7 +15,8 @@
  * validation and move parsing to other modules.
  */
 
-// TODO: write scirpt to build executable (GUI)
+// TODO: write script to build executable (GUI)
+// TODO: this is a god class, extract position-state class !!
 
 class Position {
   public:
@@ -34,7 +36,8 @@ class Position {
     MoveContext getMoveContext(const Move &move);
     ColoredPiece getPiece(Square square) const;
     void setPiece(Square square, ColoredPiece cp);
-    bool isSquareEmpty(const Square &square) const;
+    void setEnPassantSquare(Square square);
+    void setCastleState(Color color, int state);
     ColoredPiece getCapturedPiece(const Move &move) const;
     bool isEnPassant(const Move &move) const;
     bool isCastling(const Move &move) const;
@@ -42,8 +45,7 @@ class Position {
     bool isStalemated() const;
     bool getIsGameOver() const;
     void changeTurn();
-    void setTurn(Color color);
-    Square getEnpassantSquare() const { return enPassantSquare; }
+    Square getEnPassantSquare() const { return enPassantSquare; }
     Color getTurn() const { return turn; }
     int getCastleState(Color color) const {
         return (color == WHITE) ? castleState.white : castleState.black;
@@ -53,6 +55,15 @@ class Position {
     }
 
   private:
+    /**
+     * NN expects floats, so we store them directly instead of ints.
+     * The position information is encoded in the tensor as follows:
+     * 0-11:  white and black pieces planes
+     * 12:    turn
+     * 13-16: castling planes
+     * 17:    en passant plane
+     */
+    std::array<float, 18 * 8 * 8> inputTensor;
     ColoredPiece board[8][8];
     Square enPassantSquare;
     Color turn;

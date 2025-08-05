@@ -1,8 +1,9 @@
 #pragma once
+#include <cstdint>
 #include <string>
 #include <unordered_set>
 #include <vector>
-#include <cstdint>
+#include <array>
 
 enum Piece : int8_t {
     EMPTY = 0,
@@ -150,3 +151,19 @@ struct PiecesSquares {
 
     PiecesSquares() : white(), black() {}
 };
+
+constexpr int NUM_PLANES = 18;
+constexpr int BOARD_SIZE = 8;
+
+size_t tensorIndex(int plane, int row, int col);
+
+void clearPiecePlanes(
+    std::array<float, NUM_PLANES * BOARD_SIZE * BOARD_SIZE> &tensor, int r,
+    int c);
+
+void setPiecePlane(
+    std::array<float, NUM_PLANES * BOARD_SIZE * BOARD_SIZE> &tensor,
+    const ColoredPiece &cp, int r, int c);
+
+void fillPlane(std::array<float, NUM_PLANES * BOARD_SIZE * BOARD_SIZE> &tensor,
+                int plane, float v);

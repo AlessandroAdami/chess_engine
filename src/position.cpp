@@ -81,11 +81,11 @@ void Position::loadFEN(const std::string &fen) {
     }
 
     if (enPassant == "-") {
-        enPassantSquare = INVALID_SQUARE;
+        this->setEnPassantSquare(INVALID_SQUARE);
     } else {
         char file = enPassant[0];
         char rank = enPassant[1];
-        enPassantSquare = Square(8 - (rank - '0'), file - 'a');
+        this->setEnPassantSquare(Square(8 - (rank - '0'), file - 'a'));
     }
 
     this->halfmoveClock = halfmoveClock;
@@ -185,6 +185,7 @@ void Position::setPiece(Square square, ColoredPiece cp) {
     if (cp.color == NONE) {
         removePieceSquare(square, BLACK);
         removePieceSquare(square, WHITE);
+        clearPiecePlanes(this->inputTensor, square.row, square.col);
         return;
     }
     if (cp.color == WHITE) {
@@ -193,10 +194,7 @@ void Position::setPiece(Square square, ColoredPiece cp) {
         removePieceSquare(square, WHITE);
     }
     addPieceSquare(square, cp.color);
-}
-
-bool Position::isSquareEmpty(const Square &square) const {
-    return getPiece(square) == NO_COLORED_PIECE;
+    setPiecePlane(this->inputTensor, cp, square.row, square.col);
 }
 
 MoveContext Position::getMoveContext(const Move &move) {
@@ -213,6 +211,7 @@ MoveContext Position::getMoveContext(const Move &move) {
     context.wasEnPassantCapture = isEnPassant(move);
     context.wasCastling = isCastling(move);
     context.previousHash = this->zobristHash;
+    context.previousInputTensor = this->inputTensor;
 
     return context;
 }
@@ -261,9 +260,12 @@ bool Position::getIsGameOver() const {
 void Position::changeTurn() {
     Color turnToSet = (this->turn == WHITE) ? BLACK : WHITE;
     this->turn = turnToSet;
+    if (this->turn == WHITE) {
+        fillPlane(this->inputTensor, 12, 1.0f);
+    } else {
+        fillPlane(this->inputTensor,12, 0.0f);
+    }
 }
-
-void Position::setTurn(Color color) { this->turn = color; }
 
 /**
  * Idempotent. Only called by loadFen(fen) to initialize the Zobrist hash.
@@ -356,5 +358,36 @@ void Position::removePieceSquare(Square s, Color c) {
         piecesSquares.white.erase(s);
     } else if (c == BLACK) {
         piecesSquares.black.erase(s);
+    }
+}
+
+void Position::setEnPassantSquare(Square square) {
+    this->enPassantSquare = square;
+    fillPlane(this->inputTensor, 17, 0.0f);
+    if (this->enPassantSquare.isValid()) {
+        int file = this->enPassantSquare.col;
+        for (int r = 0; r < BOARD_SIZE; ++r) {
+            this->inputTensor[tensorIndex(17, r, file)] = 1.0f;
+        }
+    }
+}
+
+void Position::setCastleState(Color color, int state) {
+    if (color == WHITE) {
+        this->castleState.white = state;
+        if (state & KING_SIDE)  {
+            fillPlane(this->inputTensor, 13, 1.0f);
+        }
+        if (state & QUEEN_SIDE) {
+            fillPlane(this->inputTensor, 14, 1.0f);
+        }
+    } else {
+        this->castleState.black = state;
+        if (state & KING_SIDE)  {
+            fillPlane(this->inputTensor, 15, 1.0f);
+        }
+        if (state & QUEEN_SIDE) {
+            fillPlane(this->inputTensor, 16, 1.0f);
+        }
     }
 }

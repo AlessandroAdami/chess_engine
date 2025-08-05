@@ -34,7 +34,7 @@ TEST(PositionTest, LoadFenFromStartingPosition) {
         }
     }
 
-    EXPECT_EQ(position.getEnpassantSquare(), (INVALID_SQUARE));
+    EXPECT_EQ(position.getEnPassantSquare(), (INVALID_SQUARE));
     EXPECT_EQ(position.getTurn(), WHITE);
     EXPECT_EQ(position.getCastleState(WHITE), KING_SIDE | QUEEN_SIDE);
     EXPECT_EQ(position.getCastleState(BLACK), KING_SIDE | QUEEN_SIDE);

@@ -1,7 +1,6 @@
 #include "movement_validator.h"
 #include "position.h"
 #include "types.h"
-#include <algorithm>
 
 MovementValidator::MovementValidator(Position *position) : position(position) {}
 
@@ -104,12 +103,12 @@ bool MovementValidator::isValidPawnMovement(Move move) const {
         this->position->getPiece(move.to) != NO_COLORED_PIECE)
         return true;
 
-    if (move.to == this->position->getEnpassantSquare() &&
+    if (move.to == this->position->getEnPassantSquare() &&
         toCol == fromCol - 1 && toRow == fromRow - colorIndex &&
         this->position->getPiece(Square(toRow + colorIndex, toCol)) !=
             NO_COLORED_PIECE)
         return true;
-    if (move.to == this->position->getEnpassantSquare() &&
+    if (move.to == this->position->getEnPassantSquare() &&
         toCol == fromCol + 1 && toRow == fromRow - colorIndex &&
         this->position->getPiece(Square(toRow + colorIndex, toCol)) !=
             NO_COLORED_PIECE)
@@ -139,7 +138,9 @@ bool MovementValidator::isValidBishopMovement(Move move) const {
     for (int i = 1; i < steps; ++i) {
         int checkRow = fromRow + i * dRow;
         int checkCol = fromCol + i * dCol;
-        if (!position->isSquareEmpty(Square(checkRow, checkCol))) {
+        Square checkSquare = Square(checkRow, checkCol);
+        ColoredPiece checkPiece = position->getPiece(checkSquare);
+        if (checkPiece != NO_COLORED_PIECE) {
             return false;
         }
     }
@@ -162,7 +163,9 @@ bool MovementValidator::isValidRookMovement(Move move) const {
     for (int i = 1; i < steps; ++i) {
         int checkRow = fromRow + i * dRow;
         int checkCol = fromCol + i * dCol;
-        if (!position->isSquareEmpty(Square(checkRow, checkCol))) {
+        Square checkSquare = Square(checkRow, checkCol);
+        ColoredPiece checkPiece = position->getPiece(checkSquare);
+        if (checkPiece != NO_COLORED_PIECE) {
             return false;
         }
     }
@@ -201,7 +204,8 @@ bool MovementValidator::isValidKingMovement(Move move) const {
                         Square(fromRow, col), color)) {
                     return false;
                 }
-                if (!this->position->isSquareEmpty(Square(toRow, col))) {
+                ColoredPiece p = position->getPiece(Square(toRow,col));
+                if (p != NO_COLORED_PIECE) {
                     return false;
                 }
             }
@@ -212,7 +216,8 @@ bool MovementValidator::isValidKingMovement(Move move) const {
                         Square(fromRow, col), color)) {
                     return false;
                 }
-                if (!this->position->isSquareEmpty(Square(toRow, col))) {
+                ColoredPiece p = position->getPiece(Square(toRow,col));
+                if (p != NO_COLORED_PIECE) {
                     return false;
                 }
             }
@@ -316,7 +321,7 @@ std::vector<Move> MovementValidator::getLegalPawnMovements(Square from,
         }
     }
 
-    Square ep = position->getEnpassantSquare();
+    Square ep = position->getEnPassantSquare();
     if (ep.isValid() && ep.row == from.row + direction &&
         std::abs(ep.col - from.col) == 1) {
         pawnMoves.push_back(Move(from, ep));

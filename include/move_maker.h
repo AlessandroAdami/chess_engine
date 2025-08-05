@@ -1,6 +1,7 @@
 #pragma once
 
 #include "types.h"
+#include <array>
 #include <cstdint>
 #include <vector>
 
@@ -22,6 +23,7 @@ struct MoveContext {
     bool wasEnPassantCapture = false;
     bool wasCastling = false;
     uint64_t previousHash;
+    std::array<float, 18 * 8 * 8> previousInputTensor;
 
     bool operator==(const MoveContext &other) const {
         return move == other.move && movedPiece == other.movedPiece &&
@@ -34,7 +36,8 @@ struct MoveContext {
                previousIsGameOver == other.previousIsGameOver &&
                wasEnPassantCapture == other.wasEnPassantCapture &&
                wasCastling == other.wasCastling &&
-               previousHash == other.previousHash;
+               previousHash == other.previousHash &&
+               previousInputTensor == other.previousInputTensor;
     }
 };
 
