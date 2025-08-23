@@ -8,7 +8,9 @@
 const int squareSize = 150;
 const int boardSize = 8;
 const int boardPixelSize = squareSize * boardSize;
-const int sidebarWidth = 200; // new sidebar for turn display
+const int sidebarWidth = 200;
+sf::Color light = sf::Color(240, 217, 181);
+sf::Color dark  = sf::Color(181, 136, 99);
 
 std::map<char, sf::Texture> pieceTextures;
 std::string basePath = "./pieces/";
@@ -39,12 +41,12 @@ void drawBoard(sf::RenderWindow& window) {
     for (int rank = 0; rank < boardSize; ++rank) {
         for (int file = 0; file < boardSize; ++file) {
             sf::RectangleShape square(sf::Vector2f(squareSize, squareSize));
-            square.setPosition(file * squareSize, (7 - rank) * squareSize);
+            square.setPosition(file * squareSize, rank * squareSize);
 
             if ((file + rank) % 2 == 0)
-                square.setFillColor(sf::Color(240, 217, 181)); // light
+                square.setFillColor(light);
             else
-                square.setFillColor(sf::Color(181, 136, 99));  // dark
+                square.setFillColor(dark);
 
             window.draw(square);
         }
@@ -93,7 +95,6 @@ int main() {
     );
     window.setFramerateLimit(60);
 
-    // Logical view now includes board + sidebar
     sf::View view(sf::FloatRect(0, 0, boardPixelSize + sidebarWidth, boardPixelSize));
     window.setView(view);
 
