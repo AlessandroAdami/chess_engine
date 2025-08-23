@@ -15,8 +15,6 @@
  * validation and move parsing to other modules.
  */
 
-// TODO: test inputTensor changes
-
 class Position {
   public:
     MoveMaker moveMaker;
@@ -69,5 +67,10 @@ class Position {
     int getCastlingRightsAsIndex(CastlingState state) const;
     void updateZobristHash(const Move &move, MoveContext context);
 
-    friend class MoveMaker; // TODO:remove
+    /**
+    TODO: think about removing this, as MoveMaker only uses
+    public methods from board to make the moves, 
+    and only accessed private fields directly in a few places.
+     */
+    friend class MoveMaker;
 };

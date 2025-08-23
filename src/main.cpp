@@ -2,9 +2,7 @@
 #include "move_parser.h"
 #include "position.h"
 #include <iostream>
-#include <sstream>
 #include <string>
-#include <vector>
 
 int main() {
     Position position;

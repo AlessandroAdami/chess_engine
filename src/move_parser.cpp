@@ -80,10 +80,10 @@ std::string MoveParser::moveToString(const Move move) const {
         if (move.promotionPiece.piece != EMPTY) {
             moveRepresentation += '=';
             moveRepresentation +=
-                std::tolower(pieceToChar(move.promotionPiece));
+                std::tolower(move.promotionPiece.toChar());
         }
     } else {
-        moveRepresentation += std::tolower(pieceToChar(cp));
+        moveRepresentation += std::tolower(cp.toChar());
 
         bool neeedDisambiguation = false;
         bool needCol = false;

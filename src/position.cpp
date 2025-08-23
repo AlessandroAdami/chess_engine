@@ -106,7 +106,7 @@ std::string Position::getFEN() const {
                     oss << emptyCount;
                     emptyCount = 0;
                 }
-                oss << pieceToChar(board[row][col]);
+                oss << board[row][col].toChar();
             }
         }
         if (emptyCount > 0) {
@@ -166,7 +166,7 @@ void Position::printBoard() const {
     for (int row = 0; row < 8; ++row) {
         std::cout << 8 - row << "| ";
         for (int col = 0; col < 8; ++col) {
-            std::cout << pieceToChar(board[row][col]) << " ";
+            std::cout << board[row][col].toChar() << " ";
         }
         std::cout << "|" << 8 - row << "\n";
     }

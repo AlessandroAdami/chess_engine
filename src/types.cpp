@@ -100,7 +100,7 @@ void setPiecePlane(
     if (cp.piece == EMPTY || cp.color == NONE)
         return;
     int plane_base = (cp.color == WHITE) ? 0 : 6;
-    int piece_index = static_cast<int>(cp.piece); // PAWN=1 ... KING=6
+    int piece_index = static_cast<int>(cp.piece);
     int piece_plane = plane_base + (piece_index - 1);
     if (piece_plane >= 0 && piece_plane < 12) {
         tensor[tensorIndex(piece_plane, r, c)] = 1.0f;

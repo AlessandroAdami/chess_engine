@@ -31,6 +31,26 @@ struct ColoredPiece {
     bool operator!=(const ColoredPiece &other) const {
         return !(*this == other);
     }
+
+    char toChar() const {
+        bool isWhite = color == WHITE;
+        switch (piece) {
+        case PAWN:
+            return isWhite ? 'P' : 'p';
+        case KNIGHT:
+            return isWhite ? 'N' : 'n';
+        case BISHOP:
+            return isWhite ? 'B' : 'b';
+        case ROOK:
+            return isWhite ? 'R' : 'r';
+        case QUEEN:
+            return isWhite ? 'Q' : 'q';
+        case KING:
+            return isWhite ? 'K' : 'k';
+        default:
+            return '.';
+        }
+    }
 };
 
 const ColoredPiece NO_COLORED_PIECE = ColoredPiece(NONE, EMPTY);
@@ -50,9 +70,9 @@ enum CastlingRights {
 };
 
 struct CastlingState {
-    int white;
-    int black;
-    CastlingState(int w, int b) : white(w), black(b) {}
+    int8_t white;
+    int8_t black;
+    CastlingState(int8_t w, int8_t b) : white(w), black(b) {}
     CastlingState()
         : white(KING_SIDE | QUEEN_SIDE), black(KING_SIDE | QUEEN_SIDE) {}
     bool operator==(const CastlingState &other) const {
@@ -87,7 +107,7 @@ template <> struct hash<Square> {
         return std::hash<int>()(r) ^ (std::hash<int>()(c) << 1);
     }
 };
-} // namespace std
+}
 
 const Square INVALID_SQUARE = Square(-1, -1);
 
@@ -110,7 +130,7 @@ struct Move {
 
     bool operator!=(const Move &other) const { return !(*this == other); }
 
-    std::string toUCI() {
+    std::string toUCI() const {
         std::string uci;
 
         uci += static_cast<char>('a' + from.col);

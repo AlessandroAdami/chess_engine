@@ -175,17 +175,15 @@ int Engine::negamax(Position *position, int depth, int alpha, int beta,
 
         alpha = std::max(alpha, eval);
         if (alpha >= beta)
-            break; // beta cutoff
+            break;
     }
 
-    // Determine node type
     NodeType nodeType = EXACT;
     if (maxEval <= alphaOrig)
         nodeType = UPPERBOUND;
     else if (maxEval >= beta)
         nodeType = LOWERBOUND;
 
-    // Store in TT
     transpositionTable[hash] = TTEntry{.score = maxEval,
                                        .depth = depth,
                                        .type = nodeType,

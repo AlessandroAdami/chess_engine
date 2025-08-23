@@ -12,7 +12,8 @@ MoveContext MoveMaker::makeMoveFromString(const std::string &moveStr) {
 
 MoveContext MoveMaker::makeMove(const Move &move) {
     if (!position->movementValidator.isValidMove(move)) {
-        std::cerr << "Illegal move.\n";
+        std::string moveStr = move.toUCI();
+        std::cerr << "Illegal move: " << moveStr << "\n";
         return MoveContext();
     }
     return makeLegalMove(move);

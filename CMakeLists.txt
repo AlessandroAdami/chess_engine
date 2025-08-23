@@ -3,7 +3,7 @@ project(ChessEngine)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_CLANG_TIDY clang-tidy)
+set(CMAKE_CXX_CLANG_TIDY "") # TODO: add linting later
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_BUILD_TYPE Debug)
 
@@ -20,58 +20,55 @@ add_custom_target(
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
 
-# Auto-formatting
-
-#add_custom_target(
-#    auto_format ALL
-#    COMMAND clang-format -i ${ALL_SOURCE_FILES}
-#    COMMENT "Auto-formatting source files"
-#)
-
 # Main executables
 add_executable(chess_engine src/main.cpp)
 add_executable(chess_uci src/uci.cpp)
 
+set(ENGINE_SOURCES
+    src/engine.cpp
+    src/position.cpp
+    src/move_parser.cpp
+    src/move_maker.cpp
+)
+add_executable(chess_gui src/gui/main.cpp ${ENGINE_SOURCES})
+
+# Copy pieces folder to build directory
+set(PIECES_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/gui/pieces)
+set(PIECES_DEST_DIR ${CMAKE_BINARY_DIR}/pieces)
+
+add_custom_command(
+    OUTPUT ${PIECES_DEST_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${PIECES_SOURCE_DIR} ${PIECES_DEST_DIR}
+    COMMENT "Copying SFML chess piece images to build folder"
+)
+
+add_custom_target(copy_pieces ALL DEPENDS ${PIECES_DEST_DIR})
+add_dependencies(chess_gui copy_pieces)
+
+# Library for engine code
 file(GLOB LIB_RESOURCES "src/*.cpp")
 list(FILTER LIB_RESOURCES EXCLUDE REGEX ".*uci\\.cpp$")
 
 add_library(chesslib ${LIB_RESOURCES})
-
-# Make sure the library can see headers
 target_include_directories(chesslib PUBLIC include)
 
-# Link main executable to library
+# Include directories
 target_include_directories(chess_engine PRIVATE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/include)
 target_include_directories(chess_uci PRIVATE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/include)
 
+# Link libraries
 target_link_libraries(chess_engine PRIVATE chesslib)
 target_link_libraries(chess_uci PRIVATE chesslib)
-# --------- GoogleTest Setup ---------
+target_link_libraries(chess_gui sfml-graphics sfml-window sfml-system chesslib)
 
-include(FetchContent)
-
-FetchContent_Declare(
-  googletest
-  GIT_REPOSITORY https://github.com/google/googletest.git
-  GIT_TAG v1.17.0
-)
-
-# For Windows: Prevent overriding the parent project's compiler/linker settings
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
-
+# GoogleTest Setup
 enable_testing()
+find_package(GTest REQUIRED)
 
-# Tests
 file(GLOB TEST_SOURCES "test/*.cpp")
-
 add_executable(tests ${TEST_SOURCES})
 target_include_directories(tests PRIVATE include)
-target_link_libraries(tests
-    PRIVATE
-    chesslib
-    GTest::gtest_main
-)
+target_link_libraries(tests PRIVATE chesslib GTest::gtest GTest::gtest_main pthread)
 
 include(GoogleTest)
 gtest_discover_tests(tests)
