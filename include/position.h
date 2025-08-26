@@ -68,7 +68,7 @@ class Position {
     void updateZobristHash(const Move &move, MoveContext context);
 
     /**
-    TODO: think about removing this, as MoveMaker only uses
+    TODO: think about removing friend class, as MoveMaker only uses
     public methods from board to make the moves, 
     and only accessed private fields directly in a few places.
      */
