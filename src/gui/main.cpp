@@ -11,6 +11,11 @@
 #include "../../include/types.h"
 #include "../../include/engine.h"
 
+//TODO: add possible move highlights and piece selection
+//TODO: add formatter again
+sf::Vector2i selectedSquare(-1, -1); //TODO change to square
+
+//Position position;
 const int squareSize = 150;
 const int boardSize = 8;
 const int boardPixelSize = squareSize * boardSize;
@@ -61,11 +66,22 @@ bool loadTextures() {
 }
 
 void drawBoard(sf::RenderWindow& window) {
+    Square ss(selectedSquare.x,selectedSquare.y);
+    //std::vector<Move> legalMovesForSelectedPiece = position.movementValidator.getLegalMovements(ss,position.getTurn());
     for (int rank = 0; rank < boardSize; ++rank) {
         for (int file = 0; file < boardSize; ++file) {
             sf::RectangleShape square(sf::Vector2f(squareSize, squareSize));
             square.setPosition(file * squareSize, rank * squareSize);
             square.setFillColor(((file + rank) % 2 == 0) ? light : dark);
+            // do the below for every possible move
+            if (sf::Vector2i(file, rank) == selectedSquare) {
+                square.setFillColor(sf::Color(100, 100, 100));
+            }
+            /*
+            if (vectorContainsMove(legalMovesForSelectedPiece,Move(ss,Square(file,rank)))) {
+                square.setFillColor(sf::Color(100, 100, 100));
+            }
+            */
             window.draw(square);
         }
     }
@@ -130,22 +146,21 @@ void drawSidebar(sf::RenderWindow& window, const Position& position) {
     }
 }
 
-// Launch engine on a background thread to compute best move
 void maybeStartEngineTurn(Engine& engine, Position& position) {
     if (engineThinking.load()) return;
     if (!shouldEngineMove(position)) return;
 
     engineThinking.store(true);
-    // Clear any stale result
     {
         std::lock_guard<std::mutex> lk(engineMoveMutex);
         engineReadyMove.reset();
     }
 
-    // Start worker thread
     engineThread = std::thread([&engine, &position]() {
         try {
-            Move best = engine.getBestMove();
+            Position otherPosition(position);
+            Engine otherEngine(&otherPosition);
+            Move best = otherEngine.getBestMove();
             {
                 std::lock_guard<std::mutex> lk(engineMoveMutex);
                 engineReadyMove = best;
@@ -173,7 +188,6 @@ int main() {
     sf::View view(sf::FloatRect(0, 0, boardPixelSize + sidebarWidth, boardPixelSize));
     window.setView(view);
 
-    sf::Vector2i selectedSquare(-1, -1);
     bool pieceSelected = false;
 
     bool running = true;
@@ -241,7 +255,9 @@ int main() {
                 if (file < 0 || file >= 8 || rank < 0 || rank >= 8)
                     continue;
 
-                if (!pieceSelected) {
+                ColoredPiece cp = position.getPiece(Square(rank,file));
+                bool friendPieceOnSquare = cp.color == position.getTurn();
+                if (!pieceSelected && friendPieceOnSquare) {
                     selectedSquare = {file, rank};
                     pieceSelected = true;
                 } else {

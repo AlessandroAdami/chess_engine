@@ -14,7 +14,8 @@ class MovementValidator {
     bool isValidMove(const Move &move) const;
     bool isValidPieceMovement(Piece piece, Move move) const;
     std::vector<Move> getLegalMoves(Color color);
-
+    std::vector<Move> getLegalMovements(Square from, Color color) const;
+    
   private:
     Position *position;
     bool isValidPawnMovement(Move move) const;

@@ -278,6 +278,37 @@ std::vector<Move> MovementValidator::getLegalMoves(Color color) {
     return legalMoves;
 }
 
+std::vector<Move> MovementValidator::getLegalMovements(Square from,
+                                                           Color color) const {
+    ColoredPiece cp = position->getPiece(from);
+    std::vector<Move> moves;
+
+    switch (cp.piece) {
+        case PAWN:
+        moves = getLegalPawnMovements(from,color);
+        break;
+        case KNIGHT:
+        moves = getLegalKnightMovements(from,color);
+        break;
+        case BISHOP:
+        moves = getLegalBishopMovements(from,color);
+        break;
+        case ROOK:
+        moves = getLegalRookMovements(from,color);
+        break;
+        case QUEEN:
+        moves = getLegalQueenMovements(from,color);
+        break;
+        case KING:
+        moves = getLegalKingMovements(from,color);
+        break;
+        default:
+        break;
+    }
+
+    return moves;
+}
+
 std::vector<Move> MovementValidator::getLegalPawnMovements(Square from,
                                                            Color color) const {
     std::vector<Move> pawnMoves;
